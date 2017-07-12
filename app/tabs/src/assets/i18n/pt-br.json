@@ -1,0 +1,90 @@
+{
+  "BACK_BUTTON_TEXT" : "Voltar",
+
+  "NAME": "Nome",
+  "EMAIL": "Email",
+  "USERNAME": "Nome de Usuário",
+  "PASSWORD": "Senha",
+  "LOGIN": "Entrar",
+  "SIGNUP": "Cadastre-se",
+
+  "TAB1_TITLE": "Home",
+  "TAB2_TITLE": "Encontrados",
+  "TAB3_TITLE": "Configurações",
+  "TAB4_TITLE": "Perdidos",
+  "TAB5_TITLE": "Cuidados Básicos",
+
+  "MAP_TITLE": "Mapa",
+
+  "TUTORIAL_SKIP_BUTTON" : "Pular",
+  "TUTORIAL_CONTINUE_BUTTON" : "Continuar",
+
+  "TUTORIAL_SLIDE1_TITLE": "Bem-vindo ao PetHug",
+  "TUTORIAL_SLIDE1_DESCRIPTION": "O <b>PetHug</b> é um aplicativo para você encontrar seu novo <i>pet!</i>",
+
+  "TUTORIAL_SLIDE2_TITLE": "Como eu adoto um animal?",
+  "TUTORIAL_SLIDE2_DESCRIPTION": "Simples, navegue pelos nossos animais cadastrados até você encontrar o perfeito! Encontrou? Agora é só entrar em contato com o responsável!",
+
+  "TUTORIAL_SLIDE3_TITLE": "Perdi meu bichinho, e agora?",
+  "TUTORIAL_SLIDE3_DESCRIPTION": "Agora é só você entrar na aba \"Animais Perdidos\" e cadastrá-lo! Quando alguém encontrar te avisamos na hora!",
+
+  "TUTORIAL_SLIDE4_TITLE": "Achei um animal na rua! O que faço?",
+  "TUTORIAL_SLIDE4_DESCRIPTION": "Anuncie ele aqui! Entre na aba \"Animais Encontrados\" e cadastre-o!",
+
+  "TUTORIAL_SLIDE5_TITLE": "Adotei, mas como eu cuido?",
+  "TUTORIAL_SLIDE5_DESCRIPTION": "Nós podemos te ajudar! Na aba \"Cuidados Básicos\" te falamos as informações básicas de como cuidar do seu bichinho!",
+
+  "TUTORIAL_SLIDE6_TITLE": "Pronto para usar? Então vamos lá!",
+
+  "WELCOME_INTRO" : "Não tem uma conta? É só se cadastrar!",
+
+  "SETTINGS_TITLE": "Configurações",
+  "SETTINGS_OPTION1": "Opção 1",
+  "SETTINGS_OPTION2": "Opção 2",
+  "SETTINGS_OPTION3": "Opção 3",
+  "SETTINGS_OPTION4": "Opção 4",
+
+  "SETTINGS_PROFILE_BUTTON" : "Editar Perfil",
+
+  "SETTINGS_PAGE_PROFILE": "Editar Perfil",
+
+  "WELCOME_TITLE": "Bem-vindo",
+
+  "LOGIN_TITLE": "Entrar",
+  "LOGIN_ERROR": "Não foi possível entrar na sua conta. Verifique seus dados e tente novamente.",
+  "LOGIN_BUTTON": "Entrar",
+  "SIGNUP_TITLE": "Cadastre-se",
+  "SIGNUP_ERROR": "Não foi possível criar sua conta. Verifique seus dados e tente novamente.",
+  "SIGNUP_BUTTON": "Cadastre-se",
+
+  "LIST_MASTER_TITLE": "Pets Disponíveis",
+
+  "FIRST_CARE_TITLE": "Primeiros Cuidados",
+  "LOST_TITLE": "Animais Perdidos",
+  "FOUND_TITLE": "Animais Encontrados",
+  "ANIMAL_REGISTER_TITLE": "Novo Animal",
+  "ANIMAL_NAME_PLACEHOLDER" : "Nome",
+  "ANIMAL_GENDER_PLACEHOLDER" : "Sexo",
+  "ANIMAL_WEIGHT_PLACEHOLDER" : "Peso",
+  "ANIMAL_AGE_PLACEHOLDER" : "Idade",
+  "ANIMAL_ABOUT_PLACEHOLDER" : "Descrição",
+  "ANIMAL_STATUS_PLACEHOLDER" : "Status",
+  "ANIMAL_SPECIES_PLACEHOLDER" : "Espécie",
+  "ANIMAL_BREED_PLACEHOLDER" : "Raça",
+  "ANIMAL_SIZE_PLACEHOLDER" : "Porte",
+
+  "ITEM_CREATE_TITLE": "Novo Item",
+  "ITEM_CREATE_CHOOSE_IMAGE": "Adicionar Imagem",
+
+  "ITEM_NAME_PLACEHOLDER" : "Nome",
+  "ITEM_ABOUT_PLACEHOLDER" : "Sobre",
+
+  "DONE_BUTTON" : "Pronto",
+  "CANCEL_BUTTON" : "Cancelar",
+  "DELETE_BUTTON" : "Apagar",
+
+  "CARDS_TITLE": "Social",
+
+  "SEARCH_TITLE": "Busca",
+  "SEARCH_PLACEHOLDER" : "Procure um item da lista, ex: \"Donald Duck\""
+}

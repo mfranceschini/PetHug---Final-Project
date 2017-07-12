@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "pethug-168423",
+  "private_key_id": "6c850c98ee05116a0404119fa6ebd186b1e94314",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/WTNK15rbBIkI\nyQL9BViRE2asOvy/ngKmrVMobzVvfrc2P1PPaSpoMHDaVhFaWIM5FIipOxFqz4E+\nMLUCP4wS2Z5RwL4jUFyyKNg6OpQldG1OQFcwIqbQyAezsnkaFMhm5KthTStMX4lH\nyGAfk8LpKGEnNLF2K/hteSMRDHu0nMMdJ8eqJ2NyLcqogZOMglMcyxMjbnNIPyap\nbbd3cfATQib13V4OUumN3m24NGBBon+JPhRxMstkfh38KEyI0p/zMoFlpHkAWAxj\njhgYnjHTtb3chNrDUa1RLXcKxBakDRntJ6k8M+rG5jN0Gpfy0qlzpOPJzNHwJwk7\n80heiXChAgMBAAECggEABIwkpWsxUXIupYhNa2D0pWH+JyqxtgYVzwtAdi4KaY9r\n4DyqC7xWlypLjEzOVcTTvYgI5WizdcPfsPAsZRTIiewlEJFRk3pF8a/5z4xz194H\n+Pubdtfj+gM+95zOtvl2d8eIcSQJ2uNMWmnfKvDyiWL9yBY+/211FnjyBeYzjGvA\nzAsgYrQ8eK8ZxTxeJAPF/Okcz6xn8OVNker9UdmnqIH1OMKpWaBeIakhp6MfQNbZ\nteVvrUwkFagzevx8WvQZb6cjyujyhsriXnya35X+bapP2JnQzrLtMWicxaLAOxAy\n8HwChYZcrmi9vuU6/AiRv5ID6H7zmJao86wd7B8M7wKBgQDf8CPzVJschiXzVijv\n6wHtILvO3WCa+UIaoIF7bCQBuKGpy0O+gAYHvhOG8WD7OLvymhNIVi6Xndyi34fy\nkj39YbHiU7r8EAsW8DMxQhyRhbJEjYBCtBkWhjbQw7a2DOTmI4iwcOd0mBD0/g8a\nTeKpIKd/iJ5esRawU0UdHIeIUwKBgQDavpLW6OHM+b5LeR0otFXoyih13XtLO6Km\nv8Uol9dr/C34Z65lu+BGpULBLMTyzoibcKnXFGO34I28AW3qx5RTDlNt/6DEO+xz\nDCM0YySsxTi6AEKTNVDEwpzgQgkLJpPxmaJsLGA73uG12bydZ93f686NA/ppyek4\nuIKDpcg0uwKBgAjGWCJIxmsvtnz6e1ArXT/1cGaCti5cZgK1F13GtwJ6QZtto5Hr\nYlEbWZiIDMzLRFIVR3wmJF08ilC3gZQ3tsYe9eFwdns6BbU4ZEkh1gy9uGaHROdY\nN0NyruMvSBGKH84Exm5jfi5LZx6yddUKCD+oT+fnao07UzBFkwe4/naRAoGAcOe6\n3SiZG/awTT53WYIzcZOe7K9kK0Hdw1nqhvhQ3dDtXXEOqD4gFfbJDPJxua32/txZ\nHcXNbqR+I9NNC8j1+yTC1V0DeyY+9mcGaMzfqjml/QOTWW5EgTq+RFZxWosQA708\nA7+n8F8re3SmkUyCTkjldQ3fm+j28yrxWsggHW8CgYEAugnpzPkqN+pnIF4gvaPZ\n4O1RuwlpZkJHeH737nHqBACxMionz/eYUbuxPb8OYuNYxH1UMd5xlhtY1G0G8fye\nTIzRTP8faVwKj1aP3OBAaEZp6QBscporBhSvQrxUH8LkRSJqSu6YBSsuFWr0GCDv\naNE/wi8K4FqF2Q9fkO+qcgY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "dog-comparison@pethug-168423.iam.gserviceaccount.com",
+  "client_id": "105368997768944967565",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dog-comparison%40pethug-168423.iam.gserviceaccount.com"
+}

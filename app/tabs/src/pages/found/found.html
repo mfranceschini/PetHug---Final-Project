@@ -1,0 +1,37 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Animais Econtrados</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="addLostAnimal()">
+        <ion-icon name="md-add-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+    <ion-item-sliding *ngFor="let animal of currentFoundAnimals">
+      <button ion-item (click)="openAnimal(animal)">
+        <ion-avatar item-start>
+          <img [src]="animal.profilePic" />
+        </ion-avatar>
+        <h2 *ngIf="animal.name">{{animal.name}}</h2>
+        <h2 *ngIf="!animal.name">{{animal.species}}</h2>
+        <p>Espécie: {{animal.species}}</p>
+        <p>Raça: {{animal.breed}}</p>
+        <p>Gênero: {{animal.gender}}</p>
+      </button>
+
+      <ion-item-options>
+        <button ion-button color="danger" (click)="deleteFoundAnimal(animal)">
+          {{ 'DELETE_BUTTON' | translate }}
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>
