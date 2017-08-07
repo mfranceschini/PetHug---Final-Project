@@ -3,6 +3,7 @@ import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { NavController, ViewController, ToastController, LoadingController } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { Camera } from '@ionic-native/camera';
+import { User } from '../../providers/user'
 
 
 @Component({
@@ -60,7 +61,7 @@ export class AnimalRegisterPage {
 
   ipAddress: any;
 
-  constructor(public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, public camera: Camera, public http: Http) {
+  constructor(public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, public camera: Camera, public http: Http, public user: User) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -259,7 +260,6 @@ export class AnimalRegisterPage {
   
 
   base64ToByteArray(base64String) {
-    console.log("Entrou na funcao OBAAAAA")
     try {
         var sliceSize = 1024;
         var byteCharacters = atob(base64String);
@@ -326,7 +326,8 @@ export class AnimalRegisterPage {
       'species': this.selectedSpecie,
       'status': 1,
       'weight': this.form.controls['weight'].value,
-      'image': this.form.controls['profilePic'].value
+      'image': this.form.controls['profilePic'].value,
+      'user': this.user._user.id
     }
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');

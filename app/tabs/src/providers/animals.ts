@@ -1,27 +1,65 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/map';
-
-import { Api } from './api';
 
 import { Animal } from '../models/animal';
 
 @Injectable()
 export class Animals {
+  animals: Animal[] = [];
 
-  constructor(public http: Http, public api: Api) {
+  ipAddress: any;
+
+  defaultAnimal: any = {
+    "species":"Cachorro",
+    "breed":"Vira Lata",  
+    "name": "Bob",
+    "size":"Pequeno",
+    "gender":"Macho",
+    "profilePic": "assets/img/speakers/puppy.jpg",
+    "age":"3",
+    "weight":"4",
+    "status":"Para adoção",
+    "about": "Sou um animal muito feliz, gosto de correr e brincar."
+  };
+
+  constructor(public http: Http) {
+    
+    let animals = [
+      {
+        "species":"Cachorro",
+        "breed":"Vira Lata",  
+        "name": "Bob",
+        "size":"Pequeno",
+        "gender":"Macho",
+        "profilePic": "assets/img/speakers/puppy.jpg",
+        "age":"3",
+        "weight":"4",
+        "status":"Para adoção",
+        "about": "Sou um animal muito feliz, gosto de correr e brincar."
+      }
+    ];
+
+    for (let animal of animals) {
+      this.animals.push(new Animal(animal));
+    } 
   }
 
   query(params?: any) {
-    console.log('animal.ts com query')
-    return this.api.get('/animal', params)
-      .map(resp => resp.json()); 
+    console.log('dentro query')
+    this.ipAddress = 'http://localhost'
+   
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.get(this.ipAddress + ':3000/pet_list', {headers: headers})
   }
 
-  add(item: Animal) {
+  add(animal: Animal) {
+    this.animals.push(animal);
   }
 
-  delete(item: Animal) {
+  delete(animal: Animal) {
+    this.animals.splice(this.animals.indexOf(animal), 1);
   }
 
 }

@@ -47,14 +47,14 @@ app.post('/get_user', function (req, res) {
   var result = []
   var userData = req.body
   var promise;
-  console.log(userData)
+  console.log(userData.email)
   client.connect(function (err) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
     const query = client.query(
-    'SELECT * FROM public."Usuario"')// WHERE email = ($1)',[userData.email])
+      'SELECT * FROM public."Usuario"')// WHERE email=$1', userData.email);
     promise = query.on('row', function(row) {
-        console.log("Recebeu os animais perdidos")
+        console.log("Recebeu usuários")
         result.push(row)
       });
     Promise.all([promise]).then(function(data) {
@@ -66,7 +66,8 @@ app.post('/get_user', function (req, res) {
             found = true
             json = JSON.stringify({ 
               status: 'sucesso',
-              nome: result[i].nome
+              nome: result[i].nome,
+              id: result[i].id
             });
             res.end(json);
             console.log("Response Sent!\n")
@@ -87,7 +88,7 @@ app.post('/get_user', function (req, res) {
 })
 
 //FUNCAO USADA PARA MONITORAMENTO DE ANIMAIS DESAPARECIDOS
-app.post('/pet', function (req, res) {
+app.get('/pet', function (req, res) { 
 
   console.log ('requisicao recebida');
   console.log (req.body.img1);
@@ -303,7 +304,7 @@ app.post('/create_pet', function (req, res) {
         console.log(imagePath)
         const path = 'home/matheus/TCC/server/' + imagePath
         const query = client.query(
-        'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path],
+        'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
           function(err, result) {
             if (err) {
               console.log("Deu erro")
@@ -325,21 +326,35 @@ app.post('/create_pet', function (req, res) {
 
 // FUNCAO PARA LISTAR TODOS OS ANIMAIS CADASTRADOS
 app.get('/pet_list', function (req, res) {
+  var result = []
   var client = new pg.Client(conString);
   console.log("Lista de Animais")
 
   client.connect(function (err) {
   	if (err) throw err;
   	console.log ("Conexão Estabelecida!");
-    // console.log (client);
+    console.log (client);
 
     const query = client.query(
     'SELECT * FROM public."Animal"');
-    query.on('row', function(row) {
+    animalPromise = query.on('row', function(row) {
       console.log("Recebeu os animais")
       result.push(row)
     });
-    query.on('end', () => { client.end(); });
+
+    Promise.all([animalPromise]).then(function(data) {
+      console.log("Todos os animais retornados")
+      var json = JSON.stringify({ 
+        animals: result
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+    }, function(err) {
+      console.error('ERROR:', err);
+      query.on('end', () => { client.end(); });
+      // one or more failed
+    })
   })
 })
 

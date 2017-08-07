@@ -81,6 +81,14 @@
     <plugin name="cordova-plugin-camera" spec="^2.4.1" />
     <plugin name="cordova-plugin-console" spec="1.0.5" />
     <plugin name="cordova-plugin-device" spec="1.1.4" />
+    <plugin name="cordova-plugin-facebook" spec="^0.2.2">
+        <variable name="FACEBOOK_DISPLAY_NAME" value="PetHug" />
+        <variable name="FACEBOOK_APP_ID" value="1252667364824744" />
+    </plugin>
+    <plugin name="cordova-plugin-facebook4" spec="^1.9.1">
+        <variable name="APP_ID" value="1252667364824744" />
+        <variable name="APP_NAME" value="PetHug" />
+    </plugin>
     <plugin name="cordova-plugin-splashscreen" spec="~4.0.1" />
     <plugin name="cordova-plugin-statusbar" spec="2.2.2" />
     <plugin name="cordova-plugin-whitelist" spec="1.3.1" />

@@ -4,6 +4,7 @@ import { MenuController, NavController } from 'ionic-angular';
 import { WelcomePage } from '../welcome/welcome';
 
 import { TranslateService } from '@ngx-translate/core';
+import { User } from "../../providers/user";
 
 
 
@@ -21,7 +22,7 @@ export class TutorialPage {
   slides: Slide[];
   showSkip = true;
 
-  constructor(public navCtrl: NavController, public menu: MenuController, translate: TranslateService) {
+  constructor(public navCtrl: NavController, public menu: MenuController, translate: TranslateService, public user: User) {
     translate.get(["TUTORIAL_SLIDE1_TITLE",
       "TUTORIAL_SLIDE1_DESCRIPTION",
       "TUTORIAL_SLIDE2_TITLE",
@@ -77,6 +78,9 @@ export class TutorialPage {
   }
 
   ionViewDidEnter() {
+    if (this.user._user != null){
+      this.startApp()
+    }
     // the root left menu should be disabled on the tutorial page
     this.menu.enable(false);
   }

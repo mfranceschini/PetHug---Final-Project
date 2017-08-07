@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
 import { Animal } from '../../models/animal';
-
+ 
 @Injectable()
 export class Animals {
   animals: Animal[] = [];

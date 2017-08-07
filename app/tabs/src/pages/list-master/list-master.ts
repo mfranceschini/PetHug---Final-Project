@@ -4,7 +4,7 @@ import { ItemDetailPage } from '../item-detail/item-detail';
 import { Animals } from '../../providers/providers';
 import { Animal } from '../../models/animal';
 import { AnimalRegisterPage } from "../animal-register/animal-register";
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 
 
 @Component({
@@ -12,16 +12,21 @@ import { Http } from '@angular/http';
   templateUrl: 'list-master.html'
 })
 export class ListMasterPage {
-  currentAnimals: Animal[];
+  currentAnimals: any;
+
+  ipAddress: any;
 
   constructor(public navCtrl: NavController, public animals: Animals, public modalCtrl: ModalController, public http: Http) {
-    this.currentAnimals = this.animals.query();
+   
+    console.log(animals.query())
   }
 
   /**
    * The view loaded, let's query our items for the list
    */
   ionViewDidLoad() {
+    console.log('dentro viewLoad')
+    console.log(this.currentAnimals)
   }
 
   /**

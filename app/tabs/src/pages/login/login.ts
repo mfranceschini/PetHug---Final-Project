@@ -28,6 +28,10 @@ export class LoginPage {
 
   ipAddress: any;
 
+  resp: any;
+
+  toast: any;
+
   constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController,public user: User,public toastCtrl: ToastController,public translateService: TranslateService) {
 
     this.translateService.get('LOGIN_ERROR').subscribe((value) => {
@@ -55,46 +59,33 @@ export class LoginPage {
           this.loading.dismiss()
     }
     else {
-      var promise;
-      let headers = new Headers();
-      headers.append('Content-Type', 'application/json');
       let body = {
         email: this.account.email,
         senha: this.account.password
       }
-      promise = this.http.post(this.ipAddress + ':3000/get_user', body, {headers: headers})
-          .map(res => res.json())
-          .subscribe((data) => {
-            this.loading.dismiss()
-            if (data.status == 'sucesso'){
-              var nome = data.nome.split(" ",1)
-              let toast = this.toastCtrl.create({
-                message: 'Bem-vindo, ' + nome,
-                duration: 3000,
-                position: 'top'
-              });
-              toast.present();
-              this.navCtrl.push(MainPage);
-            }
-            else if (data.status == 'erro'){
-              let toast = this.toastCtrl.create({
-                message: this.loginErrorString,
-                duration: 3000,
-                position: 'top'
-              });
-              toast.present();
-            }
-            
-          }, (err) => {
-            // Unable to sign up
-            let toast = this.toastCtrl.create({
-              message: this.loginErrorString,
-              duration: 3000,
-              position: 'top'
-            });
-            this.loading.dismiss()
-            toast.present();
-          });
+
+      var login = this.user.login(body)
+
+      login.map(res => res.json())
+      .subscribe((data) => {
+        this.user._loggedIn(data);
+        this.loading.dismiss()
+        var nome = data.nome.split(" ",1)
+        this.toast = this.toastCtrl.create({
+          message: 'Bem-vindo, ' + nome,
+          duration: 3000,
+          position: 'top'
+        });
+        this.toast.present();
+        this.navCtrl.push(MainPage);
+      }, (err) => {
+        this.toast = this.toastCtrl.create({
+          message: this.loginErrorString,
+          duration: 3000,
+          position: 'top'
+        });
+        this.toast.present();
+      });
     }
   }
 }

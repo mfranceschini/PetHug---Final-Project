@@ -29,6 +29,10 @@ export class SignupPage {
 
   loading: any;
 
+  resp: any;
+
+  toast: any;
+
   constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService) {
 
     this.translateService.get('SIGNUP_ERROR').subscribe((value) => {
@@ -44,6 +48,7 @@ export class SignupPage {
   }
 
   doSignup() {
+    this.resp = 0
     this.loading.present()
     if (this.account.name == null || this.account.email == null || this.account.password == null) {
       let toast = this.toastCtrl.create({
@@ -55,37 +60,32 @@ export class SignupPage {
           this.loading.dismiss()
     }
     else {
-      var promise;
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    let body = {
-      nome: this.account.name,
-      email: this.account.email,
-      senha: this.account.password
-    }
-    promise = this.http.post(this.ipAddress + ':3000/create_user', body, {headers: headers})
-        .map(res => res.json())
-        .subscribe((data) => {
-          this.loading.dismiss()
-          console.log("Retorno de criar usuario")
-          console.log(data)
-          let toast = this.toastCtrl.create({
-            message: 'Usuário criado com sucesso! Entre com seu email e senha.',
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();
-          this.navCtrl.push(WelcomePage);
-        }, (err) => {
-          // Unable to sign up
-          let toast = this.toastCtrl.create({
+      let body = {
+        nome: this.account.name,
+        email: this.account.email,
+        senha: this.account.password
+      }
+
+      var create = this.user.signup(body)
+      create.map(res => res.json())
+      .subscribe((data) => {
+        this.loading.dismiss()
+        this.toast = this.toastCtrl.create({
+          message: 'Usuário criado com sucesso! Entre com seu email e senha.',
+          duration: 3000,
+          position: 'top'
+        });
+        this.toast.present();
+        this.navCtrl.push(WelcomePage);
+      }, (err) => {
+        this.toast = this.toastCtrl.create({
             message: this.signupErrorString,
             duration: 3000,
             position: 'top'
           });
           this.loading.dismiss()
-          toast.present();
-        });
+          this.toast.present();
+      });
     }
   }
 }
