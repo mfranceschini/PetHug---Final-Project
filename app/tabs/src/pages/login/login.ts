@@ -85,6 +85,7 @@ export class LoginPage {
           position: 'top'
         });
         this.toast.present();
+        this.loading.dismiss()
       });
     }
   }

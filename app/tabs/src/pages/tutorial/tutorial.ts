@@ -78,6 +78,7 @@ export class TutorialPage {
   }
 
   ionViewDidEnter() {
+    console.log('usuario: '+this.user._user)
     if (this.user._user != null){
       this.startApp()
     }

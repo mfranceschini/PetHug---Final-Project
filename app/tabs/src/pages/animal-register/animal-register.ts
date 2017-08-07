@@ -1,9 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
-import { NavController, ViewController, ToastController, LoadingController } from 'ionic-angular';
+import { NavController, ViewController, ToastController, LoadingController, ModalController } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { Camera } from '@ionic-native/camera';
 import { User } from '../../providers/user'
+import { ListMasterPage } from "../list-master/list-master";
+import { Animals } from '../../providers/providers';
 
 
 @Component({
@@ -61,7 +63,9 @@ export class AnimalRegisterPage {
 
   ipAddress: any;
 
-  constructor(public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, public camera: Camera, public http: Http, public user: User) {
+  listMaster: any;
+
+  constructor(public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, public camera: Camera, public http: Http, public user: User, public animals: Animals, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -345,6 +349,8 @@ export class AnimalRegisterPage {
           position: 'top'
         });
         toast.present();
+        this.listMaster = new ListMasterPage(this.navCtrl, this.animals, this.modalCtrl, this.http, this.loadingCtrl, this.toastCtrl)
+        this.listMaster.loadAnimals(true)
       });
     if (!this.form.valid) { return; }
     this.viewCtrl.dismiss(this.form.value);

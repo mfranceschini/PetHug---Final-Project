@@ -46,7 +46,6 @@ export class Animals {
   }
 
   query(params?: any) {
-    console.log('dentro query')
     this.ipAddress = 'http://localhost'
    
     let headers = new Headers();
@@ -59,7 +58,12 @@ export class Animals {
   }
 
   delete(animal: Animal) {
-    this.animals.splice(this.animals.indexOf(animal), 1);
+    // this.animals.splice(this.animals.indexOf(animal), 1);
+    this.ipAddress = 'http://localhost'
+   
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/delete_pet', animal, {headers: headers})
   }
 
 }
