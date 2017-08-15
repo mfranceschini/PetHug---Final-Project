@@ -43,7 +43,6 @@ export class LoginPage {
       content: 'Conectando...'
     });
 
-    this.ipAddress = 'http://localhost'
   }
 
   // Attempt to login in through our User service

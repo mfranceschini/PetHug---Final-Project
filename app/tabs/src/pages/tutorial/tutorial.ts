@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { MenuController, NavController } from 'ionic-angular';
+import { MenuController, NavController, ToastController } from 'ionic-angular';
 
+import { TabsPage } from '../tabs/tabs';
 import { WelcomePage } from '../welcome/welcome';
 
 import { TranslateService } from '@ngx-translate/core';
@@ -21,8 +22,10 @@ export interface Slide {
 export class TutorialPage {
   slides: Slide[];
   showSkip = true;
+  toast: any;
 
-  constructor(public navCtrl: NavController, public menu: MenuController, translate: TranslateService, public user: User) {
+  constructor(public navCtrl: NavController, public toastCtrl: ToastController, public menu: MenuController, translate: TranslateService, public user: User) {
+    
     translate.get(["TUTORIAL_SLIDE1_TITLE",
       "TUTORIAL_SLIDE1_DESCRIPTION",
       "TUTORIAL_SLIDE2_TITLE",
@@ -67,10 +70,22 @@ export class TutorialPage {
   }
 
   startApp() {
-    this.navCtrl.setRoot(WelcomePage, {}, {
-      animate: true,
-      direction: 'forward'
-    });
+    this.user.getUser().then((data) => {
+      let usr = JSON.parse(data);
+      if (usr != null){
+        this.navCtrl.setRoot(TabsPage, {}, {
+          animate: true,
+          direction: 'forward'
+        });
+      }
+      else {
+        this.navCtrl.setRoot(WelcomePage, {}, {
+          animate: true,
+          direction: 'forward'
+        });
+      }
+    })
+    
   }
 
   onSlideChangeStart(slider) {
@@ -78,12 +93,21 @@ export class TutorialPage {
   }
 
   ionViewDidEnter() {
-    console.log('usuario: '+this.user._user)
-    if (this.user._user != null){
-      this.startApp()
-    }
-    // the root left menu should be disabled on the tutorial page
-    this.menu.enable(false);
+    this.user.getUser().then((data) => {
+      let usr = JSON.parse(data);
+      if (usr != null){
+        var nome = usr.nome.split(" ",1)
+        this.toast = this.toastCtrl.create({
+          message: 'Bem-vindo, ' + nome,
+          duration: 3000,
+          position: 'top'
+        });
+        this.toast.present();
+        this.startApp()
+      }
+      this.menu.enable(false);
+    })
+    
   }
 
   ionViewWillLeave() {

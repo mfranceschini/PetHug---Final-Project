@@ -3,6 +3,7 @@ import { NavController, ToastController, LoadingController } from 'ionic-angular
 import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
 import { User } from '../../providers/user';
+import { Api } from '../../providers/api';
 import { WelcomePage } from '../welcome/welcome';
 
 import { TranslateService } from '@ngx-translate/core';
@@ -33,7 +34,7 @@ export class SignupPage {
 
   toast: any;
 
-  constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService) {
+  constructor(public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService) {
 
     this.translateService.get('SIGNUP_ERROR').subscribe((value) => {
       this.signupErrorString = value;
@@ -43,8 +44,6 @@ export class SignupPage {
       spinner: 'dots',
       content: 'Cadastrando Usuário...'
     });
-
-    this.ipAddress = 'http://localhost'
   }
 
   doSignup() {

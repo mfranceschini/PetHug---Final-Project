@@ -3,6 +3,8 @@ import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 import { Animal } from '../models/animal';
+import { Api } from '../providers/api';
+import { Storage } from '@ionic/storage';
 
 @Injectable()
 export class Animals {
@@ -23,8 +25,17 @@ export class Animals {
     "about": "Sou um animal muito feliz, gosto de correr e brincar."
   };
 
-  constructor(public http: Http) {
+  constructor(public http: Http, public api: Api, private storage: Storage) {
     
+    if (this.api.url == undefined){
+      this.api.getIP().then((data)=>{
+        this.ipAddress = data
+      })
+    }
+    else {
+      this.ipAddress = 'http://' + this.api.url
+    }
+
     let animals = [
       {
         "species":"Cachorro",
@@ -46,8 +57,6 @@ export class Animals {
   }
 
   query(params?: any) {
-    this.ipAddress = 'http://localhost'
-   
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return this.http.get(this.ipAddress + ':3000/pet_list', {headers: headers})
@@ -59,7 +68,6 @@ export class Animals {
 
   delete(animal: Animal) {
     // this.animals.splice(this.animals.indexOf(animal), 1);
-    this.ipAddress = 'http://localhost'
    
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');

@@ -2,11 +2,11 @@ import { Component, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { NavController, ViewController, ToastController, LoadingController, ModalController } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
-import { Camera } from '@ionic-native/camera';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 import { User } from '../../providers/user'
+import { Api } from '../../providers/api'
 import { ListMasterPage } from "../list-master/list-master";
 import { Animals } from '../../providers/providers';
-
 
 @Component({
   selector: 'page-animal-register',
@@ -65,7 +65,7 @@ export class AnimalRegisterPage {
 
   listMaster: any;
 
-  constructor(public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, public camera: Camera, public http: Http, public user: User, public animals: Animals, public modalCtrl: ModalController) {
+  constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: User, public animals: Animals, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -83,26 +83,30 @@ export class AnimalRegisterPage {
     this.showLoading = false;
     this.showSkip = true;
 
-    this.ipAddress = 'http://localhost'
+    this.api.getIP().then((data)=>{
+      // this.ipAddress = data
+      this.ipAddress = 'http://' + this.api.url
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
+        .map(res => res.json())
+        .subscribe(data => {
+          this.animalsData = data;
+          this.loadData(this.animalsData)
+        });
+
+      // Watch the form for changes, and
+      this.form.valueChanges.subscribe((v) => {
+        this.isReadyToSave = this.form.valid;
+      });
+
+    })
 
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',
       content: 'Analisando imagem...'
     });
 
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
-      .map(res => res.json())
-      .subscribe(data => {
-        this.animalsData = data;
-        this.loadData(this.animalsData)
-      });
-
-    // Watch the form for changes, and
-    this.form.valueChanges.subscribe((v) => {
-      this.isReadyToSave = this.form.valid;
-    });
   }
 
   loadData(data) {
@@ -142,30 +146,46 @@ export class AnimalRegisterPage {
   }
 
   getPicture() {
-    // if (Camera['installed']()) {
-    //   console.log("Camera instalada")
-    //   this.camera.getPicture({
-    //     destinationType: this.camera.DestinationType.DATA_URL,
-    //     targetWidth: 96,
-    //     targetHeight: 96
-    //   }).then((data) => {
-    //     // let toast = this.toastCtrl.create({
-    //     //     message: "Pegando imagem",
-    //     //     duration: 1000,
-    //     //     position: 'bottom'
-    //     //   });
-    //     //   toast.present();
-    //     this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
-    //   }, (err) => {
-    //     alert('Unable to take photo');
-    //     this.fileInput.nativeElement.click();
-    //   })
-    // } else {
-    //   console.log("Não achou a camera")
-    //   // this.imageLoaded = true;
-    //   this.fileInput.nativeElement.click();
-    // }
-    this.fileInput.nativeElement.click();
+
+    const options: CameraOptions = {
+      quality : 75, 
+      destinationType : this.camera.DestinationType.DATA_URL, 
+      sourceType : this.camera.PictureSourceType.CAMERA, 
+      allowEdit : false,
+      encodingType: this.camera.EncodingType.JPEG,
+      targetWidth: 300,
+      targetHeight: 300,
+      saveToPhotoAlbum: true
+    }
+    if (Camera['installed']()) {
+      console.log("Camera instalada")
+      this.processWebImage(this.camera.getPicture(options).then((data)=>{
+        this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
+      }, (err) => {
+        alert('Unable to take photo');
+        alert(err)
+        this.fileInput.nativeElement.click();
+      }))
+      // this.camera.getPicture(options).then((data) => {
+      //   // let toast = this.toastCtrl.create({
+      //   //     message: "Pegando imagem",
+      //   //     duration: 1000,
+      //   //     position: 'bottom'
+      //   //   });
+      //   //   toast.present();
+      //   this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
+      //   // this.processWebImage(this.camera.getPicture())
+      // }, (err) => {
+      //   alert('Unable to take photo');
+      //   alert(err)
+      //   this.fileInput.nativeElement.click();
+      // })
+    } else {
+      console.log("Não achou a camera")
+      // this.imageLoaded = true;
+      this.fileInput.nativeElement.click();
+    }
+    // this.fileInput.nativeElement.click();
   }
 
   skipImage() {
@@ -174,6 +194,7 @@ export class AnimalRegisterPage {
   }
 
   processWebImage(event) {
+    this.ipAddress = 'http://' + this.api.url
     // let toast = this.toastCtrl.create({
     //         message: "Dentro process",
     //         duration: 2000,
@@ -319,8 +340,10 @@ export class AnimalRegisterPage {
         break
       }
     }
+    this.user.getUser().then((data) => {
+      var usr = JSON.parse(data);
 
-    this.animalForm = {
+      this.animalForm = {
       'about': this.form.controls['about'].value,
       'age': this.form.controls['age'].value,
       'breed': this.selectedBreed,
@@ -331,29 +354,34 @@ export class AnimalRegisterPage {
       'status': 1,
       'weight': this.form.controls['weight'].value,
       'image': this.form.controls['profilePic'].value,
-      'user': this.user._user.id
-    }
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    let body = {
-      'form': this.animalForm
-    };
+      'user': usr.id
+      }
 
-    this.http.post(this.ipAddress + ':3000/create_pet', body, {headers: headers})
-      .map(res => res.json())
-      .subscribe(data => {
-        console.log("Retorno depois de criar animal")
-        let toast = this.toastCtrl.create({
-          message: "Animal Cadastrado com Sucesso!",
-          duration: 3000,
-          position: 'top'
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      let body = {
+        'form': this.animalForm
+      };
+      this.ipAddress = 'http://' + this.api.url
+
+      this.http.post(this.ipAddress + ':3000/create_pet', body, {headers: headers})
+        .map(res => res.json())
+        .subscribe(data => {
+          console.log("Retorno depois de criar animal")
+          let toast = this.toastCtrl.create({
+            message: "Animal Cadastrado com Sucesso!",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
         });
-        toast.present();
-        this.listMaster = new ListMasterPage(this.navCtrl, this.animals, this.modalCtrl, this.http, this.loadingCtrl, this.toastCtrl)
-        this.listMaster.loadAnimals(true)
-      });
-    if (!this.form.valid) { return; }
-    this.viewCtrl.dismiss(this.form.value);
+      if (!this.form.valid) { return; }
+      this.viewCtrl.dismiss(this.form.value);
+      // this.viewCtrl.onDidDismiss(()=> location.reload())
+    })
+    
+
+    
 
   }
 }

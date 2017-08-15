@@ -1,15 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions, URLSearchParams } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { Storage } from '@ionic/storage';
 
 /**
  * Api is a generic REST Api handler. Set your API url first.
  */
 @Injectable()
 export class Api {
-  url: string = 'https://example.com/api/v1';
+  url: string;
 
-  constructor(public http: Http) {
+  constructor(public http: Http, private storage: Storage) {
+  }
+
+  setIP(string){
+    this.url = string;
+    this.storage.set("ip", this.url);
+  }
+
+  getIP(){
+    return this.storage.get("ip");
   }
 
   get(endpoint: string, params?: any, options?: RequestOptions) {

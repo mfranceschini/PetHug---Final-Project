@@ -293,6 +293,9 @@ app.post('/create_pet', function (req, res) {
               console.log("Erro ao criar imagem")
               console.log(err);
             }
+            else{
+              console.log("Imagem Criada!")
+            }
           }))
         })
       // }
@@ -300,7 +303,7 @@ app.post('/create_pet', function (req, res) {
       // Promise.all([promise]).then(function(data) {
         console.log("Dentro promise - depois de criar imagem")
         console.log(imagePath)
-        const path = 'home/matheus/Área de Trabalho/PetHug/TCC/server/' + imagePath
+        const path = 'home/matheus/TCC/server/' + imagePath
         const query = client.query(
         'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
           function(err, result) {

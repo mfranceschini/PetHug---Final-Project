@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { NavController, NavParams } from 'ionic-angular';
 
 import { Settings } from '../../providers/settings';
+import { User } from '../../providers/user'
+import { WelcomePage } from '../welcome/welcome';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -38,7 +40,8 @@ export class SettingsPage {
     public settings: Settings,
     public formBuilder: FormBuilder,
     public navParams: NavParams,
-    public translate: TranslateService) {
+    public translate: TranslateService,
+    public user: User) {
   }
 
   _buildForm() {
@@ -91,5 +94,15 @@ export class SettingsPage {
 
   ngOnChanges() {
     console.log('Ng All Changes');
+  }
+
+  doLogout() {
+    this.user.logout().then((data) => {
+      console.log("Logout realizado")
+      this.navCtrl.setRoot(WelcomePage, {}, {
+          animate: true,
+          direction: 'forward'
+        });
+    })
   }
 }

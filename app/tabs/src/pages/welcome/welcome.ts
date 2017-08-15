@@ -4,6 +4,7 @@ import { Facebook } from '@ionic-native/facebook';
 
 import { LoginPage } from '../login/login';
 import { SignupPage } from '../signup/signup';
+import { Api } from '../../providers/api';
 
 /**
  * The Welcome Page is a splash page that quickly describes the app,
@@ -16,9 +17,25 @@ import { SignupPage } from '../signup/signup';
   templateUrl: 'welcome.html'
 })
 export class WelcomePage {
+  ipAddr: string;
 
-  constructor(public navCtrl: NavController, private fb: Facebook, public toastCtrl: ToastController) { }
+  constructor(public navCtrl: NavController, private fb: Facebook, public toastCtrl: ToastController, public api: Api) {
+    this.getIPAddr()
+  }
 
+  setIPAddr(){
+    this.api.setIP(this.ipAddr)
+  }
+
+  getIPAddr(){
+    console.log("Pegando IP")
+    this.api.getIP().then((data)=>{
+      if (data != null){
+        console.log("Existe IP")
+      }
+    })
+  }
+  
   login() {
     this.navCtrl.push(LoginPage);
   }

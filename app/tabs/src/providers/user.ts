@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { NavController, ToastController, LoadingController } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
+import { Api } from './api'
 
 @Injectable()
 export class User {
@@ -8,10 +10,12 @@ export class User {
 
   ipAddress: any;
   toast:any;
+  local: Storage;
 
-  constructor(public http: Http, public toastCtrl: ToastController) {
-
-    this.ipAddress = 'http://localhost'
+  constructor(public http: Http, public toastCtrl: ToastController, private storage: Storage, public api: Api) {
+    this.api.getIP().then((data)=>{
+      this.ipAddress = data
+    })
   }
 
   /**
@@ -19,6 +23,7 @@ export class User {
    * the user entered on the form.
    */
   login(accountInfo: any) {
+    this.ipAddress = 'http://' + this.api.url
     var promise;
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -30,6 +35,7 @@ export class User {
    * the user entered on the form.
    */
   signup(accountInfo: any) {
+    this.ipAddress = 'http://' + this.api.url
     var promise, response;
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -41,6 +47,7 @@ export class User {
    */
   logout() {
     this._user = null;
+    return this.storage.clear()
   }
 
   /**
@@ -48,5 +55,17 @@ export class User {
    */
   _loggedIn(resp) {
     this._user = resp;
+    let val = JSON.stringify(this._user);
+    this.storage.set("user", val);
+  }
+
+  getUser(){
+    return this.storage.get("user")
+    // .then((profile) => {
+    // console.log("retornou usuario")
+    // var val = JSON.parse(profile);
+    // console.log(val);
+    // return val;
+    // })
   }
 }

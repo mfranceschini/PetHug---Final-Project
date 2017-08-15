@@ -5,6 +5,7 @@ import { Animals } from '../../providers/providers';
 import { Animal } from '../../models/animal';
 import { AnimalRegisterPage } from "../animal-register/animal-register";
 import { Http, Headers } from '@angular/http';
+import { User } from '../../providers/user'
 
 
 @Component({
@@ -20,7 +21,7 @@ export class ListMasterPage {
   loadingDel: any;
   loadingUpdate: any;
 
-  constructor(public navCtrl: NavController, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+  constructor(public navCtrl: NavController, public user: User, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
    
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',
@@ -34,7 +35,6 @@ export class ListMasterPage {
       spinner: 'dots',
       content: 'Atualizando...'
     });
-    this.loading.present()
     this.loadAnimals(false)
   }
 
@@ -42,12 +42,27 @@ export class ListMasterPage {
    * The view loaded, let's query our items for the list
    */
   ionViewDidLoad() {
+    this.user.getUser().then((data) =>{
+      console.log("Entrou")
+      console.log(data)
+    })
+  }
+
+  newFunction(){
+    this.loadAnimals(true)
   }
 
   loadAnimals(loading){
-    if (loading){
-      this.loadingUpdate.present()
-    }
+    // if (loading){
+    //   this.loadingUpdate.present()
+    // }
+    // this.loading.present() 
+    let toast = this.toastCtrl.create({
+          message: "Carregando Animais....",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
     console.log("Carregando Animais")
     this.currentAnimals = []
     this.currentAnimals.splice(0,this.currentAnimals.length)
@@ -67,15 +82,22 @@ export class ListMasterPage {
           "about": d.descricao.toString(),
           "id": d.id.toString()
         })
+        // this.loading.dismiss()
       });
-      this.loading.dismiss()
+      // if (!loading){
+      
+      // }
+      // else if (loading){
+      // this.loadingUpdate.dismiss()
+      // }
+      
     }, (err) => {
       console.log('deu erro')
       this.loading.dismiss()
     });
-    if (loading){
-      this.loadingUpdate.dismiss()
-    }
+    // if (loading){
+    //   this.loadingUpdate.dismiss()
+    // }
   }
 
   /**
@@ -96,7 +118,7 @@ export class ListMasterPage {
    * Delete an item from the list of items.
    */
   deleteAnimal(animal) {
-    this.loadingDel.present()
+    // this.loadingDel.present()
     console.log("Apagando animal")
     let ret = this.animals.delete(animal);
     ret.map(res => res.json())
@@ -107,7 +129,7 @@ export class ListMasterPage {
           position: 'top'
         });
         toast.present();
-      this.loadingDel.dismiss()
+      // this.loadingDel.dismiss()
       this.loadAnimals(true)
     }, (err) => {
       let toast = this.toastCtrl.create({
@@ -116,7 +138,7 @@ export class ListMasterPage {
         position: 'top'
       });
       toast.present();
-      this.loadingDel.dismiss()
+      // this.loadingDel.dismiss()
     });
   }
 
