@@ -6,6 +6,7 @@ import { Animal } from '../../models/animal';
 import { AnimalRegisterPage } from "../animal-register/animal-register";
 import { Http, Headers } from '@angular/http';
 import { User } from '../../providers/user'
+import { Api } from '../../providers/api'
 
 
 @Component({
@@ -17,11 +18,14 @@ export class ListMasterPage {
 
   ipAddress: any;
   
-  loading:any;
+  loading:any; 
   loadingDel: any;
   loadingUpdate: any;
+  speciesList: any;
+  breedsList: any;
+  sizesList: any
 
-  constructor(public navCtrl: NavController, public user: User, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+  constructor(public api: Api, public navCtrl: NavController, public user: User, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
    
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',
@@ -41,11 +45,19 @@ export class ListMasterPage {
   /**
    * The view loaded, let's query our items for the list
    */
-  ionViewDidLoad() {
-    this.user.getUser().then((data) =>{
-      console.log("Entrou")
-      console.log(data)
-    })
+  ionViewDidLoad() {}
+
+  doRefresh(refresher) {
+    setTimeout(() => {
+      this.loadAnimals(true)
+      refresher.complete()
+      let toast = this.toastCtrl.create({
+        message: "Animais atualizados!",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+    }, 2000);
   }
 
   newFunction(){
@@ -56,43 +68,65 @@ export class ListMasterPage {
     // if (loading){
     //   this.loadingUpdate.present()
     // }
-    // this.loading.present() 
-    let toast = this.toastCtrl.create({
-          message: "Carregando Animais....",
-          duration: 3000,
-          position: 'top'
-        });
-        toast.present();
+    // this.loading.present()
     console.log("Carregando Animais")
     this.currentAnimals = []
     this.currentAnimals.splice(0,this.currentAnimals.length)
     this.animals.query().map(res => res.json())
     .subscribe((data) => {
-      data.animals.forEach(d => {
-        this.currentAnimals.push({
-          "species":d.especie_id.toString(),
-          "breed":d.raca_id.toString(),  
-          "name": d.nome.toString(),
-          "size":d.porte_id.toString(),
-          "gender":d.sexo.toString(),
-          "profilePic": d.imagem.toString(),
-          "age":d.idade.toString(),
-          "weight":d.peso.toString(),
-          "status":d.status_id.toString(),
-          "about": d.descricao.toString(),
-          "id": d.id.toString()
-        })
-        // this.loading.dismiss()
+      this.ipAddress = 'http://' + this.api.url
+      if (this.ipAddress == 'http://undefined'){
+        this.ipAddress = 'http://localhost'
+      }
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
+      .map(res => res.json())
+      .subscribe(data2 => {
+        var i;
+        data.animals.forEach(d => {
+          for (i=0;i<data2.species.length;i++){
+            if (data2.species[i].id == d.especie_id){
+              d.especie_id = data2.species[i].nome
+            }
+          }
+          for (i=0;i<data2.breeds.length;i++){
+            if (data2.breeds[i].id == d.raca_id){
+              d.raca_id = data2.breeds[i].nome
+            }
+          }
+          for (i=0;i<data2.size.length;i++){
+            if (data2.size[i].id == d.porte_id){
+              d.porte_id = data2.size[i].nome
+            }
+          }
+          this.currentAnimals.push({
+            "species":d.especie_id.toString(),
+            "breed":d.raca_id.toString(),  
+            "name": d.nome.toString(),
+            "size":d.porte_id.toString(),
+            "gender":d.sexo.toString(),
+            "profilePic": d.imagem.toString(),
+            "age":d.idade.toString(),
+            "weight":d.peso.toString(),
+            "status":d.status_id.toString(),
+            "about": d.descricao.toString(),
+            "id": d.id.toString()
+          })
+          // this.loading.dismiss()
+        });
+        // if (!loading){
+        
+        // }
+        // else if (loading){
+        // this.loadingUpdate.dismiss()
+        // }
       });
-      // if (!loading){
       
-      // }
-      // else if (loading){
-      // this.loadingUpdate.dismiss()
-      // }
       
     }, (err) => {
       console.log('deu erro')
+      console.log(err)
       this.loading.dismiss()
     });
     // if (loading){

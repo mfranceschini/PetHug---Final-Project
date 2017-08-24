@@ -29,7 +29,7 @@ export class Animals {
     
     if (this.api.url == undefined){
       this.api.getIP().then((data)=>{
-        this.ipAddress = data
+        this.ipAddress = 'http://' + data
       })
     }
     else {
@@ -57,6 +57,9 @@ export class Animals {
   }
 
   query(params?: any) {
+    if (this.ipAddress == undefined){
+      this.ipAddress = 'http://localhost'
+    }
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return this.http.get(this.ipAddress + ':3000/pet_list', {headers: headers})
@@ -68,7 +71,6 @@ export class Animals {
 
   delete(animal: Animal) {
     // this.animals.splice(this.animals.indexOf(animal), 1);
-   
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return this.http.post(this.ipAddress + ':3000/delete_pet', animal, {headers: headers})

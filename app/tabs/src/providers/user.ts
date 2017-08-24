@@ -68,4 +68,14 @@ export class User {
     // return val;
     // })
   }
+
+  verifyFacebookUser(facebook_id:any) {
+    console.log("Dentro Funcao de verificar!!")
+    console.log("Facebook ID: " + facebook_id.toString())
+    this.ipAddress = 'http://' + this.api.url
+    console.log(this.ipAddress)
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/verify_facebook', '1234', {headers: headers})
+  }
 }

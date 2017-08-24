@@ -42,6 +42,70 @@ app.post('/create_user', function (req, res) {
   });
 })
 
+app.post('/verify_facebook', function (req, res) {
+  console.log("Dentro Funcao Verificar Facebook")
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+    const query = client.query(
+    'SELECT * FROM public."Social"',// WHERE facebook_id= ($1)',[userData.facebook_id],
+      function(err, result) {
+        if (err) {
+          console.log("Erro Verify Facebook")
+          console.log(err);
+        } else {
+          console.log("User Exist!")
+          var json = JSON.stringify({ 
+            success: "existe"
+          });
+          res.end(json)
+        }
+      });
+      query.on('end', () => { client.end(); });
+  });
+})
+
+app.post('/create_facebook_user', function (req, res) {
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+    const query = client.query(
+    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3)',[userData.nome, userData.email, userData.senha],
+      function(err, result) {
+        if (err) {
+          console.log("Deu erro")
+          console.log(err);
+        } else {
+          console.log("User Created")
+          // var json = JSON.stringify({ 
+          //   success: "sucesso"
+          // });
+          // res.end(json)
+          const query2 = client.query("SELECT currval('id');",
+              function(err, result){
+                if (err) {
+                  console.log("Erro no retorno ID")
+                  console.log(err);
+                } else {
+                  console.log("ID Retrieved " + result)
+                  // const query3 = client.query(
+                  //   'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result, userData.facebook_id, userData.instagram_id],
+                  //     function(err, result) {})
+                }
+              })
+          
+        }
+      });
+      query.on('end', () => { client.end(); });
+  });
+})
+
 app.post('/get_user', function (req, res) {
   var client = new pg.Client(conString);
   var result = []
@@ -303,27 +367,186 @@ app.post('/create_pet', function (req, res) {
       // Promise.all([promise]).then(function(data) {
         console.log("Dentro promise - depois de criar imagem")
         console.log(imagePath)
-        const path = 'home/matheus/TCC/server/' + imagePath
+        const path = '/home/matheus/TCC/server/' + imagePath
         const query = client.query(
-        'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
-          function(err, result) {
-            if (err) {
-              console.log("Deu erro")
-              console.log(err);
-            } else {
-              console.log("Animal Inserted")
-              var json = JSON.stringify({ 
-                success: "sucesso"
-              });
-              res.end(json)
-            }
-          });
-        query.on('end', () => { client.end(); });
+        'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user])
+          // function(err, result, row) {
+          //   if (err) {
+          //     console.log("Deu erro")
+          //     console.log(err);
+          //   } else {
+          //     console.log("Animal Inserted")
+          //     var json = JSON.stringify({ 
+          //       success: "sucesso"
+          //     });
+          //     res.end(json)
+          //   }
+          // });
+        query.on('row', function(err, row, result) {
+          if (err) {
+            console.log("Deu erro")
+            console.log(err);
+          }
+          else {
+            console.log('on row')
+            result.addRow(row);
+            console.log(result)
+            query.on('end', () => { client.end(); });
+          }
+          
+        });
+        
       // })
     }
     })
   }
 });
+
+app.post('/create_found_pet', function (req, res) {
+  
+    console.log ('Criar Animal Encontrado!');
+    // console.log (req);
+  
+    var analysis1;
+    var index = 0;
+    // Instantiates a client
+    const visionClient = Vision({
+      projectId: projectId
+    });
+  
+    // The name of the image file to annotate
+    if (req.body.img1) {
+      var fileName = req.body.img1;
+  
+      function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+          response = {};
+  
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+  
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+  
+        return response;
+      }
+  
+      var imageBuffer = decodeBase64Image(fileName);
+      var random = Math.random() * (9999 - 1000) + 1000
+      random = random.toPrecision(4)
+      const imagePath = 'images/animal' + random + '.png'
+  
+      createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+            if(err){
+              throw(err);
+            }
+            else{
+              Promise.resolve()
+            }
+        }))
+  
+      Promise.all([createFile]).then(function(data) {
+        // all loaded
+        visionClient.detectLabels(imagePath)
+        .then((results) => {
+          const labels = results[0];
+          console.log('Analysing Image...!\n');
+          labels.forEach((label) =>
+            console.log(label));
+          console.log("Image Analysed!\n");
+          var json = JSON.stringify({ 
+          image1: labels
+          });
+          res.end(json);
+          console.log("Response Sent!\n")
+        })
+        .catch((err) => {
+          console.error('ERROR:', err);
+          res.end('erro')
+        });
+      }, function(err) {
+        console.error('ERROR:', err);
+        // one or more failed
+      });
+    }
+    else if (req.body.form){
+      var form = req.body.form
+      console.log("Salvando Animal no BD")
+      var client = new pg.Client(conString);
+      var result = [];
+      client.connect(function (err) {
+        if (err) throw err;
+        console.log ("Conexão Estabelecida!");
+  
+        if (form.image){
+          function decodeBase64Image(dataString) {
+            var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+              response = {};
+  
+            if (matches.length !== 3) {
+              return new Error('Invalid input string');
+            }
+  
+            response.type = matches[1];
+            response.data = new Buffer(matches[2], 'base64');
+  
+            return response;
+          }
+          var imageBuffer = decodeBase64Image(form.image);
+          var random = Math.random() * (9999 - 1000) + 1000
+          random = random.toPrecision(4)
+          const imagePath = 'images/db/animal' + random + '.png'
+  
+          promise = new Promise(function(resolve, reject) {
+            (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+              if(err){
+                console.log("Erro ao criar imagem")
+                console.log(err);
+              }
+              else{
+                console.log("Imagem Criada!")
+              }
+            }))
+          })
+        // }
+  
+        // Promise.all([promise]).then(function(data) {
+          console.log("Dentro promise - depois de criar imagem")
+          console.log(imagePath)
+          const path = '/home/matheus/PetHug/TCC/server/' + imagePath
+          const query = client.query(
+          'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
+            function(err, result) {
+              if (err) {
+                console.log("Deu erro")
+                console.log(err);
+              } else {
+                console.log("Animal Inserted")
+                console.log(result)
+                // const query2 = client.query(
+                //   'INSERT INTO public."Animal_Encontrado"(animal_id, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
+                //     function(err, result) {
+                //       if (err) {
+                //         console.log("Deu erro")
+                //         console.log(err);
+                //       } else {
+                //         console.log("Found Animal Inserted")
+                //         var json = JSON.stringify({ 
+                //           success: "sucesso"
+                //         });
+                //         res.end(json)
+                //         query2.on('end', () => { client.end(); });
+                //       }
+                //     });
+              }
+            });
+          query.on('end', () => { client.end(); });
+        // })
+      }
+      })
+    }
+  });
 
 // FUNCAO PARA LISTAR TODOS OS ANIMAIS CADASTRADOS
 app.get('/pet_list', function (req, res) {

@@ -6,6 +6,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 import { User } from '../../providers/user'
 import { Api } from '../../providers/api'
 import { ListMasterPage } from "../list-master/list-master";
+import { MainPage } from '../../pages/pages';
 import { Animals } from '../../providers/providers';
 
 @Component({
@@ -86,6 +87,9 @@ export class AnimalRegisterPage {
     this.api.getIP().then((data)=>{
       // this.ipAddress = data
       this.ipAddress = 'http://' + this.api.url
+      if (this.ipAddress == 'http://undefined'){
+        this.ipAddress = 'http://localhost'
+      }
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
       this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
@@ -159,27 +163,21 @@ export class AnimalRegisterPage {
     }
     if (Camera['installed']()) {
       console.log("Camera instalada")
-      this.processWebImage(this.camera.getPicture(options).then((data)=>{
-        this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
-      }, (err) => {
-        alert('Unable to take photo');
-        alert(err)
-        this.fileInput.nativeElement.click();
-      }))
-      // this.camera.getPicture(options).then((data) => {
-      //   // let toast = this.toastCtrl.create({
-      //   //     message: "Pegando imagem",
-      //   //     duration: 1000,
-      //   //     position: 'bottom'
-      //   //   });
-      //   //   toast.present();
+      // this.processWebImage(this.camera.getPicture(options).then((data)=>{
       //   this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
-      //   // this.processWebImage(this.camera.getPicture())
       // }, (err) => {
       //   alert('Unable to take photo');
       //   alert(err)
       //   this.fileInput.nativeElement.click();
-      // })
+      // }))
+      this.camera.getPicture(options).then((data) => {
+        this.form.patchValue({ 'profilePic': data });
+        this.processCameraImage(data)
+      }, (err) => {
+        alert('Unable to take photo');
+        alert(err)
+        this.fileInput.nativeElement.click();
+      })
     } else {
       console.log("Não achou a camera")
       // this.imageLoaded = true;
@@ -193,15 +191,108 @@ export class AnimalRegisterPage {
     this.showSkip = false;
   }
 
+  processCameraImage(imageData){
+    this.ipAddress = 'http://' + this.api.url
+    if (this.ipAddress == 'http://undefined'){
+      this.ipAddress = 'http://localhost'
+    }
+    // if (!this.loading){
+      this.loading.present()
+    // }
+    console.log("Processando Imagem...")
+
+    var promise;
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    let body = {
+      'img1': imageData
+    };
+
+    promise = this.http.post(this.ipAddress + ':3000/create_pet', body, {headers: headers})
+      .map(res => res.json())
+      .subscribe((data) => {
+        console.log("Resultado de Análise Recebida!")
+        let i = 0;
+        for (i=0;i<data.image1.length;i++){
+          if (data.image1[i] == 'whiskers' || data.image1[i] == 'cat like mammal' || data.image1[i] == 'dog breed' || data.image1[i] == 'mammal' || data.image1[i] == 'vertebrate' || data.image1[i] == 'dog like mammal'){
+            data.image1.splice(i,1)
+          }
+          if (data.image1[i] == 'dog'){
+            data.image1[i] = 'Cachorro'
+          }
+          else if (data.image1[i] == 'cat'){
+            data.image1[i] = 'Gato'
+          }
+          else if (data.image1[i] == 'shetland sheepdog'){
+            data.image1[i] = 'Pastor de Shetland'
+          }
+        }
+        var j;
+        for (j=0;j<this.speciesList.length;j++){
+          for(i=0;i<data.image1.length;i++){
+            if (this.speciesList[j].nome == data.image1[i]){
+              this.specieModel = this.speciesList[j].nome
+              Promise.resolve()
+              this.imageLoaded = true
+              if (this.loading){
+                this.loading.dismiss()
+              }
+              this.updateBreed()
+              break
+            }
+          }
+        }
+        //Sugere Raça
+        for (j=0;j<this.breedsList.length;j++){
+          for(i=0;i<data.image1.length;i++){
+            if (this.breedsList[j].nome == data.image1[i]){
+              this.breedModel = this.breedsList[j].nome
+              Promise.resolve()
+              this.imageLoaded = true
+              break
+            }
+          }
+        }
+      },
+      (err) => {
+        let toast = this.toastCtrl.create({
+          message: "Não foi possível analisar a imagem. Por favor, preencha os campos abaixo",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        this.imageLoaded = true
+        if (this.loading){
+          this.loading.dismiss()
+        }
+      });
+    Promise.all([promise]).then(function(data) {
+      // all loaded
+      console.log("Promise resolvida")
+      // this.imageLoaded = true;
+    }, function(err) {
+      console.error('ERROR:', err);
+      // one or more failed
+    });
+  }
+
+
+
+
   processWebImage(event) {
     this.ipAddress = 'http://' + this.api.url
+    if (this.ipAddress == 'http://undefined'){
+      this.ipAddress = 'http://localhost'
+    }
     // let toast = this.toastCtrl.create({
     //         message: "Dentro process",
     //         duration: 2000,
     //         position: 'bottom'
     //       });
     //       toast.present();
-    this.loading.present()
+    // if (!this.loading){
+      this.loading.present()
+    // }
     console.log("Processando Imagem...")
     let reader = new FileReader();
     reader.onload = (readerEvent) => {
@@ -241,7 +332,9 @@ export class AnimalRegisterPage {
                 this.specieModel = this.speciesList[j].nome
                 Promise.resolve()
                 this.imageLoaded = true
-                this.loading.dismiss()
+                if (this.loading){
+                  this.loading.dismiss()
+                }
                 this.updateBreed()
                 break
               }
@@ -267,7 +360,9 @@ export class AnimalRegisterPage {
           });
           toast.present();
           this.imageLoaded = true
-          this.loading.dismiss()
+          if (this.loading){
+            this.loading.dismiss()
+          }
         });
       Promise.all([promise]).then(function(data) {
         // all loaded
@@ -363,6 +458,9 @@ export class AnimalRegisterPage {
         'form': this.animalForm
       };
       this.ipAddress = 'http://' + this.api.url
+      if (this.ipAddress == 'http://undefined'){
+        this.ipAddress = 'http://localhost'
+      }
 
       this.http.post(this.ipAddress + ':3000/create_pet', body, {headers: headers})
         .map(res => res.json())
@@ -378,6 +476,7 @@ export class AnimalRegisterPage {
       if (!this.form.valid) { return; }
       this.viewCtrl.dismiss(this.form.value);
       // this.viewCtrl.onDidDismiss(()=> location.reload())
+      this.navCtrl.push(MainPage);
     })
     
 

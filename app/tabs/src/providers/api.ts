@@ -10,16 +10,21 @@ import { Storage } from '@ionic/storage';
 export class Api {
   url: string;
 
-  constructor(public http: Http, private storage: Storage) {
+  constructor(public http: Http, public storage: Storage) {
   }
 
   setIP(string){
+    if (string == null){
+      console.log('não inseriu IP')
+      string = 'localhost'
+    }
     this.url = string;
-    this.storage.set("ip", this.url);
+    this.storage.set('ip', this.url);
+    console.log('IP salvo!'+ this.url)
   }
 
   getIP(){
-    return this.storage.get("ip");
+    return this.storage.get('ip');
   }
 
   get(endpoint: string, params?: any, options?: RequestOptions) {
