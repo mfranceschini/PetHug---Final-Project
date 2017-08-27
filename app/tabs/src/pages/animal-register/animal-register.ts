@@ -466,17 +466,26 @@ export class AnimalRegisterPage {
         .map(res => res.json())
         .subscribe(data => {
           console.log("Retorno depois de criar animal")
-          let toast = this.toastCtrl.create({
-            message: "Animal Cadastrado com Sucesso!",
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();
+          if (data.success == 'sucesso'){
+            let toast = this.toastCtrl.create({
+              message: "Animal cadastrado com sucesso!",
+              duration: 3000,
+              position: 'top'
+            });
+            toast.present();
+            this.viewCtrl.dismiss(this.form.value);
+            this.navCtrl.push(MainPage);
+          }
+          else if (data.success == 'erro'){
+            let toast = this.toastCtrl.create({
+              message: "Erro ao cadastrar animal!",
+              duration: 3000,
+              position: 'top'
+            });
+            toast.present();
+          }
         });
       if (!this.form.valid) { return; }
-      this.viewCtrl.dismiss(this.form.value);
-      // this.viewCtrl.onDidDismiss(()=> location.reload())
-      this.navCtrl.push(MainPage);
     })
     
 

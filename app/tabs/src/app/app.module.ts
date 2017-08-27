@@ -30,8 +30,8 @@ import { WelcomePage } from '../pages/welcome/welcome';
 import { Api } from '../providers/api';
 // import { Items } from '../mocks/providers/items';
 import { Animals } from '../providers/animals';
-import { LostAnimals } from '../mocks/providers/lost-animals';
-import { FoundAnimals } from '../mocks/providers/found-animals';
+import { LostAnimals } from '../providers/lost-animals';
+import { FoundAnimals } from '../providers/found-animals';
 import { Settings } from '../providers/settings';
 import { User } from '../providers/user';
 
@@ -114,6 +114,7 @@ export function providers() {
     SplashScreen,
     StatusBar,
     Facebook,
+    // SignupPage,
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development

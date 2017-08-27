@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, ToastController, LoadingController } from 'ionic-angular';
+import { NavController, ToastController, LoadingController, Events } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
 import { User } from '../../providers/user';
@@ -25,16 +25,13 @@ export class SignupPage {
 
   // Our translated text strings
   private signupErrorString: string;
-
   ipAddress: any;
-
   loading: any;
-
   resp: any;
-
   toast: any;
+  showPassword: boolean;
 
-  constructor(public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService) {
+  constructor(public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
 
     this.translateService.get('SIGNUP_ERROR').subscribe((value) => {
       this.signupErrorString = value;
@@ -44,6 +41,21 @@ export class SignupPage {
       spinner: 'dots',
       content: 'Cadastrando Usuário...'
     });
+
+    this.showPassword = true;
+  }
+
+  facebookSignup(fb_data: any){
+    console.log("dentro facebook Signup")
+    console.log(fb_data)
+    this.showPassword = false
+    if (fb_data.nome){
+      this.account.name = fb_data.nome
+    }
+    if (fb_data.email){
+      this.account.email = fb_data.email
+    }
+    
   }
 
   doSignup() {
@@ -71,6 +83,48 @@ export class SignupPage {
         this.loading.dismiss()
         this.toast = this.toastCtrl.create({
           message: 'Usuário criado com sucesso! Entre com seu email e senha.',
+          duration: 3000,
+          position: 'top'
+        });
+        this.toast.present();
+        this.navCtrl.push(WelcomePage);
+      }, (err) => {
+        this.toast = this.toastCtrl.create({
+            message: this.signupErrorString,
+            duration: 3000,
+            position: 'top'
+          });
+          this.loading.dismiss()
+          this.toast.present();
+      });
+    }
+  }
+
+  doSignupFacebook() {
+    this.resp = 0
+    this.loading.present()
+    if (this.account.name == null || this.account.email == null) {
+      let toast = this.toastCtrl.create({
+            message: this.signupErrorString,
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+          this.loading.dismiss()
+    }
+    else {
+      let body = {
+        nome: this.account.name,
+        email: this.account.email,
+        senha: null
+      }
+
+      var create = this.user.signup(body)
+      create.map(res => res.json())
+      .subscribe((data) => {
+        this.loading.dismiss()
+        this.toast = this.toastCtrl.create({
+          message: 'Usuário criado com sucesso! Selecione "Entrar com Facebook"',
           duration: 3000,
           position: 'top'
         });

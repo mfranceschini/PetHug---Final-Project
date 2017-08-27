@@ -70,12 +70,18 @@ export class User {
   }
 
   verifyFacebookUser(facebook_id:any) {
-    console.log("Dentro Funcao de verificar!!")
-    console.log("Facebook ID: " + facebook_id.toString())
+    let json = {"facebook_id":facebook_id}
     this.ipAddress = 'http://' + this.api.url
-    console.log(this.ipAddress)
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    return this.http.post(this.ipAddress + ':3000/verify_facebook', '1234', {headers: headers})
+    return this.http.post(this.ipAddress + ':3000/verify_facebook', json, {headers: headers})
+  }
+
+  signupFacebook(accountInfo: any) {
+    this.ipAddress = 'http://' + this.api.url
+    var promise, response;
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/create_facebook_user', accountInfo, {headers: headers})
   }
 }

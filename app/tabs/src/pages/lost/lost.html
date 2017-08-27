@@ -1,5 +1,4 @@
 <ion-header>
-
   <ion-navbar>
     <ion-title>Animais Perdidos</ion-title>
 
@@ -13,18 +12,21 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
 
   <ion-list>
     <ion-item-sliding *ngFor="let animal of currentLostAnimals">
-      <button ion-item (click)="openAnimal(animal)">
+      <button ion-item (click)="openFoundAnimal(animal)">
         <ion-avatar item-start>
           <img [src]="animal.profilePic" />
         </ion-avatar>
-        <h2 *ngIf="animal.name">{{animal.name}}</h2>
-        <h2 *ngIf="!animal.name">{{animal.species}}</h2>
-        <p>Espécie: {{animal.species}}</p>
+        <h2>{{animal.species}}</h2>
         <p>Raça: {{animal.breed}}</p>
-        <p>Perdido em: {{animal.location}}</p>
+        <p>Cidade: {{animal.city}}</p>
+        <p>Bairro: {{animal.neighbor}}</p>
+        <p>Endereço: {{animal.address}}</p>
       </button>
 
       <ion-item-options>

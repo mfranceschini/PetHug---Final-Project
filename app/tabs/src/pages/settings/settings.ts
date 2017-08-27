@@ -101,7 +101,7 @@ export class SettingsPage {
       console.log("Logout realizado")
       this.navCtrl.setRoot(WelcomePage, {}, {
           animate: true,
-          direction: 'forward'
+          direction: 'backward'
         });
     })
   }

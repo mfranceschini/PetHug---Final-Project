@@ -5,6 +5,7 @@ import { SignupPage } from '../signup/signup';
 import { Api } from '../../providers/api';
 import { User } from '../../providers/user';
 import { Facebook } from '@ionic-native/facebook';
+import { MainPage } from '../../pages/pages';
 
 /**
  * The Welcome Page is a splash page that quickly describes the app,
@@ -16,6 +17,7 @@ import { Facebook } from '@ionic-native/facebook';
   selector: 'page-welcome',
   templateUrl: 'welcome.html'
 })
+
 export class WelcomePage {
   ipAddr: string;
   toast: any;
@@ -51,31 +53,44 @@ export class WelcomePage {
     console.log("funcao facebook")
     let params = ["public_profile", "email"];
     this.fb.login(params).then((response)=> {
-      console.log("Login Response:" + JSON.stringify(response));
+      console.log("dentro fb.login")
       let authId = response.authResponse.userID;
       if (response.status == "connected") {
+        console.log("status connected")
         this.fb.api( authId + "/?fields=id,email,first_name,last_name",
         ['public_profile', 'email']).then((success)=>{
-          console.log("dentro API")
-          console.log(JSON.stringify(success))
           this.user.verifyFacebookUser(success.id)
           .map(res => res.json())
           .subscribe((data) => {
             console.log("Retorno de Verificar Facebook!!")
-            console.log(data)
+            console.log(JSON.stringify(data))
+            if (data.success == 'existe'){
+              this.user._loggedIn(data.id);
+              var nome = data.nome.split(" ",1)
+              this.toast = this.toastCtrl.create({
+                message: 'Bem-vindo, ' + nome,
+                duration: 3000,
+                position: 'top'
+              });
+              this.toast.present();
+              this.navCtrl.push(MainPage);
+            }
+            else if (data.success == 'nao_existe'){
+              console.log("Usuario FB nao tem cadastro!!")
+              // NAO CONSIGO CHAMAR ESSA FUNCAO POR AQUI -> FAZER A PAGINA SIGNUP VIRAR UM PROVIDER
+              // this.signupCtrl.facebookSignup(data)
+              this.navCtrl.push(SignupPage)
+              this.toast = this.toastCtrl.create({
+                message: 'Por Favor, preencha os campos abaixo',
+                duration: 5000,
+                position: 'top'
+              });
+              this.toast.present();
+            }
           }, (err) => {
             console.log("Erro Verificar Facebook")
             console.log(JSON.stringify(err))
           });
-          // this.fb.getLoginStatus().then((status)=>{
-          //   console.log("Pegando login status")
-          //   console.log(status.authResponse.userID)
-          //   console.log(status.status)
-          // },
-          // (error)=>{
-          //   console.log("Erro no login status!")
-          //   console.log(error)
-          // })
         },
         (error)=>{
           console.log("Erro ao obter dados do usuário!")
