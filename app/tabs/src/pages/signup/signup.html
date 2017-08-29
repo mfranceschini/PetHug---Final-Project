@@ -21,14 +21,14 @@
         <ion-input type="email" [(ngModel)]="account.email" name="email" required placeholder="exemplo@email.com"></ion-input>
       </ion-item>
 
-      <ion-item *ngIf="showPassword">
+      <ion-item *ngIf="showPassword == true">
         <ion-label fixed>{{ 'PASSWORD' | translate }}</ion-label>
         <ion-input type="password" [(ngModel)]="account.password" name="password" required ></ion-input>
       </ion-item>
 
       <div padding>
-        <button *ngIf="showPassword" (click)="doSignup()" ion-button color="primary" block>{{ 'SIGNUP_BUTTON' | translate }}</button>
-        <button *ngIf="!showPassword" (click)="doSignupFacebook()" ion-button class="signupFB" block>{{ 'SIGNUP_BUTTON' | translate }}</button>
+        <button *ngIf="showPassword == true" (click)="doSignup()" ion-button color="primary" block>{{ 'SIGNUP_BUTTON' | translate }}</button>
+        <button *ngIf="showPassword == false" (click)="doSignupFacebook()" ion-button class="signupFB" block>{{ 'SIGNUP_BUTTON' | translate }}</button>
       </div>
 
     </ion-list>

@@ -70,7 +70,7 @@ export class User {
   }
 
   verifyFacebookUser(facebook_id:any) {
-    let json = {"facebook_id":facebook_id}
+    let json = {"facebook_id": facebook_id}
     this.ipAddress = 'http://' + this.api.url
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');

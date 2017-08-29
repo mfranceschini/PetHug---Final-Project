@@ -103,33 +103,31 @@ app.post('/create_facebook_user', function (req, res) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
     const query = client.query(
-    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3)',[userData.nome, userData.email, userData.senha],
+    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3) RETURNING id',[userData.nome, userData.email, userData.senha],
       function(err, result) {
         if (err) {
           console.log("Deu erro")
           console.log(err);
         } else {
-          console.log("User Created")
-          // var json = JSON.stringify({ 
-          //   success: "sucesso"
-          // });
-          // res.end(json)
-          const query2 = client.query("SELECT currval('id');",
-              function(err, result){
-                if (err) {
-                  console.log("Erro no retorno ID")
-                  console.log(err);
-                } else {
-                  console.log("ID Retrieved " + result)
-                  // const query3 = client.query(
-                  //   'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result, userData.facebook_id, userData.instagram_id],
-                  //     function(err, result) {})
+          const query2 = client.query(
+            'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result.rows[0].id, userData.facebook_id, userData.instagram_id],
+              function(err, result2) {
+                if (err){
+                  console.log("Erro ao inserir em Social")
+                  console.log(err)
+                }
+                else {
+                  console.log(result2)
+                  let json = JSON.stringify({ 
+                    status: 'sucesso'
+                  });
+                  res.end(json);
+                  console.log("Facebook User Created!")
                 }
               })
-          
+          query2.on('end', () => { client.end(); });
         }
       });
-      query.on('end', () => { client.end(); });
   });
 })
 
@@ -138,7 +136,6 @@ app.post('/get_user', function (req, res) {
   var result = []
   var userData = req.body
   var promise;
-  console.log(userData.email)
   client.connect(function (err) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
@@ -959,7 +956,6 @@ app.post('/delete_lost_pet', function (req, res) {
     })
   })
 })
-
 
 app.listen(3000, function (err) {
 

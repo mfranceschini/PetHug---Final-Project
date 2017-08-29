@@ -52,18 +52,20 @@ export class WelcomePage {
   facebookLogin() {
     console.log("funcao facebook")
     let params = ["public_profile", "email"];
+    let result;
+    let authId;
+    var user_id = {}
     this.fb.login(params).then((response)=> {
       console.log("dentro fb.login")
-      let authId = response.authResponse.userID;
+      authId = response.authResponse.userID;
       if (response.status == "connected") {
         console.log("status connected")
         this.fb.api( authId + "/?fields=id,email,first_name,last_name",
         ['public_profile', 'email']).then((success)=>{
+          result = success;
           this.user.verifyFacebookUser(success.id)
           .map(res => res.json())
           .subscribe((data) => {
-            console.log("Retorno de Verificar Facebook!!")
-            console.log(JSON.stringify(data))
             if (data.success == 'existe'){
               this.user._loggedIn(data.id);
               var nome = data.nome.split(" ",1)
@@ -77,9 +79,8 @@ export class WelcomePage {
             }
             else if (data.success == 'nao_existe'){
               console.log("Usuario FB nao tem cadastro!!")
-              // NAO CONSIGO CHAMAR ESSA FUNCAO POR AQUI -> FAZER A PAGINA SIGNUP VIRAR UM PROVIDER
-              // this.signupCtrl.facebookSignup(data)
-              this.navCtrl.push(SignupPage)
+              user_id = {'id':authId}
+              this.navCtrl.push(SignupPage,result, user_id)
               this.toast = this.toastCtrl.create({
                 message: 'Por Favor, preencha os campos abaixo',
                 duration: 5000,

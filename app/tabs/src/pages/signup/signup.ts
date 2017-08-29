@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, ToastController, LoadingController, Events } from 'ionic-angular';
+import { NavController, ToastController, LoadingController, Events, NavParams } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
 import { User } from '../../providers/user';
@@ -30,8 +30,9 @@ export class SignupPage {
   resp: any;
   toast: any;
   showPassword: boolean;
+  facebook_user_id: any;
 
-  constructor(public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
+  constructor(public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
 
     this.translateService.get('SIGNUP_ERROR').subscribe((value) => {
       this.signupErrorString = value;
@@ -45,17 +46,17 @@ export class SignupPage {
     this.showPassword = true;
   }
 
-  facebookSignup(fb_data: any){
-    console.log("dentro facebook Signup")
-    console.log(fb_data)
+  ionViewDidLoad(){
     this.showPassword = false
-    if (fb_data.nome){
-      this.account.name = fb_data.nome
+    if (this.navParams.get('first_name') && this.navParams.get('last_name')){
+      this.account.name = this.navParams.get('first_name') + ' ' + this.navParams.get('last_name')
     }
-    if (fb_data.email){
-      this.account.email = fb_data.email
+    if (this.navParams.get('email')){
+      this.account.email = this.navParams.get('email')
     }
-    
+    if (this.navParams.get('id')){
+      this.facebook_user_id = this.navParams.get('id')
+    }
   }
 
   doSignup() {
@@ -116,10 +117,11 @@ export class SignupPage {
       let body = {
         nome: this.account.name,
         email: this.account.email,
-        senha: null
+        senha: null,
+        facebook_id: this.facebook_user_id
       }
 
-      var create = this.user.signup(body)
+      var create = this.user.signupFacebook(body)
       create.map(res => res.json())
       .subscribe((data) => {
         this.loading.dismiss()
