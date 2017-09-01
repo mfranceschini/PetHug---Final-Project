@@ -6,6 +6,7 @@ import { Api } from '../../providers/api';
 import { User } from '../../providers/user';
 import { Facebook } from '@ionic-native/facebook';
 import { MainPage } from '../../pages/pages';
+import { Auth } from '@ionic/cloud-angular';
 
 /**
  * The Welcome Page is a splash page that quickly describes the app,
@@ -15,7 +16,8 @@ import { MainPage } from '../../pages/pages';
 */
 @Component({
   selector: 'page-welcome',
-  templateUrl: 'welcome.html'
+  templateUrl: 'welcome.html',
+  providers: [Auth]
 })
 
 export class WelcomePage {
@@ -24,7 +26,7 @@ export class WelcomePage {
   userId: any;
   params:any;
 
-  constructor(public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public user: User) {
+  constructor(public auth: Auth, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public user: User) {
     this.getIPAddr()
   }
 
@@ -102,5 +104,13 @@ export class WelcomePage {
       function(response) {
         console.log("Other Response: " + JSON.stringify(response))
       });
+  }
+
+  instagramLogin() {
+    console.log("Dentro Login Instagram")
+    this.auth.login('instagram').then((data)=>{
+      console.log("dentro da funcao")
+      console.log(data)
+    });
   }
 }
