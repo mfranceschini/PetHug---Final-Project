@@ -1,4 +1,4 @@
-import { User } from './user';
+import { UserPage } from './user';
 import { Api } from './api';
 import { Settings } from './settings';
 import { LostAnimals } from './lost-animals';
@@ -7,7 +7,7 @@ import { Animals } from './animals';
 import { Items } from '../mocks/providers/items';
 
 export {
-User,
+UserPage,
 Api,
 Settings,
 LostAnimals,

@@ -3,7 +3,7 @@ import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { NavController, ViewController, ToastController, LoadingController, ModalController } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { User } from '../../providers/user'
+import { UserPage } from '../../providers/user'
 import { Api } from '../../providers/api'
 import { ListMasterPage } from "../list-master/list-master";
 import { MainPage } from '../../pages/pages';
@@ -66,7 +66,7 @@ export class AnimalRegisterPage {
 
   listMaster: any;
 
-  constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: User, public animals: Animals, public modalCtrl: ModalController) {
+  constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public animals: Animals, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],

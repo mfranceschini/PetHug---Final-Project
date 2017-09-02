@@ -5,7 +5,7 @@ import { TabsPage } from '../tabs/tabs';
 import { WelcomePage } from '../welcome/welcome';
 
 import { TranslateService } from '@ngx-translate/core';
-import { User } from "../../providers/user";
+import { UserPage } from "../../providers/user";
 
 
 
@@ -24,7 +24,7 @@ export class TutorialPage {
   showSkip = true;
   toast: any;
 
-  constructor(public navCtrl: NavController, public toastCtrl: ToastController, public menu: MenuController, translate: TranslateService, public user: User) {
+  constructor(public navCtrl: NavController, public toastCtrl: ToastController, public menu: MenuController, translate: TranslateService, public user: UserPage) {
     
     translate.get(["TUTORIAL_SLIDE1_TITLE",
       "TUTORIAL_SLIDE1_DESCRIPTION",

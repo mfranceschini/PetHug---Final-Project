@@ -5,7 +5,7 @@ import { Animals } from '../../providers/providers';
 import { Animal } from '../../models/animal';
 import { AnimalRegisterPage } from "../animal-register/animal-register";
 import { Http, Headers } from '@angular/http';
-import { User } from '../../providers/user'
+import { UserPage } from '../../providers/user'
 import { Api } from '../../providers/api'
 
 
@@ -25,7 +25,7 @@ export class ListMasterPage {
   breedsList: any;
   sizesList: any
 
-  constructor(public api: Api, public navCtrl: NavController, public user: User, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+  constructor(public api: Api, public navCtrl: NavController, public user: UserPage, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
    
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',

@@ -131,6 +131,95 @@ app.post('/create_facebook_user', function (req, res) {
   });
 })
 
+app.post('/verify_instagram', function (req, res) {
+  console.log("Dentro Funcao Verificar Instagram")
+  var client = new pg.Client(conString);
+  var result = []
+  var result_id = []
+  var userData = req.body
+  console.log(userData.instagram_id)
+  client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+    const query = client.query(
+    'SELECT * FROM public."Social" WHERE instagram_id=($1)',[userData.instagram_id],
+      function(err, result) {
+        if (err) {
+          console.log("Erro Verify Instagram")
+          console.log(err);
+        } else {
+          if (result.rowCount == 1){
+            result_id = result.rows[0].id
+            console.log("Instagram User Exist!")
+            const query2 = client.query(
+              'SELECT * FROM public."Usuario" WHERE id=($1)',[result_id],
+            function(err, resp){
+              if (err) {
+                console.log("Erro Get User Data")
+                console.log(err);
+              } else {
+                if (resp.rowCount == 1){
+                  console.log("User has Link With Instagram!")
+                  var json = JSON.stringify({ 
+                    success: "existe",
+                    id: result_id,
+                    nome: resp.rows[0].nome
+                  });
+                  res.end(json)
+                }
+              }
+            })
+            query2.on('end', () => { client.end(); });
+          }
+          else if (result.rowCount == 0){
+            console.log("Instagram User DONT Exist!")
+            var json = JSON.stringify({ 
+              success: "nao_existe"
+            });
+            res.end(json)
+          }
+        }
+      });      
+  });
+})
+
+app.post('/create_instagram_user', function (req, res) {
+  console.log("Funcao Criar Usuario Instagram")
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+    const query = client.query(
+    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3) RETURNING id',[userData.nome, userData.email, userData.senha],
+      function(err, result) {
+        if (err) {
+          console.log("Deu erro")
+          console.log(err);
+        } else {
+          const query2 = client.query(
+            'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result.rows[0].id, userData.facebook_id, userData.instagram_id],
+              function(err, result2) {
+                if (err){
+                  console.log("Erro ao inserir em Social")
+                  console.log(err)
+                }
+                else {
+                  console.log(result2)
+                  let json = JSON.stringify({ 
+                    status: 'sucesso'
+                  });
+                  res.end(json);
+                  console.log("Instagram User Created!")
+                }
+              })
+          query2.on('end', () => { client.end(); });
+        }
+      });
+  });
+})
+
 app.post('/get_user', function (req, res) {
   var client = new pg.Client(conString);
   var result = []

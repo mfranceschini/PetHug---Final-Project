@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule, Http } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Storage, IonicStorageModule } from '@ionic/storage';
-import { Auth } from '@ionic/cloud-angular';
+// import { Auth } from '@ionic/cloud-angular';
 
 import { MyApp } from './app.component';
 
@@ -34,7 +34,7 @@ import { Animals } from '../providers/animals';
 import { LostAnimals } from '../providers/lost-animals';
 import { FoundAnimals } from '../providers/found-animals';
 import { Settings } from '../providers/settings';
-import { User } from '../providers/user';
+import { UserPage } from '../providers/user';
 
 import { Camera } from '@ionic-native/camera';
 import { GoogleMaps } from '@ionic-native/google-maps';
@@ -44,6 +44,13 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
+
+const cloudSettings: CloudSettings = {
+  'core': {
+    'app_id': '6206b079'
+  }
+};
 
 // The translate loader needs to know where to load i18n files
 // in Ionic's static asset pipeline.
@@ -109,13 +116,12 @@ export function providers() {
     Animals,
     LostAnimals,
     FoundAnimals,
-    User,
+    UserPage,
     Camera,
     GoogleMaps,
     SplashScreen,
     StatusBar,
     Facebook,
-    Auth,
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development
@@ -136,7 +142,8 @@ export function providers() {
       }
     }),
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot(),
+    CloudModule.forRoot(cloudSettings)
   ],
   bootstrap: [IonicApp],
   entryComponents: entryComponents(),

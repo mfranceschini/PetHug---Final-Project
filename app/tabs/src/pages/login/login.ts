@@ -3,7 +3,7 @@ import { NavController, ToastController, LoadingController } from 'ionic-angular
 import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
 
-import { User } from '../../providers/user';
+import { UserPage } from '../../providers/user';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -32,7 +32,7 @@ export class LoginPage {
 
   toast: any;
 
-  constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController,public user: User,public toastCtrl: ToastController,public translateService: TranslateService) {
+  constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController,public userCtrl: UserPage,public toastCtrl: ToastController,public translateService: TranslateService) {
 
     this.translateService.get('LOGIN_ERROR').subscribe((value) => {
       this.loginErrorString = value;
@@ -63,11 +63,11 @@ export class LoginPage {
         senha: this.account.password
       }
 
-      var login = this.user.login(body)
+      var login = this.userCtrl.login(body)
 
       login.map(res => res.json())
       .subscribe((data) => {
-        this.user._loggedIn(data);
+        this.userCtrl._loggedIn(data);
         this.loading.dismiss()
         var nome = data.nome.split(" ",1)
         this.toast = this.toastCtrl.create({

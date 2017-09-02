@@ -5,7 +5,7 @@ import { Storage } from '@ionic/storage';
 import { Api } from './api'
 
 @Injectable()
-export class User {
+export class UserPage {
   _user: any;
 
   ipAddress: any;
@@ -83,5 +83,21 @@ export class User {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return this.http.post(this.ipAddress + ':3000/create_facebook_user', accountInfo, {headers: headers})
+  }
+
+  verifyInstagramUser(instagram_id:any) {
+    let json = {"instagram_id": instagram_id}
+    this.ipAddress = 'http://' + this.api.url
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/verify_instagram', json, {headers: headers})
+  }
+
+  signupInstagram(accountInfo: any) {
+    this.ipAddress = 'http://' + this.api.url
+    var promise, response;
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/create_instagram_user', accountInfo, {headers: headers})
   }
 }

@@ -3,10 +3,10 @@ import { NavController, ToastController } from 'ionic-angular';
 import { LoginPage } from '../login/login';
 import { SignupPage } from '../signup/signup';
 import { Api } from '../../providers/api';
-import { User } from '../../providers/user';
+import { UserPage } from '../../providers/user';
 import { Facebook } from '@ionic-native/facebook';
 import { MainPage } from '../../pages/pages';
-import { Auth } from '@ionic/cloud-angular';
+import { Auth, User } from '@ionic/cloud-angular';
 
 /**
  * The Welcome Page is a splash page that quickly describes the app,
@@ -17,7 +17,7 @@ import { Auth } from '@ionic/cloud-angular';
 @Component({
   selector: 'page-welcome',
   templateUrl: 'welcome.html',
-  providers: [Auth]
+  providers: []
 })
 
 export class WelcomePage {
@@ -26,7 +26,7 @@ export class WelcomePage {
   userId: any;
   params:any;
 
-  constructor(public auth: Auth, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public user: User) {
+  constructor(public auth: Auth, public user: User, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public userCtrl: UserPage) {
     this.getIPAddr()
   }
 
@@ -65,11 +65,11 @@ export class WelcomePage {
         this.fb.api( authId + "/?fields=id,email,first_name,last_name",
         ['public_profile', 'email']).then((success)=>{
           result = success;
-          this.user.verifyFacebookUser(success.id)
+          this.userCtrl.verifyFacebookUser(success.id)
           .map(res => res.json())
           .subscribe((data) => {
             if (data.success == 'existe'){
-              this.user._loggedIn(data.id);
+              this.userCtrl._loggedIn(data.id);
               var nome = data.nome.split(" ",1)
               this.toast = this.toastCtrl.create({
                 message: 'Bem-vindo, ' + nome,
@@ -107,10 +107,50 @@ export class WelcomePage {
   }
 
   instagramLogin() {
+    let user_id = {}
+    let result;
     console.log("Dentro Login Instagram")
-    this.auth.login('instagram').then((data)=>{
-      console.log("dentro da funcao")
-      console.log(data)
+    this.auth.login('instagram').then(
+    (data)=>{
+      this.userCtrl.verifyInstagramUser(this.user.social.instagram.uid)
+      .map(res => res.json())
+      .subscribe((data) => {
+        if (data.success == 'existe'){
+          this.userCtrl._loggedIn(data.id);
+          var nome = data.nome.split(" ",1)
+          this.toast = this.toastCtrl.create({
+            message: 'Bem-vindo, ' + nome,
+            duration: 3000,
+            position: 'top'
+          });
+          this.toast.present();
+          this.navCtrl.push(MainPage);
+        }
+        else if (data.success == 'nao_existe'){
+          console.log("Usuario INSTA nao tem cadastro!!")
+          let name = this.user.social.instagram.data.full_name
+          let email = this.user.social.instagram.data.email
+          user_id = {'id':this.user.social.instagram.uid}
+          result = {
+            'instagram': true,
+            'name':name,
+            'email': email}
+          this.navCtrl.push(SignupPage, result, user_id)
+          this.toast = this.toastCtrl.create({
+            message: 'Por Favor, preencha os campos abaixo',
+            duration: 5000,
+            position: 'top'
+          });
+          this.toast.present();
+        }
+      }, (err) => {
+        console.log("Erro Verificar Instagram")
+        console.log(JSON.stringify(err))
+      });
+    },
+    (err)=>{
+      console.log("Erro ao obter dados do usuário!")
+      console.log(err)
     });
   }
 }
