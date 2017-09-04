@@ -9,12 +9,21 @@
   <div padding>
     <button ion-button block (click)="signup()" class="signup">{{ 'SIGNUP' | translate }}</button>
     <button ion-button block (click)="login()" class="login">{{ 'LOGIN' | translate }}</button>
-    <button ion-button block (click)="facebookLogin()" class="facebookLogin">Entrar com Facebook</button>
-    <button ion-button block (click)="instagramLogin()" class="instagramLogin">Entrar com Instagram</button>
-<!--####################################################################################  -->
-      <ion-label fixed>{{ IP }}</ion-label>
-      <ion-input type="text" [(ngModel)]="ipAddr" name="ipAddr" placeholder="Endereço IP"></ion-input>
-      <button ion-button block (click)="setIPAddr()" class="signup">Salvar IP</button>
+    <br/>
+    <ion-label style="margin:0 auto;" text-center>Conectar-se com:</ion-label>
+    <div class="col-md-12" text-center>
+        <div class="col-md-6">
+          <img src="../../assets/img/face.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;border-radius:20%" (click)="facebookLogin()">          
+          <img src="../../assets/img/insta.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;" (click)="instagramLogin()">
+        </div>
+    </div>
+    
+    
+    <!-- <button ion-button block (click)="facebookLogin()" class="facebookLogin">Entrar com Facebook</button> -->
+    <!-- <button ion-button block (click)="instagramLogin()" class="instagramLogin">Entrar com Instagram</button> -->
+    <ion-label fixed>{{ IP }}</ion-label>
+    <ion-input type="text" [(ngModel)]="ipAddr" name="ipAddr" placeholder="Endereço IP"></ion-input>
+    <button ion-button block (click)="setIPAddr()" class="signup">Salvar IP</button>
 
   </div>
 </ion-content>
