@@ -107,7 +107,6 @@ export class WelcomePage {
   }
 
   instagramLogin() {
-    let user_id = {}
     let result;
     console.log("Dentro Login Instagram")
     this.auth.login('instagram').then(
@@ -130,12 +129,12 @@ export class WelcomePage {
           console.log("Usuario INSTA nao tem cadastro!!")
           let name = this.user.social.instagram.data.full_name
           let email = this.user.social.instagram.data.email
-          user_id = {'id':this.user.social.instagram.uid}
           result = {
+            'id': this.user.social.instagram.uid,
             'instagram': true,
             'name':name,
             'email': email}
-          this.navCtrl.push(SignupPage, result, user_id)
+          this.navCtrl.push(SignupPage, result)
           this.toast = this.toastCtrl.create({
             message: 'Por Favor, preencha os campos abaixo',
             duration: 5000,

@@ -58,6 +58,8 @@ export class SignupPage {
         this.account.email = this.navParams.get('email')
       }
       if (this.navParams.get('id')){
+        console.log('dentro get id')
+        console.log(this.navParams.get('id'))
         this.instagram_user_id = this.navParams.get('id')
       }
     }

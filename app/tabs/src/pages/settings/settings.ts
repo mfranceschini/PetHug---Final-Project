@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, App } from 'ionic-angular';
 
 import { Settings } from '../../providers/settings';
 import { UserPage } from '../../providers/user'
@@ -41,7 +41,8 @@ export class SettingsPage {
     public formBuilder: FormBuilder,
     public navParams: NavParams,
     public translate: TranslateService,
-    public user: UserPage) {
+    public user: UserPage,
+    public app: App) {
   }
 
   _buildForm() {
@@ -99,10 +100,10 @@ export class SettingsPage {
   doLogout() {
     this.user.logout().then((data) => {
       console.log("Logout realizado")
-      this.navCtrl.setRoot(WelcomePage, {}, {
-          animate: true,
-          direction: 'backward'
-        });
+      this.app.getRootNav().setRoot(WelcomePage, {}, {
+        animate: true,
+        direction: 'backward'
+      });
     })
   }
 }
