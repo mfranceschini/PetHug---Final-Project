@@ -150,7 +150,6 @@ export class LostRegisterPage {
   }
 
   getPicture() {
-
     const options: CameraOptions = {
       quality : 75, 
       destinationType : this.camera.DestinationType.DATA_URL, 
@@ -159,20 +158,14 @@ export class LostRegisterPage {
       encodingType: this.camera.EncodingType.JPEG,
       targetWidth: 300,
       targetHeight: 300,
-      saveToPhotoAlbum: true
+      saveToPhotoAlbum: true,
+      correctOrientation: true
     }
     if (Camera['installed']()) {
       console.log("Camera instalada")
-      // this.processWebImage(this.camera.getPicture(options).then((data)=>{
-      //   this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
-      // }, (err) => {
-      //   alert('Unable to take photo');
-      //   alert(err)
-      //   this.fileInput.nativeElement.click();
-      // }))
       this.camera.getPicture(options).then((data) => {
-        this.form.patchValue({ 'profilePic': data });
-        this.processCameraImage(data)
+        this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
+        this.processCameraImage('data:image/jpg;base64,' + data)
       }, (err) => {
         alert('Unable to take photo');
         alert(err)
@@ -183,7 +176,6 @@ export class LostRegisterPage {
       // this.imageLoaded = true;
       this.fileInput.nativeElement.click();
     }
-    // this.fileInput.nativeElement.click();
   }
 
   skipImage() {
@@ -225,6 +217,12 @@ export class LostRegisterPage {
           }
           else if (data.image1[i] == 'shetland sheepdog'){
             data.image1[i] = 'Pastor de Shetland'
+          }
+          else if (data.image1[i] == 'golden retriever'){
+            data.image1[i] = 'Golden Retriever'
+          }
+          else if (data.image1[i] == 'english cocker spaniel'){
+            data.image1[i] = 'Cocker Spaniel'
           }
         }
         var j;
@@ -321,6 +319,12 @@ export class LostRegisterPage {
             else if (data.image1[i] == 'shetland sheepdog'){
               data.image1[i] = 'Pastor de Shetland'
             }
+            else if (data.image1[i] == 'golden retriever'){
+              data.image1[i] = 'Golden Retriever'
+            }
+            else if (data.image1[i] == 'english cocker spaniel'){
+              data.image1[i] = 'Cocker Spaniel'
+            }
           }
           var j;
           for (j=0;j<this.speciesList.length;j++){
@@ -374,32 +378,6 @@ export class LostRegisterPage {
     reader.readAsDataURL(event.target.files[0]);
     
   }
-  
-
-  base64ToByteArray(base64String) {
-    try {
-        var sliceSize = 1024;
-        var byteCharacters = atob(base64String);
-        var bytesLength = byteCharacters.length;
-        var slicesCount = Math.ceil(bytesLength / sliceSize);
-        var byteArrays = new Array(slicesCount);
-
-        for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-            var begin = sliceIndex * sliceSize;
-            var end = Math.min(begin + sliceSize, bytesLength);
-
-            var bytes = new Array(end - begin);
-            for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
-                bytes[i] = byteCharacters[offset].charCodeAt(0);
-            }
-            byteArrays[sliceIndex] = new Uint8Array(bytes);
-        }
-        return byteArrays;
-    } catch (e) {
-        console.log("Couldn't convert to byte array: " + e);
-        return undefined;
-    }
-  }
 
   getProfileImageStyle() {
     return 'url(' + this.form.controls['profilePic'].value + ')'
@@ -433,20 +411,27 @@ export class LostRegisterPage {
       }
     }
     this.user.getUser().then((data) => {
+      var usuario;
       var usr = JSON.parse(data);
+      if (usr.id){
+        usuario = usr.id
+      }
+      else {
+        usuario = usr
+      }
 
       this.animalForm = {
-      'breed': this.selectedBreed,
-      'gender': this.form.controls['gender'].value,
-      'name': this.form.controls['name'].value,
-      'size': this.selectedSize,
-      'species': this.selectedSpecie,
-      'city': this.form.controls['city'].value,
-      'neighbor': this.form.controls['neighbor'].value,
-      'address': this.form.controls['address'].value,
-      'image': this.form.controls['profilePic'].value,
-      'user': usr.id
-      }
+        'city': this.form.controls['city'].value,
+        'neighbor': this.form.controls['neighbor'].value,
+        'address': this.form.controls['address'].value,
+        'breed': this.selectedBreed,
+        'gender': this.form.controls['gender'].value,
+        'name': this.form.controls['name'].value,
+        'size': this.selectedSize,
+        'species': this.selectedSpecie,
+        'image': this.form.controls['profilePic'].value,
+        'user': usuario
+        }
 
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
@@ -464,13 +449,13 @@ export class LostRegisterPage {
           console.log("Retorno depois de criar animal")
           if (data.success == 'sucesso'){
             let toast = this.toastCtrl.create({
-              message: "Animal Encontrado cadastrado com sucesso!",
+              message: "Animal Perdido cadastrado com sucesso!",
               duration: 3000,
               position: 'top'
             });
             toast.present();
             this.viewCtrl.dismiss(this.form.value);
-            // this.navCtrl.push(LostPage);
+            this.navCtrl.push(LostPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({
@@ -483,11 +468,5 @@ export class LostRegisterPage {
         });
       if (!this.form.valid) { return; }
     })
-
-    // ARRUMAR ANALISE DE IMAGEM NO FOUND E ANIMAL
-
-    // TESTAR LOGIN PELO FB -> TA BUGADO
-    
-
   }
 }

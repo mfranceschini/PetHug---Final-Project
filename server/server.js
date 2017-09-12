@@ -367,161 +367,8 @@ app.get('/pet', function (req, res) {
 
 
 // FUNCAO USADA DURANTE O CADASTRO DE UM NOVO ANIMAL
-// UTILIZADA PARA SUGERIR ESPÉCIE E RAÇA DO ANIMAL
 app.post('/create_pet', function (req, res) {
-
-  console.log ('Requisicao de analise recebida!');
-  // console.log (req);
-
-  var analysis1;
-  var index = 0;
-  // Instantiates a client
-  const visionClient = Vision({
-    projectId: projectId
-  });
-
-  // The name of the image file to annotate
-  if (req.body.img1) {
-    var fileName = req.body.img1;
-
-    function decodeBase64Image(dataString) {
-      var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-        response = {};
-
-      if (matches.length !== 3) {
-        return new Error('Invalid input string');
-      }
-
-      response.type = matches[1];
-      response.data = new Buffer(matches[2], 'base64');
-
-      return response;
-    }
-
-    var imageBuffer = decodeBase64Image(fileName);
-    var random = Math.random() * (9999 - 1000) + 1000
-    random = random.toPrecision(4)
-    const imagePath = 'images/animal' + random + '.png'
-
-    createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
-          if(err){
-            throw(err);
-          }
-          else{
-            Promise.resolve()
-          }
-      }))
-
-    Promise.all([createFile]).then(function(data) {
-      // all loaded
-      visionClient.detectLabels(imagePath)
-      .then((results) => {
-        const labels = results[0];
-        console.log('Analysing Image...!\n');
-        labels.forEach((label) =>
-          console.log(label));
-        console.log("Image Analysed!\n");
-        var json = JSON.stringify({ 
-        image1: labels
-        });
-        res.end(json);
-        console.log("Response Sent!\n")
-      })
-      .catch((err) => {
-        console.error('ERROR:', err);
-        res.end('erro')
-      });
-    }, function(err) {
-      console.error('ERROR:', err);
-      // one or more failed
-    });
-  }
-  else if (req.body.form){
-    var form = req.body.form
-    console.log("Salvando Animal no BD")
-    var client = new pg.Client(conString);
-    var result = [];
-    client.connect(function (err) {
-      if (err) throw err;
-      console.log ("Conexão Estabelecida!");
-
-      if (form.image){
-        function decodeBase64Image(dataString) {
-          var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-            response = {};
-
-          if (matches.length !== 3) {
-            return new Error('Invalid input string');
-          }
-
-          response.type = matches[1];
-          response.data = new Buffer(matches[2], 'base64');
-
-          return response;
-        }
-        var imageBuffer = decodeBase64Image(form.image);
-        var random = Math.random() * (9999 - 1000) + 1000
-        random = random.toPrecision(4)
-        const imagePath = 'images/db/animal' + random + '.png'
-
-        promise = new Promise(function(resolve, reject) {
-          (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
-            if(err){
-              console.log("Erro ao criar imagem")
-              console.log(err);
-            }
-            else{
-              console.log("Imagem Criada!")
-            }
-          }))
-        })
-      // }
-
-      // Promise.all([promise]).then(function(data) {
-        console.log("Dentro promise - depois de criar imagem")
-        console.log(imagePath)
-        const path = '/home/matheus/TCC/server/' + imagePath
-        const query = client.query(
-        'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
-          function(err, result) {
-            if (err) {
-              console.log("Deu erro")
-              console.log(err);
-              var json = JSON.stringify({ 
-                success: "erro"
-              });
-              res.end(json)
-            } else {
-              console.log("Animal Inserted")
-              var json = JSON.stringify({ 
-                success: "sucesso"
-              });
-              res.end(json)
-            }
-          });
-        query.on('row', function(err, row, result) {
-          if (err) {
-            console.log("Deu erro")
-            console.log(err);
-          }
-          else {
-            console.log('on row')
-            result.addRow(row);
-            console.log(result)
-            query.on('end', () => { client.end(); });
-          }
-          
-        });
-        
-      // })
-    }
-    })
-  }
-});
-
-app.post('/create_found_pet', function (req, res) {
-  
-    console.log ('Criar Animal Encontrado!');
+    console.log ('Requisicao de analise recebida!');
     // console.log (req);
   
     var analysis1;
@@ -533,12 +380,13 @@ app.post('/create_found_pet', function (req, res) {
   
     // The name of the image file to annotate
     if (req.body.img1) {
+      console.log("\nAnalisando imagem..")
       var fileName = req.body.img1;
   
       function decodeBase64Image(dataString) {
         var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
           response = {};
-  
+
         if (matches.length !== 3) {
           return new Error('Invalid input string');
         }
@@ -552,13 +400,14 @@ app.post('/create_found_pet', function (req, res) {
       var imageBuffer = decodeBase64Image(fileName);
       var random = Math.random() * (9999 - 1000) + 1000
       random = random.toPrecision(4)
-      const imagePath = 'images/db/animal' + random + '.png'
+      const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
   
       createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
             if(err){
               throw(err);
             }
             else{
+              console.log("\nAnalysed Image: " + imagePath)
               Promise.resolve()
             }
         }))
@@ -577,6 +426,8 @@ app.post('/create_found_pet', function (req, res) {
           });
           res.end(json);
           console.log("Response Sent!\n")
+          require('fs').unlinkSync(imagePath)
+          console.log("Image Deleted: " + imagePath)
         })
         .catch((err) => {
           console.error('ERROR:', err);
@@ -589,7 +440,7 @@ app.post('/create_found_pet', function (req, res) {
     }
     else if (req.body.form){
       var form = req.body.form
-      console.log("Salvando Animal no BD")
+      console.log("\nSalvando Animal no BD")
       var client = new pg.Client(conString);
       var result = [];
       client.connect(function (err) {
@@ -613,21 +464,156 @@ app.post('/create_found_pet', function (req, res) {
           var imageBuffer = decodeBase64Image(form.image);
           var random = Math.random() * (9999 - 1000) + 1000
           random = random.toPrecision(4)
-          const imagePath = 'images/db/animal' + random + '.png'
+          const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
   
-          promise = new Promise(function(resolve, reject) {
-            (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+          promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
               if(err){
-                console.log("Erro ao criar imagem")
+                console.log("\nErro ao criar imagem")
                 console.log(err);
+                Promise.reject()
               }
-              else{
-                console.log("Imagem Criada!")
+              else {
+                console.log("\nImagem criada: " + imagePath)
+                Promise.resolve()
               }
             }))
-          })
-          const path = '/home/matheus/TCC/server/' + imagePath
-          console.log('CAminho Imagem: '+path)
+  
+        Promise.all([promise]).then((data) => {
+          const path = imagePath
+          const query = client.query(
+          'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
+            function(err, result) {
+              if (err) {
+                console.log("Deu erro")
+                console.log(err);
+              } else {
+                console.log("Animal Inserted")
+                var json = JSON.stringify({ 
+                  success: "sucesso"
+                });
+                res.end(json)
+              }
+            });
+          query.on('end', () => { client.end(); });
+        })
+      }
+      })
+    }
+  });
+
+app.post('/create_found_pet', function (req, res) {
+  
+    console.log ('Criar Animal Encontrado!');
+    // console.log (req);
+    var analysis1;
+    var index = 0;
+    // Instantiates a client
+    const visionClient = Vision({
+      projectId: projectId
+    });
+  
+    // The name of the image file to annotate
+    if (req.body.img1) {
+      console.log("\nAnalisando imagem..")
+      var fileName = req.body.img1;
+  
+      function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+          response = {};
+
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+  
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+  
+        return response;
+      }
+  
+      var imageBuffer = decodeBase64Image(fileName);
+      var random = Math.random() * (9999 - 1000) + 1000
+      random = random.toPrecision(4)
+      const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+  
+      createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+            if(err){
+              throw(err);
+            }
+            else{
+              console.log("\nAnalysed Image: " + imagePath)
+              Promise.resolve()
+            }
+        }))
+  
+      Promise.all([createFile]).then(function(data) {
+        // all loaded
+        visionClient.detectLabels(imagePath)
+        .then((results) => {
+          const labels = results[0];
+          console.log('Analysing Image...!\n');
+          labels.forEach((label) =>
+            console.log(label));
+          console.log("Image Analysed!\n");
+          var json = JSON.stringify({ 
+          image1: labels
+          });
+          res.end(json);
+          console.log("Response Sent!\n")
+          require('fs').unlinkSync(imagePath)
+          console.log("Image Deleted: " + imagePath)
+        })
+        .catch((err) => {
+          console.error('ERROR:', err);
+          res.end('erro')
+        });
+      }, function(err) {
+        console.error('ERROR:', err);
+        // one or more failed
+      });
+    }
+    else if (req.body.form){
+      var form = req.body.form
+      console.log("\nSalvando Animal no BD")
+      var client = new pg.Client(conString);
+      var result = [];
+      client.connect(function (err) {
+        if (err) throw err;
+        console.log ("Conexão Estabelecida!");
+  
+        if (form.image){
+          function decodeBase64Image(dataString) {
+            var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+              response = {};
+  
+            if (matches.length !== 3) {
+              return new Error('Invalid input string');
+            }
+  
+            response.type = matches[1];
+            response.data = new Buffer(matches[2], 'base64');
+  
+            return response;
+          }
+          var imageBuffer = decodeBase64Image(form.image);
+          var random = Math.random() * (9999 - 1000) + 1000
+          random = random.toPrecision(4)
+          const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+  
+          promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+              if(err){
+                console.log("\nErro ao criar imagem")
+                console.log(err);
+                Promise.reject()
+              }
+              else {
+                console.log("\nImagem criada: " + imagePath)
+                Promise.resolve()
+              }
+            }))
+  
+        Promise.all([promise]).then((data) => {
+          const path = imagePath
           const query = client.query(
           'INSERT INTO public."Animal_Encontrado"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
             function(err, result) {
@@ -647,13 +633,14 @@ app.post('/create_found_pet', function (req, res) {
               }
             });
           query.on('end', () => { client.end(); });
+        })
       }
       })
     }
   });
 
-  app.post('/create_lost_pet', function (req, res) {
-    
+
+app.post('/create_lost_pet', function (req, res) {
       console.log ('Criar Perdido Encontrado!');
       // console.log (req);
     
@@ -666,12 +653,13 @@ app.post('/create_found_pet', function (req, res) {
     
       // The name of the image file to annotate
       if (req.body.img1) {
+        console.log("\nAnalisando imagem..")
         var fileName = req.body.img1;
     
         function decodeBase64Image(dataString) {
           var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
             response = {};
-    
+  
           if (matches.length !== 3) {
             return new Error('Invalid input string');
           }
@@ -685,13 +673,14 @@ app.post('/create_found_pet', function (req, res) {
         var imageBuffer = decodeBase64Image(fileName);
         var random = Math.random() * (9999 - 1000) + 1000
         random = random.toPrecision(4)
-        const imagePath = 'images/db/animal' + random + '.png'
+        const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
     
         createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
               if(err){
                 throw(err);
               }
               else{
+                console.log("\nAnalysed Image: " + imagePath)
                 Promise.resolve()
               }
           }))
@@ -710,6 +699,8 @@ app.post('/create_found_pet', function (req, res) {
             });
             res.end(json);
             console.log("Response Sent!\n")
+            require('fs').unlinkSync(imagePath)
+            console.log("Image Deleted: " + imagePath)
           })
           .catch((err) => {
             console.error('ERROR:', err);
@@ -722,7 +713,7 @@ app.post('/create_found_pet', function (req, res) {
       }
       else if (req.body.form){
         var form = req.body.form
-        console.log("Salvando Animal no BD")
+        console.log("\nSalvando Animal no BD")
         var client = new pg.Client(conString);
         var result = [];
         client.connect(function (err) {
@@ -746,21 +737,22 @@ app.post('/create_found_pet', function (req, res) {
             var imageBuffer = decodeBase64Image(form.image);
             var random = Math.random() * (9999 - 1000) + 1000
             random = random.toPrecision(4)
-            const imagePath = 'images/db/animal' + random + '.png'
+            const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
     
-            promise = new Promise(function(resolve, reject) {
-              (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+            promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
                 if(err){
-                  console.log("Erro ao criar imagem")
+                  console.log("\nErro ao criar imagem")
                   console.log(err);
+                  Promise.reject()
                 }
-                else{
-                  console.log("Imagem Criada!")
+                else {
+                  console.log("\nImagem criada: " + imagePath)
+                  Promise.resolve()
                 }
               }))
-            })
-            const path = '/home/matheus/TCC/server/' + imagePath
-            console.log('CAminho Imagem: '+path)
+    
+          Promise.all([promise]).then((data) => {
+            const path = imagePath
             const query = client.query(
             'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
               function(err, result) {
@@ -780,6 +772,7 @@ app.post('/create_found_pet', function (req, res) {
                 }
               });
             query.on('end', () => { client.end(); });
+          })
         }
         })
       }

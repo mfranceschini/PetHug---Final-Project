@@ -1,18 +1,15 @@
 page-animal-register {
+
   .profile-image-wrapper {
     text-align: center;
     margin: 20px 0;
 
-    .profile-image {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
+    .profile-image { 
+      // display: inline-block;
 
-      display: inline-block;
-
-      background-repeat: no-repeat;
+      background-position: center center;
       background-size: cover;
-      background-position: center;
+      height: 150px;
     }
 
     .profile-image-placeholder {
@@ -22,7 +19,6 @@ page-animal-register {
       width: 96px;
       height: 96px;
       border-radius: 50%;
-
       font-size: 12px;
 
       ion-icon {

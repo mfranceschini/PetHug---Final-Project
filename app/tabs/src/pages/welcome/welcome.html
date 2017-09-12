@@ -10,11 +10,11 @@
     <button ion-button block (click)="signup()" class="signup">{{ 'SIGNUP' | translate }}</button>
     <button ion-button block (click)="login()" class="login">{{ 'LOGIN' | translate }}</button>
     <br/>
-    <ion-label style="margin:0 auto;" text-center>Conectar-se com:</ion-label>
+    <ion-label style="margin:0 auto;font-weight:bold;" text-center>Conectar-se com:</ion-label>
     <div class="col-md-12" text-center>
         <div class="col-md-6">
-          <img src="../../assets/img/face.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;border-radius:20%" (click)="facebookLogin()">          
-          <img src="../../assets/img/insta.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;" (click)="instagramLogin()">
+          <img (click)="facebookLogin()" src="assets/img/face.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;border-radius:20%">         
+          <img (click)="instagramLogin()" src="assets/img/insta.png" style="width:60px;height:60px;margin:0 auto;display:inline-block;">
         </div>
     </div>
     

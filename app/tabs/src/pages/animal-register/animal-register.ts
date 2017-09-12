@@ -150,7 +150,6 @@ export class AnimalRegisterPage {
   }
 
   getPicture() {
-
     const options: CameraOptions = {
       quality : 75, 
       destinationType : this.camera.DestinationType.DATA_URL, 
@@ -159,20 +158,14 @@ export class AnimalRegisterPage {
       encodingType: this.camera.EncodingType.JPEG,
       targetWidth: 300,
       targetHeight: 300,
-      saveToPhotoAlbum: true
+      saveToPhotoAlbum: true,
+      correctOrientation: true
     }
     if (Camera['installed']()) {
       console.log("Camera instalada")
-      // this.processWebImage(this.camera.getPicture(options).then((data)=>{
-      //   this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
-      // }, (err) => {
-      //   alert('Unable to take photo');
-      //   alert(err)
-      //   this.fileInput.nativeElement.click();
-      // }))
       this.camera.getPicture(options).then((data) => {
-        this.form.patchValue({ 'profilePic': data });
-        this.processCameraImage(data)
+        this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
+        this.processCameraImage('data:image/jpg;base64,' + data)
       }, (err) => {
         alert('Unable to take photo');
         alert(err)
@@ -183,7 +176,6 @@ export class AnimalRegisterPage {
       // this.imageLoaded = true;
       this.fileInput.nativeElement.click();
     }
-    // this.fileInput.nativeElement.click();
   }
 
   skipImage() {
@@ -192,6 +184,7 @@ export class AnimalRegisterPage {
   }
 
   processCameraImage(imageData){
+    console.log("Processando imagem da camera")
     this.ipAddress = 'http://' + this.api.url
     if (this.ipAddress == 'http://undefined'){
       this.ipAddress = 'http://localhost'
@@ -225,6 +218,12 @@ export class AnimalRegisterPage {
           }
           else if (data.image1[i] == 'shetland sheepdog'){
             data.image1[i] = 'Pastor de Shetland'
+          }
+          else if (data.image1[i] == 'golden retriever'){
+            data.image1[i] = 'Golden Retriever'
+          }
+          else if (data.image1[i] == 'english cocker spaniel'){
+            data.image1[i] = 'Cocker Spaniel'
           }
         }
         var j;
@@ -276,9 +275,6 @@ export class AnimalRegisterPage {
     });
   }
 
-
-
-
   processWebImage(event) {
     this.ipAddress = 'http://' + this.api.url
     if (this.ipAddress == 'http://undefined'){
@@ -323,6 +319,12 @@ export class AnimalRegisterPage {
             }
             else if (data.image1[i] == 'shetland sheepdog'){
               data.image1[i] = 'Pastor de Shetland'
+            }
+            else if (data.image1[i] == 'golden retriever'){
+              data.image1[i] = 'Golden Retriever'
+            }
+            else if (data.image1[i] == 'english cocker spaniel'){
+              data.image1[i] = 'Cocker Spaniel'
             }
           }
           var j;
@@ -377,32 +379,6 @@ export class AnimalRegisterPage {
     reader.readAsDataURL(event.target.files[0]);
     
   }
-  
-
-  base64ToByteArray(base64String) {
-    try {
-        var sliceSize = 1024;
-        var byteCharacters = atob(base64String);
-        var bytesLength = byteCharacters.length;
-        var slicesCount = Math.ceil(bytesLength / sliceSize);
-        var byteArrays = new Array(slicesCount);
-
-        for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-            var begin = sliceIndex * sliceSize;
-            var end = Math.min(begin + sliceSize, bytesLength);
-
-            var bytes = new Array(end - begin);
-            for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
-                bytes[i] = byteCharacters[offset].charCodeAt(0);
-            }
-            byteArrays[sliceIndex] = new Uint8Array(bytes);
-        }
-        return byteArrays;
-    } catch (e) {
-        console.log("Couldn't convert to byte array: " + e);
-        return undefined;
-    }
-  }
 
   getProfileImageStyle() {
     return 'url(' + this.form.controls['profilePic'].value + ')'
@@ -436,7 +412,14 @@ export class AnimalRegisterPage {
       }
     }
     this.user.getUser().then((data) => {
+      var usuario;
       var usr = JSON.parse(data);
+      if (usr.id){
+        usuario = usr.id
+      }
+      else {
+        usuario = usr
+      }
 
       this.animalForm = {
       'about': this.form.controls['about'].value,
@@ -449,7 +432,7 @@ export class AnimalRegisterPage {
       'status': 1,
       'weight': this.form.controls['weight'].value,
       'image': this.form.controls['profilePic'].value,
-      'user': usr.id
+      'user': usuario
       }
 
       let headers = new Headers();
@@ -487,9 +470,5 @@ export class AnimalRegisterPage {
         });
       if (!this.form.valid) { return; }
     })
-    
-
-    
-
   }
 }

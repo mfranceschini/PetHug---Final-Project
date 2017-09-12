@@ -100,6 +100,7 @@ export class ListMasterPage {
               d.porte_id = data2.size[i].nome
             }
           }
+          console.log("Caminho da imagem: " +d.imagem.toString())
           this.currentAnimals.push({
             "species":d.especie_id.toString(),
             "breed":d.raca_id.toString(),  
@@ -126,7 +127,7 @@ export class ListMasterPage {
       
     }, (err) => {
       console.log('deu erro')
-      console.log(err)
+      console.log(JSON.stringify(err))
       this.loading.dismiss()
     });
     // if (loading){
