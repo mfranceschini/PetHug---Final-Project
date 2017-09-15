@@ -21,7 +21,9 @@
         "@angular/platform-browser": "4.1.0",
         "@angular/platform-browser-dynamic": "4.1.0",
         "@ionic-native/camera": "^3.9.2",
-        "@ionic-native/core": "3.7.0",
+        "@ionic-native/core": "^3.7.0",
+        "@ionic-native/email-composer": "^4.2.1",
+        "@ionic-native/geolocation": "^4.2.1",
         "@ionic-native/google-maps": "^3.9.2",
         "@ionic-native/splash-screen": "3.7.0",
         "@ionic-native/status-bar": "3.7.0",
@@ -35,8 +37,10 @@
         "cordova-plugin-compat": "^1.1.0",
         "cordova-plugin-console": "1.0.5",
         "cordova-plugin-device": "1.1.4",
+        "cordova-plugin-email-composer": "^0.8.9",
         "cordova-plugin-facebook4": "^1.9.1",
         "cordova-plugin-file": "^4.3.3",
+        "cordova-plugin-geolocation": "^2.4.3",
         "cordova-plugin-inappbrowser": "^1.7.1",
         "cordova-plugin-media-capture": "^1.4.3",
         "cordova-plugin-splashscreen": "~4.0.1",
@@ -72,7 +76,11 @@
                 "APP_ID": "1252667364824744",
                 "APP_NAME": "PetHug"
             },
-            "cordova-plugin-inappbrowser": {}
+            "cordova-plugin-inappbrowser": {},
+            "cordova-plugin-geolocation": {
+                "GEOLOCATION_USAGE_DESCRIPTION": " "
+            },
+            "cordova-plugin-email-composer": {}
         },
         "platforms": [
             "android"

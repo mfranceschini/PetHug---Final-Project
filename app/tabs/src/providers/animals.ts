@@ -47,7 +47,8 @@ export class Animals {
         "age":"3",
         "weight":"4",
         "status":"Para adoção",
-        "about": "Sou um animal muito feliz, gosto de correr e brincar."
+        "about": "Sou um animal muito feliz, gosto de correr e brincar.",
+        "user_id": 1
       }
     ];
 

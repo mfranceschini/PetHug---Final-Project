@@ -243,6 +243,7 @@ app.post('/get_user', function (req, res) {
             found = true
             json = JSON.stringify({ 
               status: 'sucesso',
+              email: result[i].email,
               nome: result[i].nome,
               id: result[i].id
             });
@@ -262,6 +263,36 @@ app.post('/get_user', function (req, res) {
       query.on('end', () => { client.end(); });
     })
   });
+})
+
+app.post('/get_user_data', function (req, res) {
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  var promise;
+  console.log(JSON.stringify(userData))
+  client.connect(function (err) {
+    if (err) throw err;
+    console.log ("Conexão Estabelecida!");
+  const query = client.query(
+  'SELECT * FROM public."Usuario" WHERE id=($1)',[userData.id],
+    function(err, result) {
+      if (err) {
+        console.log("Erro Get User Data")
+        console.log(err);
+      } else {
+        if (result.rowCount == 1){
+          console.log("User Exist!")
+          var json = JSON.stringify({ 
+            email: result.rows[0].email,
+            nome: result.rows[0].nome
+          });
+          res.end(json)
+        }
+      }
+      query.on('end', () => { client.end(); });
+    });      
+});
 })
 
 //FUNCAO USADA PARA MONITORAMENTO DE ANIMAIS DESAPARECIDOS

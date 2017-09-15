@@ -9,6 +9,7 @@ import { ListMasterPage } from "../list-master/list-master";
 import { FoundPage } from "../found/found";
 import { MainPage } from '../../pages/pages';
 import { Animals } from '../../providers/providers';
+import { Geolocation } from '@ionic-native/geolocation';
 
 @Component({
   selector: 'page-found-register',
@@ -67,7 +68,7 @@ export class FoundRegisterPage {
 
   listMaster: any;
 
-  constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
+  constructor(public geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -104,6 +105,8 @@ export class FoundRegisterPage {
         this.isReadyToSave = this.form.valid;
       });
 
+      this.geolocation.watchPosition();
+
     })
 
     this.loading = this.loadingCtrl.create({
@@ -111,6 +114,19 @@ export class FoundRegisterPage {
       content: 'Analisando imagem...'
     });
 
+  }
+
+  getLocation() {
+    console.log("Funcao de local!")
+    this.geolocation.getCurrentPosition().then((data) => {
+      console.log('My latitude : ', data.coords.latitude);
+      console.log('My longitude: ', data.coords.longitude);
+      console.log(JSON.stringify(data))
+    })
+    .catch((err)=>{
+      console.log("Error")
+      console.log(JSON.stringify(err))
+    });
   }
 
   loadData(data) {
@@ -264,14 +280,6 @@ export class FoundRegisterPage {
           this.loading.dismiss()
         }
       });
-    Promise.all([promise]).then(function(data) {
-      // all loaded
-      console.log("Promise resolvida")
-      // this.imageLoaded = true;
-    }, function(err) {
-      console.error('ERROR:', err);
-      // one or more failed
-    });
   }
 
   processWebImage(event) {
@@ -365,14 +373,6 @@ export class FoundRegisterPage {
             this.loading.dismiss()
           }
         });
-      Promise.all([promise]).then(function(data) {
-        // all loaded
-        console.log("Promise resolvida")
-        // this.imageLoaded = true;
-      }, function(err) {
-        console.error('ERROR:', err);
-        // one or more failed
-      });
     };
 
     reader.readAsDataURL(event.target.files[0]);

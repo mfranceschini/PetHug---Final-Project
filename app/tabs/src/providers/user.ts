@@ -61,12 +61,14 @@ export class UserPage {
 
   getUser(){
     return this.storage.get("user")
-    // .then((profile) => {
-    // console.log("retornou usuario")
-    // var val = JSON.parse(profile);
-    // console.log(val);
-    // return val;
-    // })
+  }
+
+  getUserData(user_id) {
+    let user = {'id': user_id}
+    this.ipAddress = 'http://' + this.api.url
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/get_user_data', user, {headers: headers})
   }
 
   verifyFacebookUser(facebook_id:any) {

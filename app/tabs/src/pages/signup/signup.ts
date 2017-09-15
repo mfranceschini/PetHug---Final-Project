@@ -43,11 +43,10 @@ export class SignupPage {
       spinner: 'dots',
       content: 'Cadastrando Usuário...'
     });
-
-    this.showPassword = 0;
   }
 
   ionViewDidLoad(){
+
     if (this.navParams.get('instagram') == true){
       this.showPassword = 1
       console.log("Login pelo Insta")
@@ -63,7 +62,7 @@ export class SignupPage {
         this.instagram_user_id = this.navParams.get('id')
       }
     }
-    else {
+    else if (this.navParams.get('facebook') == true){
       this.showPassword = 2
       console.log("Login pelo Face")
       if (this.navParams.get('first_name') && this.navParams.get('last_name')){
@@ -75,6 +74,10 @@ export class SignupPage {
       if (this.navParams.get('id')){
         this.facebook_user_id = this.navParams.get('id')
       }
+    }
+    else {
+      console.log("Login normal")
+      this.showPassword = 0;
     }
     
   }

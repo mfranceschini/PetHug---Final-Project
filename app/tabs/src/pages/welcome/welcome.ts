@@ -81,7 +81,7 @@ export class WelcomePage {
             }
             else if (data.success == 'nao_existe'){
               console.log("Usuario FB nao tem cadastro!!")
-              user_id = {'id':authId}
+              user_id = {'id':authId, 'facebook':true}
               this.navCtrl.push(SignupPage,result, user_id)
               this.toast = this.toastCtrl.create({
                 message: 'Por Favor, preencha os campos abaixo',
