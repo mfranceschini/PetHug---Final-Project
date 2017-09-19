@@ -455,7 +455,17 @@ export class LostRegisterPage {
             });
             toast.present();
             this.viewCtrl.dismiss(this.form.value);
-            this.navCtrl.push(LostPage);
+            if (data.exist == true){
+              // EXISTE ANIMAL PARECIDO!!!
+              console.log("Existe Animal Parecido!!")
+              let toast = this.toastCtrl.create({
+                message: "Encontramos um Animal Encontrado semelhante!",
+                duration: 4000,
+                position: 'top'
+              });
+              toast.present();
+            }
+            // this.navCtrl.push(LostPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

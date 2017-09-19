@@ -19,9 +19,11 @@
   <ion-list>
     <ion-item-sliding *ngFor="let animal of currentAnimals">
       <button ion-item (click)="openAnimal(animal)">
-        <ion-avatar item-start>
-          <img [src]="animal.profilePic" />
-        </ion-avatar>
+        <div *ngIf="animal.species == 'Cachorro'" class="mask_dog"></div>
+        <div *ngIf="animal.species == 'Gato'" class="mask_cat"></div>
+        <div class="imagediv">
+            <img [src]="animal.profilePic"/>
+        </div>
         <h2 *ngIf="animal.name">{{animal.name}}</h2>
         <h2 *ngIf="!animal.name">{{animal.species}}</h2>
         <p>Espécie: {{animal.species}}</p>

@@ -3,6 +3,7 @@ var Vision = require('@google-cloud/vision');
 var resemble = require('node-resemble-js');
 var express = require('express');
 var bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
 var pg = require('pg');
 var fs = require('fs');
 var cors = require('cors')
@@ -292,7 +293,7 @@ app.post('/get_user_data', function (req, res) {
       }
       query.on('end', () => { client.end(); });
     });      
-});
+  });
 })
 
 //FUNCAO USADA PARA MONITORAMENTO DE ANIMAIS DESAPARECIDOS
@@ -657,13 +658,89 @@ app.post('/create_found_pet', function (req, res) {
                 res.end(json)
               } else {
                 console.log("Found Animal Inserted")
-                var json = JSON.stringify({ 
-                  success: "sucesso"
-                });
-                res.end(json)
+                console.log("\n\n------- HORA DA VERDADE -------\n")
+                console.log("Verificando se tem animal encontrado...")
+                // ANIMAL PERDIDO CADASTRADO COM SUCESSO
+                // VERIFICA SE EXISTE ANIMAL ENCONTRADO PARECIDO
+                // SELECT ANIMAL ENCONTRADO ATRAVES DE {RAÇA, ESPECIE, CIDADE, BAIRRO}
+                // SE ROWCOUNT >= 1 --> COMPARA AS DUAS IMAGENS --> SE FOREM PARECIDAS, SUCESSO
+                const query2 = client.query(
+                'SELECT * FROM public."Animal_Encontrado" WHERE especie_id=($1) AND raca_id=($2) AND cidade=($3) AND bairro=($4)',[form.species, form.breed, form.city, form.neighbor],
+                function(err, result) {
+                  if (err) {
+                    console.log("Erro ao ver se tem animal encontrado parecido")
+                    console.log(err);
+                  }
+                  else {
+                    console.log("Existe animal encontrado parecido!!!")
+                    if (result.rowCount > 0)
+                    {
+                      console.log("Imagem cadastrada: " + path)
+                      console.log("Imagem retornada: " + result.rows[0].imagem)
+                      // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
+                      // var diff = resemble(req.query.img1).compareTo(req.query.img2).ignoreAntialiasing().onComplete(function(data){
+                      //   console.log("Diferença entre as imagens: " + data.misMatchPercentage);
+                      //   res.end('Diferença entre as imagens: ' + data.misMatchPercentage);
+                      // });
+                      const query3 = client.query(
+                      'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
+                        function(err, result) {
+                          if (err) {
+                            console.log("Erro Get User Data")
+                            console.log(err);
+                          } else {
+                            if (result.rowCount == 1){
+                              console.log("User Exist!")
+                              console.log("Enviando email para responsavel")
+                              const query4 = client.query(
+                              'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                function(err, user) {
+                                  if (err){
+                                    console.log("Erro ao pegar usuario logado")
+                                    console.log(JSON.stringify(err))
+                                  }
+                                  else {
+                                    console.log(JSON.stringify(user))
+                                    // var transporter = nodemailer.createTransport({
+                                    //   service: 'gmail',
+                                    //   auth: {
+                                    //     user: 'm.franceschini17@gmail.com',
+                                    //     pass: 'ngt03$#y'
+                                    //   }
+                                    // });
+                                    
+                                    // var mailOptions = {
+                                    //   from: 'm.franceschini17@gmail.com',
+                                    //   to: user.rows[0].email,
+                                    //   subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                    //   text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
+                                    //   'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
+                                    //   'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                    // };
+                                    
+                                    // transporter.sendMail(mailOptions, function(error, info){
+                                    //   if (error) {
+                                    //     console.log(error);
+                                    //   } else {
+                                    //     console.log('Email sent: ' + info.response);
+                                        var json = JSON.stringify({
+                                          success: 'sucesso',
+                                          exist: true
+                                        });
+                                        res.end(json)
+                                    //   }
+                                    // });
+                                  }
+                                })
+                                query4.on('end', () => { client.end(); });
+                            }
+                          }
+                        });
+                    }
+                  }
+                })
               }
             });
-          query.on('end', () => { client.end(); });
         })
       }
       })
@@ -672,142 +749,218 @@ app.post('/create_found_pet', function (req, res) {
 
 
 app.post('/create_lost_pet', function (req, res) {
-      console.log ('Criar Perdido Encontrado!');
-      // console.log (req);
-    
-      var analysis1;
-      var index = 0;
-      // Instantiates a client
-      const visionClient = Vision({
-        projectId: projectId
+  console.log ('Criar Perdido Encontrado!');
+  // console.log (req);
+
+  var analysis1;
+  var index = 0;
+  // Instantiates a client
+  const visionClient = Vision({
+    projectId: projectId
+  });
+
+  // The name of the image file to annotate
+  if (req.body.img1) {
+    console.log("\nAnalisando imagem..")
+    var fileName = req.body.img1;
+
+    function decodeBase64Image(dataString) {
+      var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+        response = {};
+
+      if (matches.length !== 3) {
+        return new Error('Invalid input string');
+      }
+
+      response.type = matches[1];
+      response.data = new Buffer(matches[2], 'base64');
+
+      return response;
+    }
+
+    var imageBuffer = decodeBase64Image(fileName);
+    var random = Math.random() * (9999 - 1000) + 1000
+    random = random.toPrecision(4)
+    const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+
+    createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+          if(err){
+            throw(err);
+          }
+          else{
+            console.log("\nAnalysed Image: " + imagePath)
+            Promise.resolve()
+          }
+      }))
+
+    Promise.all([createFile]).then(function(data) {
+      // all loaded
+      visionClient.detectLabels(imagePath)
+      .then((results) => {
+        const labels = results[0];
+        console.log('Analysing Image...!\n');
+        labels.forEach((label) =>
+          console.log(label));
+        console.log("Image Analysed!\n");
+        var json = JSON.stringify({ 
+        image1: labels
+        });
+        res.end(json);
+        console.log("Response Sent!\n")
+        require('fs').unlinkSync(imagePath)
+        console.log("Image Deleted: " + imagePath)
+      })
+      .catch((err) => {
+        console.error('ERROR:', err);
+        res.end('erro')
       });
-    
-      // The name of the image file to annotate
-      if (req.body.img1) {
-        console.log("\nAnalisando imagem..")
-        var fileName = req.body.img1;
-    
+    }, function(err) {
+      console.error('ERROR:', err);
+      // one or more failed
+    });
+  }
+  else if (req.body.form){
+    var form = req.body.form
+    console.log("\nSalvando Animal no BD")
+    var client = new pg.Client(conString);
+    var result = [];
+    client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+
+      if (form.image){
         function decodeBase64Image(dataString) {
           var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
             response = {};
-  
+
           if (matches.length !== 3) {
             return new Error('Invalid input string');
           }
-    
+
           response.type = matches[1];
           response.data = new Buffer(matches[2], 'base64');
-    
+
           return response;
         }
-    
-        var imageBuffer = decodeBase64Image(fileName);
+        var imageBuffer = decodeBase64Image(form.image);
         var random = Math.random() * (9999 - 1000) + 1000
         random = random.toPrecision(4)
         const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
-    
-        createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
-              if(err){
-                throw(err);
-              }
-              else{
-                console.log("\nAnalysed Image: " + imagePath)
-                Promise.resolve()
-              }
-          }))
-    
-        Promise.all([createFile]).then(function(data) {
-          // all loaded
-          visionClient.detectLabels(imagePath)
-          .then((results) => {
-            const labels = results[0];
-            console.log('Analysing Image...!\n');
-            labels.forEach((label) =>
-              console.log(label));
-            console.log("Image Analysed!\n");
-            var json = JSON.stringify({ 
-            image1: labels
-            });
-            res.end(json);
-            console.log("Response Sent!\n")
-            require('fs').unlinkSync(imagePath)
-            console.log("Image Deleted: " + imagePath)
-          })
-          .catch((err) => {
-            console.error('ERROR:', err);
-            res.end('erro')
-          });
-        }, function(err) {
-          console.error('ERROR:', err);
-          // one or more failed
-        });
-      }
-      else if (req.body.form){
-        var form = req.body.form
-        console.log("\nSalvando Animal no BD")
-        var client = new pg.Client(conString);
-        var result = [];
-        client.connect(function (err) {
-          if (err) throw err;
-          console.log ("Conexão Estabelecida!");
-    
-          if (form.image){
-            function decodeBase64Image(dataString) {
-              var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-                response = {};
-    
-              if (matches.length !== 3) {
-                return new Error('Invalid input string');
-              }
-    
-              response.type = matches[1];
-              response.data = new Buffer(matches[2], 'base64');
-    
-              return response;
+
+        promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+            if(err){
+              console.log("\nErro ao criar imagem")
+              console.log(err);
+              Promise.reject()
             }
-            var imageBuffer = decodeBase64Image(form.image);
-            var random = Math.random() * (9999 - 1000) + 1000
-            random = random.toPrecision(4)
-            const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
-    
-            promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
-                if(err){
-                  console.log("\nErro ao criar imagem")
-                  console.log(err);
-                  Promise.reject()
-                }
-                else {
-                  console.log("\nImagem criada: " + imagePath)
-                  Promise.resolve()
-                }
-              }))
-    
-          Promise.all([promise]).then((data) => {
-            const path = imagePath
-            const query = client.query(
-            'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
+            else {
+              console.log("\nImagem criada: " + imagePath)
+              Promise.resolve()
+            }
+          }))
+
+      Promise.all([promise]).then((data) => {
+        const path = imagePath
+        const query = client.query(
+        'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
+          function(err, result) {
+            if (err) {
+              console.log("Deu erro")
+              console.log(err);
+              var json = JSON.stringify({ 
+                success: "erro"
+              });
+              res.end(json)
+            } else {
+              console.log("Lost Animal Inserted")
+              console.log("\n\n------- HORA DA VERDADE -------\n")
+              console.log("Verificando se tem animal encontrado...")
+              // ANIMAL PERDIDO CADASTRADO COM SUCESSO
+              // VERIFICA SE EXISTE ANIMAL ENCONTRADO PARECIDO
+              // SELECT ANIMAL ENCONTRADO ATRAVES DE {RAÇA, ESPECIE, CIDADE, BAIRRO}
+              // SE ROWCOUNT >= 1 --> COMPARA AS DUAS IMAGENS --> SE FOREM PARECIDAS, SUCESSO
+              const query2 = client.query(
+              'SELECT * FROM public."Animal_Encontrado" WHERE especie_id=($1) AND raca_id=($2) AND cidade=($3) AND bairro=($4)',[form.species, form.breed, form.city, form.neighbor],
               function(err, result) {
                 if (err) {
-                  console.log("Deu erro")
+                  console.log("Erro ao ver se tem animal encontrado parecido")
                   console.log(err);
-                  var json = JSON.stringify({ 
-                    success: "erro"
-                  });
-                  res.end(json)
-                } else {
-                  console.log("Lost Animal Inserted")
-                  var json = JSON.stringify({ 
-                    success: "sucesso"
-                  });
-                  res.end(json)
                 }
-              });
-            query.on('end', () => { client.end(); });
-          })
-        }
-        })
-      }
-    });
+                else {
+                  console.log("Existe animal encontrado parecido!!!")
+                  if (result.rowCount > 0)
+                  {
+                    console.log("Imagem cadastrada: " + path)
+                    console.log("Imagem retornada: " + result.rows[0].imagem)
+                    // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
+                    // var diff = resemble(req.query.img1).compareTo(req.query.img2).ignoreAntialiasing().onComplete(function(data){
+                    //   console.log("Diferença entre as imagens: " + data.misMatchPercentage);
+                    //   res.end('Diferença entre as imagens: ' + data.misMatchPercentage);
+                    // });
+                    const query3 = client.query(
+                    'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
+                      function(err, result) {
+                        if (err) {
+                          console.log("Erro Get User Data")
+                          console.log(err);
+                        } else {
+                          if (result.rowCount == 1){
+                            console.log("User Exist!")
+                            console.log("Enviando email para responsavel")
+                            const query4 = client.query(
+                              'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                function(err, user) {
+                                  if (err){
+                                    console.log("Erro ao pegar usuario logado")
+                                    console.log(JSON.stringify(err))
+                                  }
+                                  else {
+                                    console.log(JSON.stringify(user))
+                                    // var transporter = nodemailer.createTransport({
+                                    //   service: 'gmail',
+                                    //   auth: {
+                                    //     user: 'm.franceschini17@gmail.com',
+                                    //     pass: 'ngt03$#y'
+                                    //   }
+                                    // });
+                                    
+                                    // var mailOptions = {
+                                    //   from: 'm.franceschini17@gmail.com',
+                                    //   to: user.rows[0].email,
+                                    //   subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                    //   text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
+                                    //   'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
+                                    //   'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                    // };
+                                    
+                                    // transporter.sendMail(mailOptions, function(error, info){
+                                    //   if (error) {
+                                    //     console.log(error);
+                                    //   } else {
+                                    //     console.log('Email sent: ' + info.response);
+                                        var json = JSON.stringify({
+                                          success: 'sucesso',
+                                          exist: true
+                                        });
+                                        res.end(json)
+                                    //   }
+                                    // });
+                                  }
+                                })
+                                query4.on('end', () => { client.end(); });
+                          }
+                        }
+                      });
+                  }
+                }
+              })
+            }
+          });
+      })
+    }
+    })
+  }
+});
 
 // FUNCAO PARA LISTAR TODOS OS ANIMAIS CADASTRADOS
 app.get('/pet_list', function (req, res) {

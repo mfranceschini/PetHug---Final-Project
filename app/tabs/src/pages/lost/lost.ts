@@ -125,7 +125,7 @@ export class LostPage {
   /**
    * Delete an item from the list of items.
    */
-  deleteFoundAnimal(animal) {
+  deleteLostAnimal(animal) {
     // this.loadingDel.present()
     console.log("Apagando animal")
     let ret = this.lostAnimals.delete(animal);

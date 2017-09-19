@@ -18,7 +18,7 @@
 
   <ion-list>
     <ion-item-sliding *ngFor="let animal of currentLostAnimals">
-      <button ion-item (click)="openFoundAnimal(animal)">
+      <button ion-item (click)="openLostAnimal(animal)">
         <ion-avatar item-start>
           <img [src]="animal.profilePic" />
         </ion-avatar>
