@@ -1,3 +1,26 @@
 page-lost {
+    .mask_dog{
+        height: 120px;
+        width: 120px;
+        background-image:url('../../assets/img/paw_frame.png');
+        z-index:1;
+        background-size: cover;
+        position: absolute;
+    }
 
+    .mask_cat{
+        width: 120px;
+        height: 100px;
+        background-image:url('../../assets/img/cat_frame.png');
+        z-index:1;
+        background-size: cover;
+        position: absolute;
+    }
+
+    .imagediv{
+        width: 120px;
+        height: 120px;
+        position: relative;
+        z-index:0;
+    }
 }

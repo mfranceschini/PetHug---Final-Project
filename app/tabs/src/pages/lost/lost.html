@@ -16,25 +16,31 @@
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
 
-  <ion-list>
-    <ion-item-sliding *ngFor="let animal of currentLostAnimals">
-      <button ion-item (click)="openLostAnimal(animal)">
-        <ion-avatar item-start>
-          <img [src]="animal.profilePic" />
-        </ion-avatar>
-        <h2>{{animal.name}}</h2>
-        <p>Espécie: {{animal.species}}</p>
-        <p>Raça: {{animal.breed}}</p>
-        <p>Cidade: {{animal.city}}</p>
-        <p>Bairro: {{animal.neighbor}}</p>
-        <p>Endereço: {{animal.address}}</p>
-      </button>
-
-      <ion-item-options>
-        <button ion-button color="danger" (click)="deleteLostAnimal(animal)">
-          {{ 'DELETE_BUTTON' | translate }}
-        </button>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+    <ion-grid>
+      <ion-row>
+        <ion-col text-center col-6 *ngFor="let animal of currentLostAnimals">
+            <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
+              <button ion-item (click)="openLostAnimal(animal)">
+                <div *ngIf="animal.species == 'Cachorro'" class="mask_dog"></div>
+                <div *ngIf="animal.species == 'Gato'" class="mask_cat"></div>
+                <div class="imagediv">
+                    <img [src]="animal.profilePic"/>
+                </div>
+                <h2>{{animal.name}}</h2>
+                <p>Espécie: {{animal.species}}</p>
+                <p>Raça: {{animal.breed}}</p>
+                <p>Cidade: {{animal.city}}</p>
+                <p>Bairro: {{animal.neighbor}}</p>
+                <p>Endereço: {{animal.address}}</p>
+              </button>
+        
+              <ion-item-options>
+                <button ion-button color="danger" (click)="deleteAnimal(animal)">
+                  {{ 'DELETE_BUTTON' | translate }}
+                </button>
+              </ion-item-options>
+          </ion-item-sliding>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 </ion-content>

@@ -105,8 +105,6 @@ export class FoundRegisterPage {
         this.isReadyToSave = this.form.valid;
       });
 
-      this.geolocation.watchPosition();
-
     })
 
     this.loading = this.loadingCtrl.create({
@@ -118,15 +116,27 @@ export class FoundRegisterPage {
 
   getLocation() {
     console.log("Funcao de local!")
-    this.geolocation.getCurrentPosition().then((data) => {
-      console.log('My latitude : ', data.coords.latitude);
-      console.log('My longitude: ', data.coords.longitude);
-      console.log(JSON.stringify(data))
-    })
-    .catch((err)=>{
-      console.log("Error")
-      console.log(JSON.stringify(err))
-    });
+    var onSuccess = function(position) {
+      console.log("deu certo");
+      
+      console.log('Latitude: '          + position.coords.latitude          + '\n' +
+            'Longitude: '         + position.coords.longitude         + '\n' +
+            'Altitude: '          + position.coords.altitude          + '\n' +
+            'Accuracy: '          + position.coords.accuracy          + '\n' +
+            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+            'Heading: '           + position.coords.heading           + '\n' +
+            'Speed: '             + position.coords.speed             + '\n' +
+            'Timestamp: '         + position.timestamp                + '\n');
+  };
+
+  // onError Callback receives a PositionError object
+  //
+  function onError(error) {
+      console.log('code: '    + error.code    + '\n' +
+            'message: ' + error.message + '\n');
+  }
+
+  navigator.geolocation.getCurrentPosition(onSuccess, onError);
   }
 
   loadData(data) {
