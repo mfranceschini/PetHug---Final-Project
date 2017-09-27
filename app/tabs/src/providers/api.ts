@@ -11,6 +11,7 @@ export class Api {
   url: string;
 
   constructor(public http: Http, public storage: Storage) {
+    this.url = "192.168.100.107"
   }
 
   setIP(string){
@@ -19,12 +20,14 @@ export class Api {
       string = 'localhost'
     }
     this.url = string;
+    
     this.storage.set('ip', this.url);
     console.log('IP salvo!'+ this.url)
   }
 
   getIP(){
-    return this.storage.get('ip');
+    // return this.storage.get('ip');
+    return this.url
   }
 
   get(endpoint: string, params?: any, options?: RequestOptions) {

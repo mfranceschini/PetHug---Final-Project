@@ -3,7 +3,6 @@ import { Platform, Nav, Config } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
-import { Geolocation } from '@ionic-native/geolocation';
 
 import { CardsPage } from '../pages/cards/cards';
 import { ContentPage } from '../pages/content/content';
@@ -74,7 +73,7 @@ export class MyApp {
     { title: 'Search', component: SearchPage }
   ]
 
-  constructor(private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen, geolocation: Geolocation) {
+  constructor(private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {
 
     this.initTranslate();
 
@@ -83,6 +82,15 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+
+      var notificationOpenedCallback = function(jsonData) {
+        console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+      };
+  
+      window["plugins"].OneSignal
+        .startInit("682f1efd-6ede-46bd-b6dc-102ecf7fac50", "463999146678")
+        .handleNotificationOpened(notificationOpenedCallback)
+        .endInit();
     });
   }
 

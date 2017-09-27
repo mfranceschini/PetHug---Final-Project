@@ -1,6 +1,6 @@
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar color="danger">
     <ion-title>{{ 'ANIMAL_REGISTER_TITLE' | translate }}</ion-title>
     <ion-buttons start>
       <button ion-button (click)="cancel()">
@@ -66,7 +66,7 @@
         <ion-input type="number" placeholder="{{ 'ANIMAL_WEIGHT_PLACEHOLDER' | translate }}" formControlName="weight"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-input type="text" placeholder="{{ 'ANIMAL_ABOUT_PLACEHOLDER' | translate }}" formControlName="about"></ion-input>
+        <ion-input type="text"  placeholder="{{ 'ANIMAL_ABOUT_PLACEHOLDER' | translate }}" formControlName="about"></ion-input>
       </ion-item>
     </ion-list>
   </form>

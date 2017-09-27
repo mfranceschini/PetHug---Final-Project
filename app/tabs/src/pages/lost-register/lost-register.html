@@ -1,6 +1,6 @@
 <ion-header>
   
-    <ion-navbar>
+    <ion-navbar color="danger">
       <ion-title>Cadastrar Animal Perdido</ion-title>
       <ion-buttons start>
         <button ion-button (click)="cancel()">
@@ -45,7 +45,7 @@
             <ion-option *ngFor="let breed of updatedBreedsList" [value]="breed.nome">{{breed.nome}}</ion-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+        <<ion-item>
           <ion-input type="text" placeholder="{{ 'ANIMAL_NAME_PLACEHOLDER' | translate }}" formControlName="name"></ion-input>
         </ion-item>
         <ion-item>
@@ -58,6 +58,9 @@
             <ion-option value="Macho">Macho</ion-option>
             <ion-option value="Fêmea">Fêmea</ion-option>
           </ion-select>
+        </ion-item>
+        <ion-item>
+          <button ion-button block (click)="getLocation()" class="location">Obter Localização</button>
         </ion-item>
         <ion-item>
           <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>

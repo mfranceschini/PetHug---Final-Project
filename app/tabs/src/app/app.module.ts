@@ -41,8 +41,8 @@ import { GoogleMaps } from '@ionic-native/google-maps';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
-import { Geolocation } from '@ionic-native/geolocation';
 import { EmailComposer } from '@ionic-native/email-composer';
+import { Geolocation } from '@ionic-native/geolocation';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -124,8 +124,8 @@ export function providers() {
     SplashScreen,
     StatusBar,
     Facebook,
-    Geolocation,
     EmailComposer,
+    Geolocation,
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development

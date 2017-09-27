@@ -84,11 +84,11 @@ export class AnimalRegisterPage {
     this.showLoading = false;
     this.showSkip = true;
 
-    this.api.getIP().then((data)=>{
+    //this.api.getIP().then((data)=>{
       // this.ipAddress = data
       this.ipAddress = 'http://' + this.api.url
       if (this.ipAddress == 'http://undefined'){
-        this.ipAddress = 'http://localhost'
+       this.ipAddress = 'http://localhost'
       }
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
@@ -104,7 +104,7 @@ export class AnimalRegisterPage {
         this.isReadyToSave = this.form.valid;
       });
 
-    })
+    //})
 
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',

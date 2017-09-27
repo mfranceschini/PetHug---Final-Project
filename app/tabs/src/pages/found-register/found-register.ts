@@ -11,6 +11,7 @@ import { MainPage } from '../../pages/pages';
 import { Animals } from '../../providers/providers';
 import { Geolocation } from '@ionic-native/geolocation';
 
+
 @Component({
   selector: 'page-found-register',
   templateUrl: 'found-register.html'
@@ -85,7 +86,7 @@ export class FoundRegisterPage {
     this.showLoading = false;
     this.showSkip = true;
 
-    this.api.getIP().then((data)=>{
+    // this.api.getIP().then((data)=>{
       // this.ipAddress = data
       this.ipAddress = 'http://' + this.api.url
       if (this.ipAddress == 'http://undefined'){
@@ -105,7 +106,7 @@ export class FoundRegisterPage {
         this.isReadyToSave = this.form.valid;
       });
 
-    })
+    // })
 
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',
@@ -116,27 +117,13 @@ export class FoundRegisterPage {
 
   getLocation() {
     console.log("Funcao de local!")
-    var onSuccess = function(position) {
-      console.log("deu certo");
-      
-      console.log('Latitude: '          + position.coords.latitude          + '\n' +
-            'Longitude: '         + position.coords.longitude         + '\n' +
-            'Altitude: '          + position.coords.altitude          + '\n' +
-            'Accuracy: '          + position.coords.accuracy          + '\n' +
-            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-            'Heading: '           + position.coords.heading           + '\n' +
-            'Speed: '             + position.coords.speed             + '\n' +
-            'Timestamp: '         + position.timestamp                + '\n');
-  };
-
-  // onError Callback receives a PositionError object
-  //
-  function onError(error) {
-      console.log('code: '    + error.code    + '\n' +
-            'message: ' + error.message + '\n');
-  }
-
-  navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    this.geolocation.getCurrentPosition().then((position) => {
+      console.log("Deu certo");
+      console.log(JSON.stringify(position));
+    }).catch((error) =>{
+      console.log("ERRO: " + error);
+      console.log("ERRO MENSAGEM: " + error.message);
+    });
   }
 
   loadData(data) {

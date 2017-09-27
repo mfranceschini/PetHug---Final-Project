@@ -25,14 +25,14 @@ export class FoundAnimals {
 
   constructor(public http: Http, public api: Api, private storage: Storage) {
     
-    if (this.api.url == undefined){
-      this.api.getIP().then((data)=>{
-        this.ipAddress = 'http://' + data
-      })
-    }
-    else {
+    // if (this.api.url == undefined){
+    //   this.api.getIP().then((data)=>{
+    //     this.ipAddress = 'http://' + data
+    //   })
+    // }
+    // else {
       this.ipAddress = 'http://' + this.api.url
-    }
+    // }
 
     let animals = [
       {

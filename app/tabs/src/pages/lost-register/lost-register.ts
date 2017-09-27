@@ -84,7 +84,7 @@ export class LostRegisterPage {
     this.showLoading = false;
     this.showSkip = true;
 
-    this.api.getIP().then((data)=>{
+    // this.api.getIP().then((data)=>{
       // this.ipAddress = data
       this.ipAddress = 'http://' + this.api.url
       if (this.ipAddress == 'http://undefined'){
@@ -104,7 +104,7 @@ export class LostRegisterPage {
         this.isReadyToSave = this.form.valid;
       });
 
-    })
+    // })
 
     this.loading = this.loadingCtrl.create({
       spinner: 'dots',

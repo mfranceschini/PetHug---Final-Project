@@ -27,7 +27,7 @@ export class WelcomePage {
   params:any;
 
   constructor(public auth: Auth, public user: User, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public userCtrl: UserPage) {
-    this.getIPAddr()
+    // this.getIPAddr()
   }
 
   setIPAddr(){
@@ -36,11 +36,11 @@ export class WelcomePage {
 
   getIPAddr(){
     console.log("Pegando IP")
-    this.api.getIP().then((data)=>{
-      if (data != null){
-        console.log("Existe IP: "+data)
-      }
-    })
+    // this.api.getIP().then((data)=>{
+    //   if (data != null){
+    //     console.log("Existe IP: "+data)
+    //   }
+    // })
   }
   
   login() {

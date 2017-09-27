@@ -13,9 +13,9 @@ export class UserPage {
   local: Storage;
 
   constructor(public http: Http, public toastCtrl: ToastController, private storage: Storage, public api: Api) {
-    this.api.getIP().then((data)=>{
-      this.ipAddress = data
-    })
+    // this.api.getIP().then((data)=>{
+    //   this.ipAddress = data
+    // })
   }
 
   /**
