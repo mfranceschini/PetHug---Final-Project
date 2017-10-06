@@ -23,7 +23,8 @@ export class ListMasterPage {
   loadingUpdate: any;
   speciesList: any;
   breedsList: any;
-  sizesList: any
+  sizesList: any;
+  myInput: any;
 
   constructor(public api: Api, public navCtrl: NavController, public user: UserPage, public animals: Animals, public modalCtrl: ModalController, public http: Http, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
    
@@ -47,7 +48,27 @@ export class ListMasterPage {
    */
   ionViewDidLoad() {}
 
+  onInput(ev: any) {
+    let val = ev.target.value;
+
+    if (val && val.trim() != '') {
+      this.currentAnimals = this.currentAnimals.filter((item) => {
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+      })
+    }
+    else {
+      this.currentAnimals = []
+      this.loadAnimals(false)
+    }
+  }
+
+  onCancel(ev: any) {
+    this.currentAnimals = []
+    this.loadAnimals(false)    
+  }
+
   doRefresh(refresher) {
+    this.myInput = null;
     setTimeout(() => {
       this.loadAnimals(true)
       refresher.complete()
@@ -100,14 +121,13 @@ export class ListMasterPage {
               d.porte_id = data2.size[i].nome
             }
           }
-          console.log("Caminho da imagem: " +d.imagem.toString())
           this.currentAnimals.push({
             "species":d.especie_id.toString(),
             "breed":d.raca_id.toString(),  
             "name": d.nome.toString(),
             "size":d.porte_id.toString(),
             "gender":d.sexo.toString(),
-            "profilePic": d.imagem.toString(),
+            "profilePic": this.ipAddress + ':3000/images/' + d.imagem.toString(),
             "age":d.idade.toString(),
             "weight":d.peso.toString(),
             "status":d.status_id.toString(),

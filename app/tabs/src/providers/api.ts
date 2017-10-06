@@ -11,7 +11,9 @@ export class Api {
   url: string;
 
   constructor(public http: Http, public storage: Storage) {
-    this.url = "192.168.100.107"
+    // this.url = "192.168.100.107" // EM CASA
+    // this.url = "192.168.1.17" // NA CAMILA
+    this.url = "172.16.252.126" //NA PUC
   }
 
   setIP(string){

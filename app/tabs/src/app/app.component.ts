@@ -83,14 +83,14 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
 
-      var notificationOpenedCallback = function(jsonData) {
-        console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-      };
+      // var notificationOpenedCallback = function(jsonData) {
+      //   console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+      // };
   
-      window["plugins"].OneSignal
-        .startInit("682f1efd-6ede-46bd-b6dc-102ecf7fac50", "463999146678")
-        .handleNotificationOpened(notificationOpenedCallback)
-        .endInit();
+      // window["plugins"].OneSignal
+      //   .startInit("682f1efd-6ede-46bd-b6dc-102ecf7fac50", "463999146678")
+      //   .handleNotificationOpened(notificationOpenedCallback)
+      //   .endInit();
     });
   }
 

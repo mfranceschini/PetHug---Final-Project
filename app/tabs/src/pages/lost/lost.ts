@@ -15,6 +15,7 @@ import { Api } from '../../providers/api'
 export class LostPage {
   currentLostAnimals: any[];
   ipAddress: any;
+  myInput: any;
 
   constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public lostAnimals: LostAnimals, public modalCtrl: ModalController, public http: Http) {
     this.loadAnimals(false)
@@ -26,7 +27,27 @@ export class LostPage {
   ionViewDidLoad() {
   }
 
+  onInput(ev: any) {
+    let val = ev.target.value;
+
+    if (val && val.trim() != '') {
+      this.currentLostAnimals = this.currentLostAnimals.filter((item) => {
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+      })
+    }
+    else {
+      this.currentLostAnimals = []
+      this.loadAnimals(false)
+    }
+  }
+
+  onCancel(ev: any) {
+    this.currentLostAnimals = []
+    this.loadAnimals(false)    
+  }
+
   doRefresh(refresher) {
+    this.myInput = null;
     setTimeout(() => {
       this.loadAnimals(true)
       refresher.complete()
@@ -81,7 +102,7 @@ export class LostPage {
             "name": d.nome.toString(),
             "size":d.porte_id.toString(),
             "gender":d.sexo.toString(),
-            "profilePic": d.imagem.toString(),
+            "profilePic": this.ipAddress + ':3000/images/' + d.imagem.toString(),
             "city":d.cidade.toString(),
             "neighbor":d.bairro.toString(),
             "address":d.endereco.toString(),

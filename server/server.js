@@ -9,6 +9,7 @@ var fs = require('fs');
 var cors = require('cors')
 var app = express();
 
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors());
@@ -432,7 +433,7 @@ app.post('/create_pet', function (req, res) {
       var imageBuffer = decodeBase64Image(fileName);
       var random = Math.random() * (9999 - 1000) + 1000
       random = random.toPrecision(4)
-      const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+      const imagePath = "./public/images/animal" + random + ".jpeg"
   
       createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
             if(err){
@@ -496,7 +497,8 @@ app.post('/create_pet', function (req, res) {
           var imageBuffer = decodeBase64Image(form.image);
           var random = Math.random() * (9999 - 1000) + 1000
           random = random.toPrecision(4)
-          const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+          const imagePath = "./public/images/animal" + random + ".jpeg"
+          const path = 'animal'+ random + ".jpeg"
   
           promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
               if(err){
@@ -511,7 +513,6 @@ app.post('/create_pet', function (req, res) {
             }))
   
         Promise.all([promise]).then((data) => {
-          const path = imagePath
           const query = client.query(
           'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
             function(err, result) {
@@ -536,7 +537,6 @@ app.post('/create_pet', function (req, res) {
 app.post('/create_found_pet', function (req, res) {
   
     console.log ('Criar Animal Encontrado!');
-    // console.log (req);
     var analysis1;
     var index = 0;
     // Instantiates a client
@@ -566,7 +566,7 @@ app.post('/create_found_pet', function (req, res) {
       var imageBuffer = decodeBase64Image(fileName);
       var random = Math.random() * (9999 - 1000) + 1000
       random = random.toPrecision(4)
-      const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+      const imagePath = "./public/images/animal" + random + ".jpeg"
   
       createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
             if(err){
@@ -630,7 +630,8 @@ app.post('/create_found_pet', function (req, res) {
           var imageBuffer = decodeBase64Image(form.image);
           var random = Math.random() * (9999 - 1000) + 1000
           random = random.toPrecision(4)
-          const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+          const imagePath = "./public/images/animal" + random + ".jpeg"
+          const path = 'animal'+ random + ".jpeg"
   
           promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
               if(err){
@@ -645,7 +646,6 @@ app.post('/create_found_pet', function (req, res) {
             }))
   
         Promise.all([promise]).then((data) => {
-          const path = imagePath
           const query = client.query(
           'INSERT INTO public."Animal_Encontrado"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
             function(err, result) {
@@ -665,23 +665,22 @@ app.post('/create_found_pet', function (req, res) {
                 // SELECT ANIMAL ENCONTRADO ATRAVES DE {RAÇA, ESPECIE, CIDADE, BAIRRO}
                 // SE ROWCOUNT >= 1 --> COMPARA AS DUAS IMAGENS --> SE FOREM PARECIDAS, SUCESSO
                 const query2 = client.query(
-                'SELECT * FROM public."Animal_Encontrado" WHERE especie_id=($1) AND raca_id=($2) AND cidade=($3) AND bairro=($4)',[form.species, form.breed, form.city, form.neighbor],
+                'SELECT * FROM public."Animal_Perdido" WHERE especie_id=($1) AND raca_id=($2) AND cidade=($3) AND bairro=($4)',[form.species, form.breed, form.city, form.neighbor],
                 function(err, result) {
                   if (err) {
-                    console.log("Erro ao ver se tem animal encontrado parecido")
+                    console.log("Erro ao ver se tem animal perdido parecido")
                     console.log(err);
                   }
                   else {
-                    console.log("Existe animal encontrado parecido!!!")
                     if (result.rowCount > 0)
                     {
+                      console.log("Existe animal perdido parecido!!!")
                       console.log("Imagem cadastrada: " + path)
                       console.log("Imagem retornada: " + result.rows[0].imagem)
                       // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
-                      // var diff = resemble(req.query.img1).compareTo(req.query.img2).ignoreAntialiasing().onComplete(function(data){
-                      //   console.log("Diferença entre as imagens: " + data.misMatchPercentage);
-                      //   res.end('Diferença entre as imagens: ' + data.misMatchPercentage);
-                      // });
+                      var diff = resemble(path).compareTo(result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
+                        console.log("Diferença entre as imagens: " + data.misMatchPercentage);
+                      });
                       const query3 = client.query(
                       'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
                         function(err, result) {
@@ -689,7 +688,7 @@ app.post('/create_found_pet', function (req, res) {
                             console.log("Erro Get User Data")
                             console.log(err);
                           } else {
-                            if (result.rowCount == 1){
+                            if (result.rowCount > 0){
                               console.log("User Exist!")
                               console.log("Enviando email para responsavel")
                               const query4 = client.query(
@@ -700,42 +699,44 @@ app.post('/create_found_pet', function (req, res) {
                                     console.log(JSON.stringify(err))
                                   }
                                   else {
-                                    console.log(JSON.stringify(user))
-                                    // var transporter = nodemailer.createTransport({
-                                    //   service: 'gmail',
-                                    //   auth: {
-                                    //     user: 'm.franceschini17@gmail.com',
-                                    //     pass: 'ngt03$#y'
-                                    //   }
-                                    // });
-                                    
-                                    // var mailOptions = {
-                                    //   from: 'm.franceschini17@gmail.com',
-                                    //   to: user.rows[0].email,
-                                    //   subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                    //   text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
-                                    //   'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
-                                    //   'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                    // };
-                                    
-                                    // transporter.sendMail(mailOptions, function(error, info){
-                                    //   if (error) {
-                                    //     console.log(error);
-                                    //   } else {
-                                    //     console.log('Email sent: ' + info.response);
+                                    const sgMail = require('@sendgrid/mail');
+                                    sgMail.setApiKey('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');
+                                    const msg = {
+                                      to: user.rows[0].email,
+                                      cc: 'm.franceschini17@gmail.com',
+                                      from: 'pethug@email.com',
+                                      subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                      text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
+                                      'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
+                                      'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                    };
+                                    sgMail.send(msg).then((data)=>{
+                                      console.log("Email enviado com sucesso")
                                         var json = JSON.stringify({
                                           success: 'sucesso',
                                           exist: true
                                         });
                                         res.end(json)
-                                    //   }
-                                    // });
+                                    }).catch((err)=>{
+                                      console.log("Erro ao enviar email")
+                                      console.log(JSON.stringify(err))
+                                    })
                                   }
                                 })
                                 query4.on('end', () => { client.end(); });
                             }
                           }
                         });
+                    }
+                    //nao tem animal parecido cadastrado
+                    else {
+                      console.log("Nao existe animal parecido")
+                      var json = JSON.stringify({
+                        success: 'sucesso',
+                        exist: false
+                      });
+                      res.end(json)
+                      query2.on('end', () => { client.end(); });
                     }
                   }
                 })
@@ -781,10 +782,11 @@ app.post('/create_lost_pet', function (req, res) {
     var imageBuffer = decodeBase64Image(fileName);
     var random = Math.random() * (9999 - 1000) + 1000
     random = random.toPrecision(4)
-    const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+    const imagePath = "./public/images/animal" + random + ".jpeg"
 
     createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
           if(err){
+            Promise.reject()
             throw(err);
           }
           else{
@@ -845,7 +847,8 @@ app.post('/create_lost_pet', function (req, res) {
         var imageBuffer = decodeBase64Image(form.image);
         var random = Math.random() * (9999 - 1000) + 1000
         random = random.toPrecision(4)
-        const imagePath = '/home/matheus/Mesa/PetHug/TCC/server/images/db/animal' + random + '.png'
+        const imagePath = "./public/images/animal" + random + ".jpeg"
+        const path = "animal" + random + ".jpeg"
 
         promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
             if(err){
@@ -860,7 +863,7 @@ app.post('/create_lost_pet', function (req, res) {
           }))
 
       Promise.all([promise]).then((data) => {
-        const path = imagePath
+        
         const query = client.query(
         'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
           function(err, result) {
@@ -887,9 +890,9 @@ app.post('/create_lost_pet', function (req, res) {
                   console.log(err);
                 }
                 else {
-                  console.log("Existe animal encontrado parecido!!!")
                   if (result.rowCount > 0)
                   {
+                    console.log("Existe animal encontrado parecido!!!")
                     console.log("Imagem cadastrada: " + path)
                     console.log("Imagem retornada: " + result.rows[0].imagem)
                     // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
@@ -904,7 +907,7 @@ app.post('/create_lost_pet', function (req, res) {
                           console.log("Erro Get User Data")
                           console.log(err);
                         } else {
-                          if (result.rowCount == 1){
+                          if (result.rowCount > 0){
                             console.log("User Exist!")
                             console.log("Enviando email para responsavel")
                             const query4 = client.query(
@@ -951,6 +954,16 @@ app.post('/create_lost_pet', function (req, res) {
                           }
                         }
                       });
+                  }
+                  //nao tem animal parecido cadastrado
+                  else {
+                    console.log("Nao existe animal parecido")
+                    var json = JSON.stringify({
+                      success: 'sucesso',
+                      exist: false
+                    });
+                    res.end(json)
+                    query2.on('end', () => { client.end(); });
                   }
                 }
               })
@@ -1007,9 +1020,10 @@ app.get('/found_pet_list', function (req, res) {
     const query = client.query(
     'SELECT * FROM public."Animal_Encontrado"');
     animalPromise = query.on('row', function(row) {
-      console.log("Recebeu os animais encontrados")
-      result.push(row)
-    });
+        console.log("Recebeu os animais encontrados")
+        result.push(row)
+    })
+    
 
     Promise.all([animalPromise]).then(function(data) {
       console.log("Todos os animais encontrados retornados")

@@ -119,13 +119,14 @@ export function providers() {
     LostAnimals,
     FoundAnimals,
     UserPage,
+    Geolocation,
     Camera,
     GoogleMaps,
     SplashScreen,
     StatusBar,
     Facebook,
     EmailComposer,
-    Geolocation,
+    
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development

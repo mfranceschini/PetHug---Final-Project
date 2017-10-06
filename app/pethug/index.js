@@ -13,9 +13,9 @@ app.post('/pet', function (req, res) {
   });
 });
 
-app.listen(3000, function (err) {
+app.listen(3001, function (err) {
   if (err) {
     throw err
   }
-  console.log('Server started on port 3000')
+  console.log('Server started on port 30001')
 })

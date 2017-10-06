@@ -8,7 +8,6 @@ import { Api } from '../../providers/api'
 import { ListMasterPage } from "../list-master/list-master";
 import { FoundPage } from "../found/found";
 import { MainPage } from '../../pages/pages';
-import { Animals } from '../../providers/providers';
 import { Geolocation } from '@ionic-native/geolocation';
 
 
@@ -69,7 +68,7 @@ export class FoundRegisterPage {
 
   listMaster: any;
 
-  constructor(public geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
+  constructor(private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -115,14 +114,18 @@ export class FoundRegisterPage {
 
   }
 
-  getLocation() {
+  getLocation(ev: any) {
     console.log("Funcao de local!")
-    this.geolocation.getCurrentPosition().then((position) => {
-      console.log("Deu certo");
-      console.log(JSON.stringify(position));
-    }).catch((error) =>{
-      console.log("ERRO: " + error);
-      console.log("ERRO MENSAGEM: " + error.message);
+    
+    let watch = this.geolocation.watchPosition();
+    watch.subscribe((data) => {
+      console.log("entrou no watch");
+      console.log(JSON.stringify(data));
+      
+      
+     // data can be a set of coordinates, or an error (if an error occurred).
+     // data.coords.latitude
+     // data.coords.longitude
     });
   }
 

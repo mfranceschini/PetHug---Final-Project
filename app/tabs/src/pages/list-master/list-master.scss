@@ -6,24 +6,24 @@ page-list-master {
         z-index:1;
         background-size: cover;
         position: absolute;
-        margin-left: 10px;
+        // margin-left: 10px;
     }
 
-    .mask_cat{
-        width: 140px;
-        height: 140px;
-        background-image:url('../../assets/img/cat_frame.png');
-        z-index:1;
-        background-size: cover;
-        position: absolute;
-        margin-left: 10px;
-    }
+    // .mask_cat{
+    //     width: 140px;
+    //     height: 140px;
+    //     background-image:url('../../assets/img/cat_frame.png');
+    //     z-index:1;
+    //     background-size: cover;
+    //     position: absolute;
+    //     margin-left: 10px;
+    // }
 
     .imagediv{
-        width: 140px;
-        height: 140px;
+        width: 150px;
+        height: 150px;
         position: relative;
-        margin-left: 10px;
+        // margin-left: 10px;
         z-index:0;
     }
 }

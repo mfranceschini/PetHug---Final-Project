@@ -5,8 +5,19 @@ import { FoundAnimals } from '../../providers/providers';
 import { FoundAnimal } from '../../models/found-animal';
 import { FoundRegisterPage } from '../found-register/found-register';
 import { Http, Headers } from '@angular/http';
-import { Api } from '../../providers/api'
+import { Api } from '../../providers/api';
 
+import { Pipe } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+
+@Pipe({name: 'safeHtml'})
+export class SafeHtml {
+  constructor(private sanitizer:DomSanitizer){}
+
+  transform(html) {
+    return this.sanitizer.bypassSecurityTrustUrl(html);
+  }
+}
 
 @Component({
   selector: 'page-found',
@@ -15,6 +26,7 @@ import { Api } from '../../providers/api'
 export class FoundPage {
   currentFoundAnimals: any[];
   ipAddress: any;
+  myInput: any[];
 
   constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public foundAnimals: FoundAnimals, public modalCtrl: ModalController, public http: Http) {
     this.loadAnimals(false)
@@ -26,7 +38,27 @@ export class FoundPage {
   ionViewDidLoad() {
   }
 
+  onInput(ev: any) {
+    let val = ev.target.value;
+
+    if (val && val.trim() != '') {
+      this.currentFoundAnimals = this.currentFoundAnimals.filter((item) => {
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+      })
+    }
+    else {
+      this.currentFoundAnimals = []
+      this.loadAnimals(false)
+    }
+  }
+
+  onCancel(ev: any) {
+    this.currentFoundAnimals = []
+    this.loadAnimals(false)    
+  }
+
   doRefresh(refresher) {
+    this.myInput = null;
     setTimeout(() => {
       this.loadAnimals(true)
       refresher.complete()
@@ -75,13 +107,14 @@ export class FoundPage {
               d.porte_id = data2.size[i].nome
             }
           }
+          
           this.currentFoundAnimals.push({
             "species":d.especie_id.toString(),
             "breed":d.raca_id.toString(),  
             "name": d.nome.toString(),
             "size":d.porte_id.toString(),
             "gender":d.sexo.toString(),
-            "profilePic": d.imagem.toString(),
+            "profilePic": this.ipAddress + ':3000/images/' + d.imagem.toString(),
             "city":d.cidade.toString(),
             "neighbor":d.bairro.toString(),
             "address":d.endereco.toString(),
