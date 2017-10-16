@@ -176,7 +176,8 @@ export class LostPage {
    */
   openLostAnimal(animal: LostAnimal) {
     this.navCtrl.push(ItemDetailPage, {
-      animal: animal
+      animal: animal,
+      "lost": true
     });
   }
 }

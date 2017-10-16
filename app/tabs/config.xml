@@ -3,7 +3,7 @@
     <name>PetHug</name>
     <description>Adote um amigo.</description>
     <author email="m.franceschini17@gmail.com">Matheus Franceschini</author>
-    <content original-src="index.html" src="http://172.16.252.126:8100" />
+    <content original-src="index.html" src="http://192.168.100.107:8100" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-intent href="http://*/*" />

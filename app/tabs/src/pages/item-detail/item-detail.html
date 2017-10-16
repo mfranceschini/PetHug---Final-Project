@@ -2,6 +2,12 @@
 
   <ion-navbar color="danger">
     <ion-title>{{ animal.name }}</ion-title>
+
+    <ion-buttons end *ngIf="showDelete == true">
+      <button ion-button icon-only (click)="deleteAnimal(animal)">
+        <ion-icon name="md-trash"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -11,7 +17,7 @@
   <div class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.profilePic + ')'">
   </div>
 
-  <div class="item-detail" padding>
+  <div *ngIf="normal == true" class="item-detail" padding>
     <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
     <p>Sou um <b>{{animal.species}}</b>,</p>
     <p>Sou <b>{{animal.gender}}</b>,</p>
@@ -19,6 +25,24 @@
     <p>Sou de porte <b>{{animal.size}}</b>,</p>
     <p>Tenho <b>{{animal.age}}</b> anos,</p>
     <p>Sobre mim: <b>{{animal.about}}</b></p>
+  </div>
+
+  <div *ngIf="found == true" class="item-detail" padding>
+    <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
+    <p>Sou um <b>{{animal.species}}</b>,</p>
+    <p>Sou <b>{{animal.gender}}</b>,</p>      
+    <p>Fui encontrado em <b>{{animal.city}}</b>,</p>
+    <p>No bairro <b>{{animal.neighbor}}</b>,</p>
+    <p>Sou de porte <b>{{animal.size}}</b>,</p>
+  </div>
+
+  <div *ngIf="lost == true" class="item-detail" padding>
+    <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
+    <p>Sou um <b>{{animal.species}}</b>,</p>
+    <p>Sou <b>{{animal.gender}}</b>,</p>      
+    <p>Fui encontrado em <b>{{animal.city}}</b>,</p>
+    <p>No bairro <b>{{animal.neighbor}}</b>,</p>
+    <p>Sou de porte <b>{{animal.size}}</b>,</p>
   </div>
 
   <button ion-button block (click)="sendEmail()" class="email">Entrar em Contato</button>

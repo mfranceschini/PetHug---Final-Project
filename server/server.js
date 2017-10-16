@@ -60,6 +60,7 @@ app.post('/verify_facebook', function (req, res) {
         if (err) {
           console.log("Erro Verify Facebook")
           console.log(err);
+          query.on('end', () => { client.end(); });          
         } else {
           if (result.rowCount == 1){
             result_id = result.rows[0].id
@@ -90,6 +91,7 @@ app.post('/verify_facebook', function (req, res) {
               success: "nao_existe"
             });
             res.end(json)
+            query.on('end', () => { client.end(); });            
           }
         }
       });      
@@ -110,6 +112,7 @@ app.post('/create_facebook_user', function (req, res) {
         if (err) {
           console.log("Deu erro")
           console.log(err);
+          query.on('end', () => { client.end(); });          
         } else {
           const query2 = client.query(
             'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result.rows[0].id, userData.facebook_id, userData.instagram_id],
@@ -149,6 +152,7 @@ app.post('/verify_instagram', function (req, res) {
         if (err) {
           console.log("Erro Verify Instagram")
           console.log(err);
+          query.on('end', () => { client.end(); });          
         } else {
           if (result.rowCount == 1){
             result_id = result.rows[0].id
@@ -179,6 +183,7 @@ app.post('/verify_instagram', function (req, res) {
               success: "nao_existe"
             });
             res.end(json)
+            query.on('end', () => { client.end(); });            
           }
         }
       });      
@@ -199,6 +204,7 @@ app.post('/create_instagram_user', function (req, res) {
         if (err) {
           console.log("Deu erro")
           console.log(err);
+          query.on('end', () => { client.end(); });          
         } else {
           const query2 = client.query(
             'INSERT INTO public."Social"(id, facebook_id, instagram_id) VALUES ($1, $2, $3)',[result.rows[0].id, userData.facebook_id, userData.instagram_id],
@@ -296,108 +302,6 @@ app.post('/get_user_data', function (req, res) {
     });      
   });
 })
-
-//FUNCAO USADA PARA MONITORAMENTO DE ANIMAIS DESAPARECIDOS
-app.get('/pet', function (req, res) { 
-
-  console.log ('requisicao recebida');
-  console.log (req.body.img1);
-  console.log (req.body.img2);
-
-  var analysis1;
-  var analysis2;
-  var index = 0;
-  var result= []
-  // Instantiates a client
-  const visionClient = Vision({
-    projectId: projectId
-  });
-
-  // The name of the image file to annotate
-  const fileName = req.body.img1;
-  const fileName2 = req.body.img2;
-
-  //Get all lost animals
-  var client = new pg.Client(conString);
-  console.log("Lista de Animais Perdidos")
-
-  client.connect(function (err) {
-  	if (err) throw err;
-  	console.log ("Conexão Estabelecida!");
-    // console.log (client);
-
-    const query = client.query(
-    'SELECT * FROM public."Animal_Perdido"');
-    promise = new Promise(function(resolve, reject) {
-      query.on('row', function(row) {
-        console.log("Recebeu os animais perdidos")
-        result.push(row)
-      });
-      Promise.resolve(true)
-    })
-    Promise.all([promise]).then(function(data) {
-      console.log("promise resolvida")
-      var result2 = []
-      query.on('end', () => { client.end(); });
-      const query2 = client.query(
-      'SELECT * FROM public."Animal" WHERE id=$1', result.animal_id);
-      query2.on('row', function(row) {
-        console.log("Recebeu os animais")
-        result2.push(row)
-        console.log(result2)
-      });
-    })
-    
-  })
-
-
-  // Performs label detection on the image file
-  // analysis1 = visionClient.detectLabels(fileName)
-  //   .then((results) => {
-  //     const labels = results[0];
-  //     console.log('Image 1 analysed!\n');
-  //     labels.forEach((label) => 
-  //       console.log(label))
-  //     return(labels);
-  //   })
-  //   .catch((err) => {
-  //     console.error('ERROR:', err);
-  //   });
-
-  // analysis2 = visionClient.detectLabels(fileName2)
-  //   .then((results) => {
-  //     const labels = results[0];
-  //     console.log('Image 2 analysed!\n');
-  //     labels.forEach((label) => 
-  //       console.log(label))
-  //     return(labels);
-  //   })
-  //   .catch((err) => {
-  //     console.error('ERROR:', err);
-  //     return(err);
-  //   });
-
-  // Promise.all([analysis1, analysis2]).then(function(data) {
-  //   // all loaded
-  //   console.log("All Images Analysed!\n");
-  //   var json = JSON.stringify({ 
-  //   image1: data[0], 
-  //   image2: data[1]
-  //   });
-  //   res.end(json);
-  //   console.log("Response Sent!\n")
-  // }, function(err) {
-  //   console.error('ERROR:', err);
-  //   // one or more failed
-  // });
-
-    // var diff = resemble(req.query.img1).compareTo(req.query.img2).ignoreAntialiasing().onComplete(function(data){
-    //   console.log("Diferença entre as imagens: " + data.misMatchPercentage);
-    //   res.end('Diferença entre as imagens: ' + data.misMatchPercentage);
-    // });
-
-  });
-
 
 // FUNCAO USADA DURANTE O CADASTRO DE UM NOVO ANIMAL
 app.post('/create_pet', function (req, res) {
@@ -678,55 +582,66 @@ app.post('/create_found_pet', function (req, res) {
                       console.log("Imagem cadastrada: " + path)
                       console.log("Imagem retornada: " + result.rows[0].imagem)
                       // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
-                      var diff = resemble(path).compareTo(result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
-                        console.log("Diferença entre as imagens: " + data.misMatchPercentage);
-                      });
-                      const query3 = client.query(
-                      'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
-                        function(err, result) {
-                          if (err) {
-                            console.log("Erro Get User Data")
-                            console.log(err);
-                          } else {
-                            if (result.rowCount > 0){
-                              console.log("User Exist!")
-                              console.log("Enviando email para responsavel")
-                              const query4 = client.query(
-                              'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                function(err, user) {
-                                  if (err){
-                                    console.log("Erro ao pegar usuario logado")
-                                    console.log(JSON.stringify(err))
-                                  }
-                                  else {
-                                    const sgMail = require('@sendgrid/mail');
-                                    sgMail.setApiKey('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');
-                                    const msg = {
-                                      to: user.rows[0].email,
-                                      cc: 'm.franceschini17@gmail.com',
-                                      from: 'pethug@email.com',
-                                      subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                      text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
-                                      'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
-                                      'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                    };
-                                    sgMail.send(msg).then((data)=>{
-                                      console.log("Email enviado com sucesso")
-                                        var json = JSON.stringify({
-                                          success: 'sucesso',
-                                          exist: true
-                                        });
-                                        res.end(json)
-                                    }).catch((err)=>{
-                                      console.log("Erro ao enviar email")
-                                      console.log(JSON.stringify(err))
+                      var diff = resemble("./public/images/" + path).compareTo("./public/images/" + result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
+                        if (data.misMatchPercentage < 40) {
+                          console.log("As imagens são parecidas!!")
+                          const query3 = client.query(
+                          'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
+                            function(err, result) {
+                              if (err) {
+                                console.log("Erro Get User Data")
+                                console.log(err);
+                              } else {
+                                if (result.rowCount > 0){
+                                  console.log("User Exist!")
+                                  console.log("Enviando email para responsavel...")
+                                  const query4 = client.query(
+                                  'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                    function(err, user) {
+                                      if (err){
+                                        console.log("Erro ao pegar usuario logado")
+                                        console.log(JSON.stringify(err))
+                                      }
+                                      else {
+                                        const sgMail = require('@sendgrid/mail');
+                                        sgMail.setApiKey('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');
+                                        const msg = {
+                                          to: user.rows[0].email,
+                                          cc: 'm.franceschini17@gmail.com',
+                                          from: 'pethug@email.com',
+                                          subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                          text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
+                                          'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
+                                          'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                        };
+                                        sgMail.send(msg).then((data)=>{
+                                          console.log("Email enviado com sucesso")
+                                            var json = JSON.stringify({
+                                              success: 'sucesso',
+                                              exist: true
+                                            });
+                                            res.end(json)
+                                        }).catch((err)=>{
+                                          console.log("Erro ao enviar email")
+                                          console.log(JSON.stringify(err))
+                                        })
+                                      }
                                     })
-                                  }
-                                })
-                                query4.on('end', () => { client.end(); });
-                            }
-                          }
-                        });
+                                    query4.on('end', () => { client.end(); });
+                                }
+                              }
+                            });
+                        }
+                        else {
+                          console.log("As imagens não são parecidas!!")
+                          var json = JSON.stringify({
+                            success: 'sucesso',
+                            exist: false
+                          });
+                          res.end(json)
+                          query2.on('end', () => { client.end(); });                          
+                        }
+                      });
                     }
                     //nao tem animal parecido cadastrado
                     else {
@@ -896,65 +811,67 @@ app.post('/create_lost_pet', function (req, res) {
                     console.log("Imagem cadastrada: " + path)
                     console.log("Imagem retornada: " + result.rows[0].imagem)
                     // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
-                    // var diff = resemble(req.query.img1).compareTo(req.query.img2).ignoreAntialiasing().onComplete(function(data){
-                    //   console.log("Diferença entre as imagens: " + data.misMatchPercentage);
-                    //   res.end('Diferença entre as imagens: ' + data.misMatchPercentage);
-                    // });
-                    const query3 = client.query(
-                    'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
-                      function(err, result) {
-                        if (err) {
-                          console.log("Erro Get User Data")
-                          console.log(err);
-                        } else {
-                          if (result.rowCount > 0){
-                            console.log("User Exist!")
-                            console.log("Enviando email para responsavel")
-                            const query4 = client.query(
-                              'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                function(err, user) {
-                                  if (err){
-                                    console.log("Erro ao pegar usuario logado")
-                                    console.log(JSON.stringify(err))
-                                  }
-                                  else {
-                                    console.log(JSON.stringify(user))
-                                    // var transporter = nodemailer.createTransport({
-                                    //   service: 'gmail',
-                                    //   auth: {
-                                    //     user: 'm.franceschini17@gmail.com',
-                                    //     pass: 'ngt03$#y'
-                                    //   }
-                                    // });
-                                    
-                                    // var mailOptions = {
-                                    //   from: 'm.franceschini17@gmail.com',
-                                    //   to: user.rows[0].email,
-                                    //   subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                    //   text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
-                                    //   'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
-                                    //   'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                    // };
-                                    
-                                    // transporter.sendMail(mailOptions, function(error, info){
-                                    //   if (error) {
-                                    //     console.log(error);
-                                    //   } else {
-                                    //     console.log('Email sent: ' + info.response);
-                                        var json = JSON.stringify({
-                                          success: 'sucesso',
-                                          exist: true
-                                        });
-                                        res.end(json)
-                                    //   }
-                                    // });
-                                  }
-                                })
-                                query4.on('end', () => { client.end(); });
-                          }
+                    var diff = resemble("./public/images/" + path).compareTo("./public/images/" + result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
+                      if (data.misMatchPercentage < 40) {
+                        console.log("As imagens são parecidas!!")
+                        const query3 = client.query(
+                        'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
+                          function(err, result) {
+                            if (err) {
+                              console.log("Erro Get User Data")
+                              console.log(err);
+                            } else {
+                              if (result.rowCount > 0){
+                                console.log("User Exist!")
+                                console.log("Enviando email para responsavel...")
+                                const query4 = client.query(
+                                'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                  function(err, user) {
+                                    if (err){
+                                      console.log("Erro ao pegar usuario logado")
+                                      console.log(JSON.stringify(err))
+                                    }
+                                    else {
+                                      const sgMail = require('@sendgrid/mail');
+                                      sgMail.setApiKey('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');
+                                      const msg = {
+                                        to: user.rows[0].email,
+                                        cc: 'm.franceschini17@gmail.com',
+                                        from: 'pethug@email.com',
+                                        subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                        text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
+                                        'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
+                                        'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                      };
+                                      sgMail.send(msg).then((data)=>{
+                                        console.log("Email enviado com sucesso")
+                                          var json = JSON.stringify({
+                                            success: 'sucesso',
+                                            exist: true
+                                          });
+                                          res.end(json)
+                                      }).catch((err)=>{
+                                        console.log("Erro ao enviar email")
+                                        console.log(JSON.stringify(err))
+                                      })
+                                    }
+                                  })
+                                  query4.on('end', () => { client.end(); });
+                                }
+                              }
+                            });
+                        }
+                        else {
+                          console.log("As imagens não são parecidas!!")
+                          var json = JSON.stringify({
+                            success: 'sucesso',
+                            exist: false
+                          });
+                          res.end(json)
+                          query2.on('end', () => { client.end(); });                          
                         }
                       });
-                  }
+                    }
                   //nao tem animal parecido cadastrado
                   else {
                     console.log("Nao existe animal parecido")
@@ -980,6 +897,7 @@ app.get('/pet_list', function (req, res) {
   var result = []
   var client = new pg.Client(conString);
   console.log("Lista de Animais")
+  client.removeAllListeners()
 
   client.connect(function (err) {
   	if (err) throw err;
@@ -1119,7 +1037,7 @@ app.get('/animal_data', function (req, res) {
       });
       res.end(json);
       console.log("Response Sent!\n")
-      query.on('end', () => { client.end(); });
+      query4.on('end', () => { client.end(); });
     }, function(err) {
       console.error('ERROR:', err);
       query.on('end', () => { client.end(); });
@@ -1133,6 +1051,7 @@ app.post('/delete_pet', function (req, res) {
   var result = []
   var client = new pg.Client(conString);
   console.log("Exclusao de Animais")
+  console.log(req.body.id)
 
   client.connect(function (err) {
   	if (err) throw err;
@@ -1236,6 +1155,101 @@ app.post('/delete_lost_pet', function (req, res) {
     })
   })
 })
+
+app.get('/place_list', function (req, res) {
+  var result = []
+  var client = new pg.Client(conString);
+  console.log("Lista de Estabelecimentos")
+
+  client.connect(function (err) {
+  	if (err) throw err;
+  	console.log ("Conexão Estabelecida!");
+
+    const query = client.query(
+    'SELECT * FROM public."Estabelecimento"');
+    placePromise = query.on('row', function(row) {
+      console.log("Recebeu os estabelecimentos")
+      result.push(row)
+    });
+
+    Promise.all([placePromise]).then(function(data) {
+      console.log("Todos os estabelecimentos retornados")
+      var json = JSON.stringify({ 
+        places: result
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+    }, function(err) {
+      console.error('ERROR:', err);
+      query.on('end', () => { client.end(); });
+      // one or more failed
+    })
+  })
+})
+
+app.post('/create_place', function (req, res) {
+  console.log("Criando Estabelecimento")
+  var form = req.body.form
+  console.log("\nSalvando Estabelecimento no BD")
+  var client = new pg.Client(conString);
+  var result = [];
+  client.connect(function (err) {
+    if (err) throw err;
+    console.log ("Conexão Estabelecida!");
+
+    if (form.image){
+      function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+          response = {};
+
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+
+        return response;
+      }
+      var imageBuffer = decodeBase64Image(form.image);
+      var random = Math.random() * (9999 - 1000) + 1000
+      random = random.toPrecision(4)
+      const imagePath = "./public/images/places/place" + random + ".jpeg"
+      const path = 'place'+ random + ".jpeg"
+
+      promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+          if(err){
+            console.log("\nErro ao criar imagem")
+            console.log(err);
+            Promise.reject()
+          }
+          else {
+            console.log("\nImagem criada: " + imagePath)
+            Promise.resolve()
+          }
+        }))
+
+    Promise.all([promise]).then((data) => {
+      const query = client.query(
+      'INSERT INTO public."Estabelecimento"(nome, cidade, bairro, endereco, telefone, email, imagem) VALUES ($1, $2, $3, $4, $5, $6, $7)',[form.name, form.city, form.neighbor, form.address, form.phone, form.email, path],
+        function(err, result) {
+          if (err) {
+            console.log("Deu erro")
+            console.log(err);
+          } else {
+            console.log("Place Inserted")
+            var json = JSON.stringify({ 
+              success: "sucesso"
+            });
+            res.end(json)
+          }
+        });
+      query.on('end', () => { client.end(); });
+    })
+  }
+  })
+});
 
 app.listen(3000, function (err) {
 

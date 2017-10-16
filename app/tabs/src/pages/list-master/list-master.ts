@@ -203,7 +203,8 @@ export class ListMasterPage {
    */
   openAnimal(animal: Animal) {
     this.navCtrl.push(ItemDetailPage, {
-      animal: animal
+      animal: animal,
+      "normal": true
     });
   }
 }

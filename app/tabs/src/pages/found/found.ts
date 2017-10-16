@@ -107,7 +107,7 @@ export class FoundPage {
               d.porte_id = data2.size[i].nome
             }
           }
-          
+
           this.currentFoundAnimals.push({
             "species":d.especie_id.toString(),
             "breed":d.raca_id.toString(),  
@@ -118,7 +118,8 @@ export class FoundPage {
             "city":d.cidade.toString(),
             "neighbor":d.bairro.toString(),
             "address":d.endereco.toString(),
-            "id": d.id.toString()
+            "id": d.id.toString(),
+            "user": d.responsavel_id.toString()
           })
           // this.loading.dismiss()
         });
@@ -188,7 +189,8 @@ export class FoundPage {
    */
   openFoundAnimal(animal: FoundAnimal) {
     this.navCtrl.push(ItemDetailPage, {
-      animal: animal
+      animal: animal,
+      "found": true
     });
   }
 }

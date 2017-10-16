@@ -2,27 +2,11 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, Nav, Config } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 
-import { CardsPage } from '../pages/cards/cards';
-import { ContentPage } from '../pages/content/content';
 import { FirstRunPage } from '../pages/pages';
-import { ListMasterPage } from '../pages/list-master/list-master';
-import { LoginPage } from '../pages/login/login';
-import { MapPage } from '../pages/map/map';
-import { MenuPage } from '../pages/menu/menu';
-import { SearchPage } from '../pages/search/search';
+import { MainPage } from '../pages/pages';
+import { PlacePage } from '../pages/place/place';
 import { SettingsPage } from '../pages/settings/settings';
-import { SignupPage } from '../pages/signup/signup';
-import { TabsPage } from '../pages/tabs/tabs';
-import { TutorialPage } from '../pages/tutorial/tutorial';
-import { WelcomePage } from '../pages/welcome/welcome';
-import { FoundPage } from '../pages/found/found';
-import { LostPage } from '../pages/lost/lost';
-import { FirstCarePage } from '../pages/first-care/first-care';
-import { AnimalRegisterPage } from '../pages/animal-register/animal-register';
-import { LostRegisterPage } from '../pages/lost-register/lost-register';
-import { FoundRegisterPage } from '../pages/found-register/found-register';
 
 import { Settings } from '../providers/providers';
 
@@ -32,7 +16,7 @@ import { TranslateService } from '@ngx-translate/core'
   template: `<ion-menu [content]="content">
     <ion-header>
       <ion-toolbar>
-        <ion-title>Pages</ion-title>
+        <ion-title>Páginas</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -53,24 +37,9 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   pages: any[] = [
-    { title: 'Tutorial', component: TutorialPage },
-    { title: 'Welcome', component: WelcomePage },
-    { title: 'Tabs', component: TabsPage },
-    { title: 'Cards', component: CardsPage },
-    { title: 'Content', component: ContentPage },
-    { title: 'Login', component: LoginPage },
-    { title: 'Signup', component: SignupPage },
-    { title: 'Map', component: MapPage },
-    { title: 'Master Detail', component: ListMasterPage },
-    { title: 'Menu', component: MenuPage },
-    { title: 'Settings', component: SettingsPage },
-    { title: 'First Care', component: FirstCarePage },
-    { title: 'Lost', component: LostPage },
-    { title: 'Found', component: FoundPage },
-    { title: 'AnimalRegister', component: AnimalRegisterPage },
-    { title: 'LostRegister', component: LostRegisterPage },
-    { title: 'FoundRegister', component: FoundRegisterPage },
-    { title: 'Search', component: SearchPage }
+    { title: 'Home', component: MainPage },
+    { title: 'Estabelecimentos', component: PlacePage },
+    { title: 'Configurações', component: SettingsPage }
   ]
 
   constructor(private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {

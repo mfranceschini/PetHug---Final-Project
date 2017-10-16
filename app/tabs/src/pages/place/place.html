@@ -1,9 +1,9 @@
 <ion-header>
   <ion-navbar color="danger">
-    <ion-title>Animais Perdidos</ion-title>
+    <ion-title>Estabelecimentos PetFriendly</ion-title>
 
     <ion-buttons end>
-      <button ion-button icon-only (click)="addLostAnimal()">
+      <button ion-button icon-only (click)="addPlace()">
         <ion-icon name="md-add-circle"></ion-icon>
       </button>
     </ion-buttons>
@@ -26,23 +26,23 @@
 
     <ion-grid>
       <ion-row>
-        <ion-label text-center style="font-size:1.3em;color:gray" *ngIf="currentLostAnimals.length == 0">Não existem animais cadastrados!</ion-label>          
-        <ion-col text-center col-6 *ngFor="let animal of currentLostAnimals">
+        <ion-label text-center style="font-size:1.3em;color:gray" *ngIf="currentPlaces.length == 0">Não existem estabelecimentos cadastrados!</ion-label>          
+        <ion-col text-center col-12 *ngFor="let place of currentPlaces">
             <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
-              <button ion-item (click)="openLostAnimal(animal)">
+              <button ion-item>
                 <div class="imagediv">
-                    <img [src]="animal.profilePic"/>
+                    <img [src]="place.profilePic"/>
                 </div>
-                <h2>{{animal.name}}</h2>
-                <p>Espécie: {{animal.species}}</p>
-                <p>Raça: {{animal.breed}}</p>
-                <p>Cidade: {{animal.city}}</p>
-                <p>Bairro: {{animal.neighbor}}</p>
-                <p>Endereço: {{animal.address}}</p>
+                <h2>{{place.name}}</h2>
+                <p>Telefone: {{place.phone}}</p>
+                <p>Email: {{place.email}}</p>
+                <p>Cidade: {{place.city}}</p>
+                <p>Bairro: {{place.neighbor}}</p>
+                <p>Endereço: {{place.address}}</p>
               </button>
         
               <ion-item-options>
-                <button ion-button color="danger" (click)="deleteAnimal(animal)">
+                <button ion-button color="danger" (click)="deletePlace(place)">
                   {{ 'DELETE_BUTTON' | translate }}
                 </button>
               </ion-item-options>

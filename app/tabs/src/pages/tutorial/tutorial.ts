@@ -95,6 +95,8 @@ export class TutorialPage {
   ionViewDidEnter() {
     this.user.getUser().then((data) => {
       let usr = JSON.parse(data);
+      console.log("USUARIO: " + JSON.stringify(usr));
+      
       if (usr != null){
         var nome = usr.nome.split(" ",1)
         this.toast = this.toastCtrl.create({

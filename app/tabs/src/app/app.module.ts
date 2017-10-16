@@ -7,6 +7,8 @@ import { Storage, IonicStorageModule } from '@ionic/storage';
 
 import { MyApp } from './app.component';
 
+import { TextMaskModule } from 'angular2-text-mask';
+
 import { CardsPage } from '../pages/cards/cards';
 import { ContentPage } from '../pages/content/content';
 import { ItemCreatePage } from '../pages/item-create/item-create';
@@ -22,11 +24,13 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { TutorialPage } from '../pages/tutorial/tutorial';
 import { LostPage } from '../pages/lost/lost';
 import { FoundPage } from '../pages/found/found';
+import { PlacePage } from '../pages/place/place';
 import { FirstCarePage } from '../pages/first-care/first-care';
 import { AnimalRegisterPage } from '../pages/animal-register/animal-register';
 import { LostRegisterPage } from '../pages/lost-register/lost-register';
 import { FoundRegisterPage } from '../pages/found-register/found-register';
 import { WelcomePage } from '../pages/welcome/welcome';
+import { PlaceRegisterPage } from '../pages/place-register/place-register';
 
 import { Api } from '../providers/api';
 // import { Items } from '../mocks/providers/items';
@@ -35,6 +39,7 @@ import { LostAnimals } from '../providers/lost-animals';
 import { FoundAnimals } from '../providers/found-animals';
 import { Settings } from '../providers/settings';
 import { UserPage } from '../providers/user';
+import { Places } from '../providers/places';
 
 import { Camera } from '@ionic-native/camera';
 import { GoogleMaps } from '@ionic-native/google-maps';
@@ -101,7 +106,9 @@ let pages = [
   AnimalRegisterPage,
   LostRegisterPage,
   FoundRegisterPage,
-  WelcomePage
+  WelcomePage,
+  PlaceRegisterPage,
+  PlacePage,
 ];
 
 export function declarations() {
@@ -118,6 +125,7 @@ export function providers() {
     Animals,
     LostAnimals,
     FoundAnimals,
+    Places,
     UserPage,
     Geolocation,
     Camera,
@@ -126,7 +134,6 @@ export function providers() {
     StatusBar,
     Facebook,
     EmailComposer,
-    
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development
@@ -137,6 +144,7 @@ export function providers() {
 @NgModule({
   declarations: declarations(),
   imports: [
+    TextMaskModule,
     BrowserModule,
     HttpModule,
     TranslateModule.forRoot({
