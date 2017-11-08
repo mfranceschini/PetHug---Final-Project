@@ -117,16 +117,12 @@ export class FoundRegisterPage {
   getLocation(ev: any) {
     console.log("Funcao de local!")
     
-    let watch = this.geolocation.watchPosition();
-    watch.subscribe((data) => {
-      console.log("entrou no watch");
-      console.log(JSON.stringify(data));
+    this.geolocation.getCurrentPosition().then((position) => {
+      console.log("Pegou localização");
+      console.log(JSON.stringify(position));
       
       
-     // data can be a set of coordinates, or an error (if an error occurred).
-     // data.coords.latitude
-     // data.coords.longitude
-    });
+    })
   }
 
   loadData(data) {

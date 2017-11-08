@@ -17,6 +17,7 @@ export class ItemDetailPage {
   found: any;
   lost: any;
   normal: any;
+  complaint: any;
 
   constructor(public toastCtrl: ToastController, public user: UserPage, private emailComposer: EmailComposer, public navCtrl: NavController, navParams: NavParams, public animals: Animals) {
     this.animal = navParams.get('animal') || animals.defaultAnimal;
@@ -26,6 +27,7 @@ export class ItemDetailPage {
     this.found = false
     this.lost = false
     this.normal = false
+    this.complaint = false
 
     if (navParams.get('found') == true) {
       console.log('veio de animais encontrados');
@@ -38,6 +40,10 @@ export class ItemDetailPage {
     else if (navParams.get('normal') == true) {
       console.log('veio de animais disponiveis');
       this.normal = true
+    }
+    else if (navParams.get('complaint') == true) {
+      console.log('veio de denuncias');
+      this.complaint = true
     }
   }
 

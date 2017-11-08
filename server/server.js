@@ -500,7 +500,9 @@ app.post('/create_found_pet', function (req, res) {
           console.log("Image Deleted: " + imagePath)
         })
         .catch((err) => {
-          console.error('ERROR:', err);
+          console.error('ERROR1:', err);
+          console.log(err.errors[0].errors)
+          
           res.end('erro')
         });
       }, function(err) {
@@ -1232,7 +1234,7 @@ app.post('/create_place', function (req, res) {
 
     Promise.all([promise]).then((data) => {
       const query = client.query(
-      'INSERT INTO public."Estabelecimento"(nome, cidade, bairro, endereco, telefone, email, imagem) VALUES ($1, $2, $3, $4, $5, $6, $7)',[form.name, form.city, form.neighbor, form.address, form.phone, form.email, path],
+      'INSERT INTO public."Estabelecimento"(nome, cidade, bairro, endereco, telefone, email, imagem, tipo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',[form.name, form.city, form.neighbor, form.address, form.phone, form.email, path, form.type],
         function(err, result) {
           if (err) {
             console.log("Deu erro")
@@ -1251,6 +1253,138 @@ app.post('/create_place', function (req, res) {
   })
 });
 
+app.get('/complaint_list', function (req, res) {
+  var result = []
+  var client = new pg.Client(conString);
+  console.log("Lista de Denúncias")
+
+  client.connect(function (err) {
+  	if (err) throw err;
+  	console.log ("Conexão Estabelecida!");
+
+    const query = client.query(
+    'SELECT * FROM public."Denuncia"');
+    complaintPromise = query.on('row', function(row) {
+      console.log("Recebeu as denúncias")
+      result.push(row)
+    });
+
+    Promise.all([complaintPromise]).then(function(data) {
+      console.log("Todas as denúncias retornados")
+      var json = JSON.stringify({ 
+        complaints: result
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+    }, function(err) {
+      console.error('ERROR:', err);
+      query.on('end', () => { client.end(); });
+      // one or more failed
+    })
+  })
+})
+
+app.post('/create_complaint', function (req, res) {
+  console.log("Criando Denúncia")
+  var form = req.body.form
+  console.log("\nSalvando Denúncia no BD")
+  var client = new pg.Client(conString);
+  var result = [];
+  client.connect(function (err) {
+    if (err) throw err;
+    console.log ("Conexão Estabelecida!");
+
+    if (form.image){
+      function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+          response = {};
+
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+
+        return response;
+      }
+      var imageBuffer = decodeBase64Image(form.image);
+      var random = Math.random() * (9999 - 1000) + 1000
+      random = random.toPrecision(4)
+      const imagePath = "./public/images/complaints/complaint" + random + ".jpeg"
+      const path = 'complaint'+ random + ".jpeg"
+
+      promise = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+          if(err){
+            console.log("\nErro ao criar imagem")
+            console.log(err);
+            Promise.reject()
+          }
+          else {
+            console.log("\nImagem criada: " + imagePath)
+            Promise.resolve()
+          }
+        }))
+
+    Promise.all([promise]).then((data) => {
+      const query = client.query(
+      'INSERT INTO public."Denuncia"(cidade, bairro, endereco, descricao, especie_id, imagem) VALUES ($1, $2, $3, $4, $5, $6)',[form.city, form.neighbor, form.address, form.about, form.species, path],
+        function(err, result) {
+          if (err) {
+            console.log("Deu erro")
+            console.log(err);
+          } else {
+            console.log("Complaint Inserted")
+            var json = JSON.stringify({ 
+              success: "sucesso"
+            });
+            res.end(json)
+          }
+        });
+      query.on('end', () => { client.end(); });
+    })
+  }
+  })
+});
+
+app.post('/delete_complaint', function (req, res) {
+  var result = []
+  var client = new pg.Client(conString);
+  console.log("Exclusao de Denúncias")
+  console.log(req.body.id)
+
+  client.connect(function (err) {
+  	if (err) throw err;
+  	console.log ("Conexão Estabelecida!");
+
+    const query = client.query(
+    'DELETE FROM public."Denuncia" WHERE id=($1)',[req.body.id]);
+    complaintPromise = query.on('row', function(row) {
+      result.push(row)
+    });
+
+    Promise.all([complaintPromise]).then(function(data) {
+      console.log("Denúncia deletado com sucesso")
+      var json = JSON.stringify({ 
+        status: 'success'
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+    }, function(err) {
+      console.error('ERROR:', err);
+      var json = JSON.stringify({ 
+        status: 'error'
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+      // one or more failed
+    })
+  })
+})
+
 app.listen(3000, function (err) {
 
   google.auth.getApplicationDefault(function(err, authClient) {
@@ -1266,7 +1400,8 @@ app.listen(3000, function (err) {
     var storage = google.storage('v1');
     storage.buckets.list({
       auth: authClient,
-      project: projectId
+      project: projectId,
+      languageHints: ['en', 'pt']
     });
   });
   

@@ -31,8 +31,16 @@ export class LostPage {
     let val = ev.target.value;
 
     if (val && val.trim() != '') {
+      if (ev.inputType == "deleteContentBackward") {        
+        this.currentLostAnimals = []
+        this.loadAnimals(false)
+      }
       this.currentLostAnimals = this.currentLostAnimals.filter((item) => {
-        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                item.species.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                item.city.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                item.neighbor.toLowerCase().indexOf(val.toLowerCase()) > -1 ||                 
+                item.breed.toLowerCase().indexOf(val.toLowerCase()) > -1);      
       })
     }
     else {

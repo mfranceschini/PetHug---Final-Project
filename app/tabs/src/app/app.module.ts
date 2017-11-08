@@ -25,12 +25,14 @@ import { TutorialPage } from '../pages/tutorial/tutorial';
 import { LostPage } from '../pages/lost/lost';
 import { FoundPage } from '../pages/found/found';
 import { PlacePage } from '../pages/place/place';
+import { ComplaintPage } from '../pages/complaint/complaint';
 import { FirstCarePage } from '../pages/first-care/first-care';
 import { AnimalRegisterPage } from '../pages/animal-register/animal-register';
 import { LostRegisterPage } from '../pages/lost-register/lost-register';
 import { FoundRegisterPage } from '../pages/found-register/found-register';
 import { WelcomePage } from '../pages/welcome/welcome';
 import { PlaceRegisterPage } from '../pages/place-register/place-register';
+import { ComplaintRegisterPage } from '../pages/complaint-register/complaint-register';
 
 import { Api } from '../providers/api';
 // import { Items } from '../mocks/providers/items';
@@ -40,6 +42,7 @@ import { FoundAnimals } from '../providers/found-animals';
 import { Settings } from '../providers/settings';
 import { UserPage } from '../providers/user';
 import { Places } from '../providers/places';
+import { Complaints } from '../providers/complaints';
 
 import { Camera } from '@ionic-native/camera';
 import { GoogleMaps } from '@ionic-native/google-maps';
@@ -109,6 +112,8 @@ let pages = [
   WelcomePage,
   PlaceRegisterPage,
   PlacePage,
+  ComplaintPage,
+  ComplaintRegisterPage,
 ];
 
 export function declarations() {
@@ -126,6 +131,7 @@ export function providers() {
     LostAnimals,
     FoundAnimals,
     Places,
+    Complaints,
     UserPage,
     Geolocation,
     Camera,

@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { FirstRunPage } from '../pages/pages';
 import { MainPage } from '../pages/pages';
 import { PlacePage } from '../pages/place/place';
+import { ComplaintPage } from '../pages/complaint/complaint';
 import { SettingsPage } from '../pages/settings/settings';
 
 import { Settings } from '../providers/providers';
@@ -39,6 +40,7 @@ export class MyApp {
   pages: any[] = [
     { title: 'Home', component: MainPage },
     { title: 'Estabelecimentos', component: PlacePage },
+    { title: 'Denúncias', component: ComplaintPage },    
     { title: 'Configurações', component: SettingsPage }
   ]
 
@@ -49,7 +51,7 @@ export class MyApp {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      statusBar.styleDefault();
+      statusBar.backgroundColorByHexString("#cc0000");
       splashScreen.hide();
 
       // var notificationOpenedCallback = function(jsonData) {
@@ -81,6 +83,6 @@ export class MyApp {
   openPage(page) {
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
-    this.nav.setRoot(page.component);
+    this.nav.push(page.component);
   }
 }

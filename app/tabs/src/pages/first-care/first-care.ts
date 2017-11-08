@@ -16,10 +16,6 @@ export class FirstCarePage {
   shownGroup = null;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController) {
-    console.log("construtor");
-
-    this.initializeList()
-    
   }
 
   presentData(select) {
@@ -32,7 +28,19 @@ export class FirstCarePage {
           },{ 
             text: ''
           },{
-            text: " - Banho: os banhos são indicados conforme a necessidade. O mais usual é dar 1 vez ao mês. Banho em filhotes é recomendado dar apenas após que todas as vacinas tenham sidos aplicadas."
+            text: " - Higiene: os banhos são indicados conforme a necessidade. O mais usual é dar 1 vez ao mês. Banho em filhotes é recomendado dar apenas após que todas as vacinas tenham sidos aplicadas."
+          },{ 
+            text: ''
+          },{
+            text: " - Vermifugação: a vermifugação é recomendada ser aplicada a cada 4 a 6 meses, ou seja, de 2 a 3 vezes ao ano."
+          },{ 
+            text: ''
+          },{
+            text: " - Vacina: em relação às vacinas, é sempre recomendado seguir o que for informado pelo veterinário, preferindo sempre pela vacina importada a nacional."
+          },{ 
+            text: ''
+          },{
+            text: " - Pulgas/Carrapatos: sempre é preciso estar atento e deixar o cachorro protegido. Existem diversos produtos de qualidade disponíveis no mercado. Para a aplicação, siga a recomendação informada pelo produto escolhido."
           }
         ]
       });
@@ -47,48 +55,25 @@ export class FirstCarePage {
           },{ 
             text: ''
           },{
-            text: " - Banho: no caso dos gatos, o mais indicado é dar banho apenas uma vez por mês. Além deles não possuírem odores, eles sempre se limpam, portanto, dar banho com muita frequência pode fazer mal ao gato."
+            text: " - Higiene: no caso dos gatos, o mais indicado é dar banho apenas uma vez por mês. Além deles não possuírem odores, eles sempre se limpam, portanto, dar banho com muita frequência pode fazer mal ao gato. Além disso, é necessário sempre limpar a caixa de areia de 1 a 2 vezes ao dia."
+          },{ 
+            text: ''
+          },{
+            text: " - Vermifugação: a vermifugação é recomendada ser aplicada a cada 4 a 6 meses, ou seja, de 2 a 3 vezes ao ano."
+          },{ 
+            text: ''
+          },{
+            text: " - Vacina: em relação às vacinas, é sempre recomendado seguir o que for informado pelo veterinário, preferindo sempre pela vacina importada a nacional."
+          },{ 
+            text: ''
+          },{
+            text: " - Pulgas/Carrapatos: sempre é preciso estar atento e deixar o gato protegido. Existem diversos produtos de qualidade disponíveis no mercado. Para a aplicação, siga a recomendação informada pelo produto escolhido."
           }
         ]
       });
       actionSheet.present();
     }
   }
-
-  initializeList() {
-    console.log("Inicializando");
-    this.groups = []
-
-    this.groups[0] = {
-      name: "Cachorros",
-      items: [{
-        "Banho": "Os banhos de cachorros variam conforme seu tamanho e a quantidade de pêlo",
-        "Comida": "Sempre dê a ração recomendada pelo veterinário seguindo a quantidade indicada pelo profissional"
-      }],
-      show: false
-    }
-
-    this.groups[1] = {
-      name: "Gatos",
-      items: [{
-        "Banho": "Os banhos de gatos variam conforme seu tamanho e a quantidade de pêlo",
-        "Comida": "Sempre dê a ração recomendada pelo veterinário seguindo a quantidade indicada pelo profissional"
-      }],
-      show: false
-    }
-
-  }
-
-  toggleGroup(group) {
-    if (this.isGroupShown(group)) {
-        this.shownGroup = null;
-    } else {
-        this.shownGroup = group;
-    }
-  };
-  isGroupShown(group) {
-      return this.shownGroup === group;
-  };
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad FirstCarePage');

@@ -31,8 +31,16 @@ export class PlacePage {
     let val = ev.target.value;
 
     if (val && val.trim() != '') {
+      if (ev.inputType == "deleteContentBackward") {        
+        this.currentPlaces = []
+        this.loadPlaces(false)
+      }
       this.currentPlaces = this.currentPlaces.filter((item) => {
-        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1 ||
+                item.city.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                item.type.toLowerCase().indexOf(val.toLowerCase()) > -1 ||
+                item.neighbor.toLowerCase().indexOf(val.toLowerCase()) > -1                
+        );
       })
     }
     else {
@@ -80,7 +88,8 @@ export class PlacePage {
           "address":d.endereco.toString(),
           "id": d.id.toString(),
           "email": d.email.toString(),
-          "phone": d.telefone.toString()
+          "phone": d.telefone.toString(),
+          "type": d.tipo.toString()
         })
       });
     }, (err) => {

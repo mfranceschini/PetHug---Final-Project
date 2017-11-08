@@ -1,7 +1,7 @@
 <ion-header>
     
       <ion-navbar color="danger">
-        <ion-title>Cadastrar Estabelecimento</ion-title>
+        <ion-title>Cadastrar Denúncia</ion-title>
         <ion-buttons start>
           <button ion-button (click)="cancel()">
             <span color="primary" showWhen="ios">
@@ -23,7 +23,7 @@
     </ion-header>
     
     <ion-content>
-      <form *ngIf="form" [formGroup]="form" (ngSubmit)="createPlace()">
+      <form *ngIf="form" [formGroup]="form" (ngSubmit)="createComplaint()">
         <input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
         <div class="profile-image-wrapper" (click)="getPicture()">
           <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">
@@ -36,24 +36,10 @@
         </div>
         <ion-list *ngIf="imageLoaded">
           <ion-item>
-            <ion-input type="text" placeholder="Nome" formControlName="name"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input type="text" placeholder="Telefone" formControlName="phone" maxlength="14" [(ngModel)]="phoneNumber" (keyup)="mascara(this, phoneNumber)"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input type="text" placeholder="Email" formControlName="email"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-select [(ngModel)]="typeModel"  placeholder="Tipo" formControlName="type">
-              <ion-option value= "Bar">Bar</ion-option>
-              <ion-option value= "Restaurante">Restaurante</ion-option>
-              <ion-option value= "Academia">Academia</ion-option>
-              <ion-option value= "Livraria">Livraria</ion-option>
-              <ion-option value= "Sorveteria">Sorveteria</ion-option>
-              <ion-option value= "Pet Shop">Pet Shop</ion-option>
-            </ion-select>
-          </ion-item>
+              <ion-select [(ngModel)]="specieModel" placeholder="{{ 'ANIMAL_SPECIES_PLACEHOLDER' | translate }}" formControlName="species">
+                <ion-option *ngFor="let specie of speciesList" [value] = "specie.nome">{{specie.nome}}</ion-option>
+              </ion-select>
+            </ion-item>
           <ion-item>
             <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>
           </ion-item>
@@ -62,6 +48,9 @@
           </ion-item>
           <ion-item>
             <ion-input type="text" placeholder="Endereço" formControlName="address"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input type="text" placeholder="Descrição" formControlName="about"></ion-input>
           </ion-item>
         </ion-list>
       </form>

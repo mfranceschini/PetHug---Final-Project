@@ -60,7 +60,7 @@
           </ion-select>
         </ion-item>
         <ion-item>
-          <button ion-button block (click)="getLocation($event)" class="location">Obter Localização</button>
+          <!-- <button ion-button block (click)="getLocation($event)" class="location">Obter Localização</button> -->
         </ion-item>
         <ion-item>
           <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>
@@ -73,5 +73,8 @@
         </ion-item>
       </ion-list>
     </form>
+
+    <div #map id="map"></div>
+    <button ion-button full (click)="getLocation()">Get the Location</button>
   </ion-content>
   

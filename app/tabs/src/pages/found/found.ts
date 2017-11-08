@@ -27,6 +27,7 @@ export class FoundPage {
   currentFoundAnimals: any[];
   ipAddress: any;
   myInput: any[];
+  val: any;
 
   constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public foundAnimals: FoundAnimals, public modalCtrl: ModalController, public http: Http) {
     this.loadAnimals(false)
@@ -39,12 +40,20 @@ export class FoundPage {
   }
 
   onInput(ev: any) {
-    let val = ev.target.value;
+    this.val = ev.target.value;
 
-    if (val && val.trim() != '') {
+    if (this.val && this.val.trim() != '') {
+      if (ev.inputType == "deleteContentBackward") {        
+        this.currentFoundAnimals = []
+        this.loadAnimals(false)
+      }
       this.currentFoundAnimals = this.currentFoundAnimals.filter((item) => {
-        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
-      })
+        return (item.name.toLowerCase().indexOf(this.val.toLowerCase()) > -1 || 
+                item.species.toLowerCase().indexOf(this.val.toLowerCase()) > -1 || 
+                item.city.toLowerCase().indexOf(this.val.toLowerCase()) > -1 || 
+                item.neighbor.toLowerCase().indexOf(this.val.toLowerCase()) > -1 ||                 
+                item.breed.toLowerCase().indexOf(this.val.toLowerCase()) > -1);      
+        })
     }
     else {
       this.currentFoundAnimals = []

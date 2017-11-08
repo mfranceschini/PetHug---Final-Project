@@ -4,60 +4,65 @@ import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
 import { Api } from '../../providers/api';
 import { WelcomePage } from '../welcome/welcome';
-import { PlacePage } from '../place/place';
+import { ComplaintPage } from '../complaint/complaint';
 
 import { TranslateService } from '@ngx-translate/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 
 @Component({
-  selector: 'page-place-register',
-  templateUrl: 'place-register.html'
+  selector: 'page-complaint-register',
+  templateUrl: 'complaint-register.html'
 })
-export class PlaceRegisterPage {
+export class ComplaintRegisterPage {
   @ViewChild('fileInput') fileInput;
     isReadyToSave: boolean;
     imageData: any;
     form: FormGroup;
     imageLoaded: boolean;
-    placeForm: any;
+    complaintForm: any;
     ipAddress: any;
-    v_obj;
-    v_fun;
+    speciesList: any;
+    animalsData: any;
+    selectedSpecie: any;
+    specieModel: any;
 
   constructor(public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
     this.form = formBuilder.group({
       profilePic: [''],
-      name: ['', Validators.required],
       address: [''],
-      phone: [''],
-      email: [''],
+      about: [''],
+      species: [''],
       neighbor: [''],
-      city: [''],
-      type: ['']
+      city: ['']
     });
 
     this.form.valueChanges.subscribe((v) => {
       this.isReadyToSave = this.form.valid;
     });
+
+    this.ipAddress = 'http://' + this.api.url
+    if (this.ipAddress == 'http://undefined'){
+     this.ipAddress = 'http://localhost'
+    }
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
+    .map(res => res.json())
+    .subscribe(data => {
+      this.animalsData = data;
+      this.loadData(this.animalsData)
+    });
   
   }
 
-  /* Máscaras ER */
-  mascara(o,f){
-    this.v_obj=o
-    this.v_fun=f
-    
-    setTimeout(this.execmascara(),1)
-  }
-  execmascara(){
-    this.v_obj.phoneNumber=this.mtel(this.v_obj.form.controls.phone.value)   
-  }
-  mtel(v){
-    v=v.replace(/\D/g,"");             //Remove tudo o que não é dígito
-    v=v.replace(/^(\d{2})(\d)/g,"($1) $2"); //Coloca parênteses em volta dos dois primeiros dígitos
-    v=v.replace(/(\d)(\d{4})$/,"$1-$2");    //Coloca hífen entre o quarto e o quinto dígitos
-    return v;
+  loadData(data) {
+    console.log("Carregando lista das espécies...")
+    this.speciesList = []
+    var i;
+    for (i=0;i<data.species.length;i++){
+      this.speciesList.push(data.species[i])
+    }
   }
 
   ionViewDidLoad(){}
@@ -89,47 +94,52 @@ export class PlaceRegisterPage {
   }
 
   done() {
-    this.placeForm = new Object()
+    this.complaintForm = new Object()
     console.log("Salvando formulário")
+    var j;
+    for (j=0;j<this.speciesList.length;j++){
+      if (this.speciesList[j].nome == this.specieModel){
+        this.selectedSpecie = this.speciesList[j].id
+        break
+      }
+    }
 
-    this.placeForm = {
+    this.complaintForm = {
       'city': this.form.controls['city'].value,
       'neighbor': this.form.controls['neighbor'].value,
       'address': this.form.controls['address'].value,
-      'name': this.form.controls['name'].value,
+      'about': this.form.controls['about'].value,
       'image': this.form.controls['profilePic'].value,
-      'phone': this.form.controls['phone'].value,
-      'email': this.form.controls['email'].value,
-      'type': this.form.controls['type'].value
+      'species': this.selectedSpecie
       }
 
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     let body = {
-      'form': this.placeForm
+      'form': this.complaintForm
     };
     this.ipAddress = 'http://' + this.api.url
     if (this.ipAddress == 'http://undefined'){
       this.ipAddress = 'http://localhost'
     }
 
-    this.http.post(this.ipAddress + ':3000/create_place', body, {headers: headers})
+    this.http.post(this.ipAddress + ':3000/create_complaint', body, {headers: headers})
       .map(res => res.json())
       .subscribe(data => {
-        console.log("Retorno depois de criar estabelecimento")
+        console.log("Retorno depois de criar denúncia")
         if (data.success == 'sucesso'){
           let toast = this.toastCtrl.create({
-            message: "Estabelecimento cadastrado com sucesso!",
+            message: "Denúncia cadastrada com sucesso!",
             duration: 3000,
             position: 'top'
           });
           toast.present();
           this.viewCtrl.dismiss(this.form.value);
-          this.navCtrl.setRoot(PlacePage);
+          this.navCtrl.setRoot(ComplaintPage);
         }
         else if (data.success == 'erro'){
           let toast = this.toastCtrl.create({
-            message: "Erro ao cadastrar estabelecimento!",
+            message: "Erro ao cadastrar denúncia!",
             duration: 3000,
             position: 'top'
           });

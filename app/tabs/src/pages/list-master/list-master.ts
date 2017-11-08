@@ -48,13 +48,23 @@ export class ListMasterPage {
    */
   ionViewDidLoad() {}
 
-  onInput(ev: any) {
+  onInput(ev: any) {    
     let val = ev.target.value;
-
+    
     if (val && val.trim() != '') {
-      this.currentAnimals = this.currentAnimals.filter((item) => {
-        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
-      })
+      
+      if (ev.inputType == "deleteContentBackward") {
+      }
+      else {
+        this.currentAnimals = this.currentAnimals.filter((item) => {
+          
+          return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                  item.species.toLowerCase().indexOf(val.toLowerCase()) > -1 || 
+                  item.breed.toLowerCase().indexOf(val.toLowerCase()) > -1);
+        }) 
+      }
+      
+           
     }
     else {
       this.currentAnimals = []

@@ -17,6 +17,9 @@
   <div class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.profilePic + ')'">
   </div>
 
+  <button ion-button block *ngIf="complaint != true" (click)="sendEmail()" class="email">Entrar em Contato</button>
+  
+
   <div *ngIf="normal == true" class="item-detail" padding>
     <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
     <p>Sou um <b>{{animal.species}}</b>,</p>
@@ -45,6 +48,12 @@
     <p>Sou de porte <b>{{animal.size}}</b>,</p>
   </div>
 
-  <button ion-button block (click)="sendEmail()" class="email">Entrar em Contato</button>
+  <div *ngIf="complaint == true" class="item-detail" padding>
+    <h2>Sou um <b>{{animal.specie}}</b>,</h2>
+    <p>Estou em <b>{{animal.city}}</b>,</p>
+    <p>No Bairro <b>{{animal.neighbor}}</b>,</p>
+    <p>No Endereço <b>{{animal.address}}</b>,</p>
+    <p>Sobre mim: <b>{{animal.about}}</b></p>
+  </div>
 
 </ion-content>

@@ -1,13 +1,14 @@
 <ion-header>
   <ion-navbar color="danger">
-    <ion-title>Estabelecimentos PetFriendly</ion-title>
+    <ion-title>Denúncias de Maus Tratos</ion-title>
 
     <ion-buttons end>
-      <button ion-button icon-only (click)="addPlace()">
+      <button ion-button icon-only (click)="addComplaint()">
         <ion-icon name="md-add-circle"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
+
 </ion-header>
 
 <ion-content>
@@ -25,24 +26,22 @@
 
     <ion-grid>
       <ion-row>
-        <ion-label text-center style="font-size:1.3em;color:gray" *ngIf="currentPlaces.length == 0">Não existem estabelecimentos cadastrados!</ion-label>          
-        <ion-col text-center col-12 *ngFor="let place of currentPlaces">
+        <ion-label text-center style="font-size:1.3em;color:gray" *ngIf="currentComplaints.length == 0">Não existem denúncias cadastrados!</ion-label>          
+        <ion-col text-center col-12 *ngFor="let complaint of currentComplaints">
             <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
-              <button ion-item>
+              <button ion-item (click)="openComplaint(complaint)">
                 <div class="imagediv">
-                    <img [src]="place.profilePic"/>
+                    <img [src]="complaint.profilePic"/>
                 </div>
-                <h2>{{place.name}}</h2>
-                <p>Tipo: {{place.type}}</p>
-                <p>Telefone: {{place.phone}}</p>
-                <p>Email: {{place.email}}</p>
-                <p>Cidade: {{place.city}}</p>
-                <p>Bairro: {{place.neighbor}}</p>
-                <p>Endereço: {{place.address}}</p>
+                <h2>{{complaint.specie}}</h2>
+                <p>Cidade: {{complaint.city}}</p>
+                <p>Bairro: {{complaint.neighbor}}</p>
+                <p>Endereço: {{complaint.address}}</p>
+                <p>Descrição: {{complaint.about}}</p>
               </button>
         
               <ion-item-options>
-                <button ion-button color="danger" (click)="deletePlace(place)">
+                <button ion-button color="danger" (click)="deleteComplaint(complaint)">
                   {{ 'DELETE_BUTTON' | translate }}
                 </button>
               </ion-item-options>
