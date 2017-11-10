@@ -51,6 +51,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import { EmailComposer } from '@ionic-native/email-composer';
 import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
+
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -134,6 +136,7 @@ export function providers() {
     Complaints,
     UserPage,
     Geolocation,
+    NativeGeocoder,
     Camera,
     GoogleMaps,
     SplashScreen,

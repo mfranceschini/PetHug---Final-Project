@@ -9,6 +9,7 @@ import { ListMasterPage } from "../list-master/list-master";
 import { FoundPage } from "../found/found";
 import { MainPage } from '../../pages/pages';
 import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
 
 
 @Component({
@@ -68,7 +69,7 @@ export class FoundRegisterPage {
 
   listMaster: any;
 
-  constructor(private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
+  constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -87,18 +88,6 @@ export class FoundRegisterPage {
 
     // this.api.getIP().then((data)=>{
       // this.ipAddress = data
-      this.ipAddress = 'http://' + this.api.url
-      if (this.ipAddress == 'http://undefined'){
-        this.ipAddress = 'http://localhost'
-      }
-      let headers = new Headers();
-      headers.append('Content-Type', 'application/json');
-      this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
-        .map(res => res.json())
-        .subscribe(data => {
-          this.animalsData = data;
-          this.loadData(this.animalsData)
-        });
 
       // Watch the form for changes, and
       this.form.valueChanges.subscribe((v) => {
@@ -113,15 +102,37 @@ export class FoundRegisterPage {
     });
 
   }
+  
 
-  getLocation(ev: any) {
+  getLocation() {
     console.log("Funcao de local!")
     
     this.geolocation.getCurrentPosition().then((position) => {
       console.log("Pegou localização");
-      console.log(JSON.stringify(position));
+      alert('latitude: '    + position.coords.latitude    + '\n' +
+      'longitude: '    + position.coords.longitude + '\n'); 
+      
+      this.nativeGeocoder.reverseGeocode(position.coords.latitude, position.coords.longitude)
+      .then((result: NativeGeocoderReverseResult) => {
+        console.log("Traduziu o endereço");
+        alert(JSON.stringify(result))
+        this.form.controls['city'].setValue(result.subAdministrativeArea)
+        this.form.controls['neighbor'].setValue(result.subLocality)
+        this.form.controls['address'].setValue(result.thoroughfare)        
+        
+      })
+      .catch((error: any) => alert(error));
       
       
+    }).catch((err)=>{
+      let toast = this.toastCtrl.create({
+        message: "Não foi possível possível obter a localização. Por favor, preencha os campos abaixo",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+      alert('code: '    + err.code    + '\n' +
+      'message: ' + err.message + '\n');
     })
   }
 
@@ -159,6 +170,18 @@ export class FoundRegisterPage {
   }
 
   ionViewDidLoad() {
+    this.ipAddress = 'http://' + this.api.url
+    if (this.ipAddress == 'http://undefined'){
+      this.ipAddress = 'http://localhost'
+    }
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    this.http.get(this.ipAddress + ':3000/animal_data', {headers: headers})
+      .map(res => res.json())
+      .subscribe(data => {
+        this.animalsData = data;
+        this.loadData(this.animalsData)
+      });
   }
 
   getPicture() {

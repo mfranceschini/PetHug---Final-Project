@@ -98,13 +98,15 @@ export class TutorialPage {
       console.log("USUARIO: " + JSON.stringify(usr));
       
       if (usr != null){
-        var nome = usr.nome.split(" ",1)
-        this.toast = this.toastCtrl.create({
-          message: 'Bem-vindo, ' + nome,
-          duration: 3000,
-          position: 'top'
-        });
-        this.toast.present();
+        if (usr.nome != null) {
+          var nome = usr.nome.split(" ",1)
+          this.toast = this.toastCtrl.create({
+            message: 'Bem-vindo, ' + nome,
+            duration: 3000,
+            position: 'top'
+          });
+          this.toast.present();
+        }
         this.startApp()
       }
       this.menu.enable(false);

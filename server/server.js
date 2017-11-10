@@ -9,6 +9,9 @@ var fs = require('fs');
 var cors = require('cors')
 var app = express();
 
+require('dotenv').config()
+
+
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json({limit: '50mb'}));
@@ -606,7 +609,7 @@ app.post('/create_found_pet', function (req, res) {
                                       }
                                       else {
                                         const sgMail = require('@sendgrid/mail');
-                                        sgMail.setApiKey('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');
+                                        sgMail.setApiKey(process.SEND_GRID_KEY);
                                         const msg = {
                                           to: user.rows[0].email,
                                           cc: 'm.franceschini17@gmail.com',
@@ -835,7 +838,7 @@ app.post('/create_lost_pet', function (req, res) {
                                     }
                                     else {
                                       const sgMail = require('@sendgrid/mail');
-                                      sgMail.setApiKey('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');
+                                      sgMail.setApiKey(process.env.SEND_GRID_KEY);
                                       const msg = {
                                         to: user.rows[0].email,
                                         cc: 'm.franceschini17@gmail.com',

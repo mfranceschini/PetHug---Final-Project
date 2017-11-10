@@ -23,7 +23,7 @@
   </ion-header>
   
   <ion-content>
-    <form *ngIf="form" [formGroup]="form" (ngSubmit)="createAnimal()">
+    <form *ngIf="form" [formGroup]="form">
       <input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
       <div class="profile-image-wrapper" (click)="getPicture()">
         <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">
@@ -60,21 +60,18 @@
           </ion-select>
         </ion-item>
         <ion-item>
-          <!-- <button ion-button block (click)="getLocation($event)" class="location">Obter Localização</button> -->
+          <button ion-button block (click)="getLocation()" class="location">Obter Localização</button>
         </ion-item>
         <ion-item>
-          <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>
+          <ion-input type="text" placeholder="Cidade" formControlName="city" [(ngModel)]="city"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input type="text" placeholder="Bairro" formControlName="neighbor"></ion-input>
+          <ion-input type="text" placeholder="Bairro" formControlName="neighbor" [(ngModel)]="neighbor"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input type="text" placeholder="Endereço" formControlName="address"></ion-input>
+          <ion-input type="text" placeholder="Endereço" formControlName="address" [(ngModel)]="address"></ion-input>
         </ion-item>
       </ion-list>
     </form>
-
-    <div #map id="map"></div>
-    <button ion-button full (click)="getLocation()">Get the Location</button>
   </ion-content>
   
