@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { NavController, ToastController, LoadingController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { Api } from './api'
+import { Api } from './api';
+import { Device } from '@ionic-native/device';
 
 @Injectable()
 export class UserPage {
@@ -12,7 +13,7 @@ export class UserPage {
   toast:any;
   local: Storage;
 
-  constructor(public http: Http, public toastCtrl: ToastController, private storage: Storage, public api: Api) {
+  constructor(private device: Device, public http: Http, public toastCtrl: ToastController, private storage: Storage, public api: Api) {
     // this.api.getIP().then((data)=>{
     //   this.ipAddress = data
     // })
@@ -71,8 +72,15 @@ export class UserPage {
     return this.http.post(this.ipAddress + ':3000/get_user_data', user, {headers: headers})
   }
 
+  setDevice(json:any) {
+    this.ipAddress = 'http://' + this.api.url
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post(this.ipAddress + ':3000/set_device', json, {headers: headers})
+  }
+
   verifyFacebookUser(facebook_id:any) {
-    let json = {"facebook_id": facebook_id}
+    let json = {"facebook_id": facebook_id, "device": this.device.uuid}
     this.ipAddress = 'http://' + this.api.url
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');

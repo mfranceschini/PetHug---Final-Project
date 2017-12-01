@@ -23,7 +23,7 @@
     </ion-header>
     
     <ion-content>
-      <form *ngIf="form" [formGroup]="form" (ngSubmit)="createComplaint()">
+      <form *ngIf="form" [formGroup]="form">
         <input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
         <div class="profile-image-wrapper" (click)="getPicture()">
           <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">
@@ -40,6 +40,9 @@
                 <ion-option *ngFor="let specie of speciesList" [value] = "specie.nome">{{specie.nome}}</ion-option>
               </ion-select>
             </ion-item>
+          <ion-item>
+            <button ion-button block (click)="getLocation()" class="location">Obter Localização</button>
+          </ion-item>
           <ion-item>
             <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>
           </ion-item>

@@ -105,25 +105,14 @@ export class FoundRegisterPage {
   
 
   getLocation() {
-    console.log("Funcao de local!")
-    
     this.geolocation.getCurrentPosition().then((position) => {
-      console.log("Pegou localização");
-      alert('latitude: '    + position.coords.latitude    + '\n' +
-      'longitude: '    + position.coords.longitude + '\n'); 
-      
       this.nativeGeocoder.reverseGeocode(position.coords.latitude, position.coords.longitude)
       .then((result: NativeGeocoderReverseResult) => {
-        console.log("Traduziu o endereço");
-        alert(JSON.stringify(result))
         this.form.controls['city'].setValue(result.subAdministrativeArea)
         this.form.controls['neighbor'].setValue(result.subLocality)
         this.form.controls['address'].setValue(result.thoroughfare)        
         
       })
-      .catch((error: any) => alert(error));
-      
-      
     }).catch((err)=>{
       let toast = this.toastCtrl.create({
         message: "Não foi possível possível obter a localização. Por favor, preencha os campos abaixo",
@@ -131,8 +120,6 @@ export class FoundRegisterPage {
         position: 'top'
       });
       toast.present();
-      alert('code: '    + err.code    + '\n' +
-      'message: ' + err.message + '\n');
     })
   }
 
@@ -186,13 +173,13 @@ export class FoundRegisterPage {
 
   getPicture() {
     const options: CameraOptions = {
-      quality : 75, 
+      quality : 100, 
       destinationType : this.camera.DestinationType.DATA_URL, 
       sourceType : this.camera.PictureSourceType.CAMERA, 
       allowEdit : false,
       encodingType: this.camera.EncodingType.JPEG,
-      targetWidth: 300,
-      targetHeight: 300,
+      targetWidth: 500,
+      targetHeight: 500,
       saveToPhotoAlbum: true,
       correctOrientation: true
     }
@@ -475,7 +462,6 @@ export class FoundRegisterPage {
               position: 'top'
             });
             toast.present();
-            this.viewCtrl.dismiss(this.form.value);
             if (data.exist == true){
               // EXISTE ANIMAL PARECIDO!!!
               console.log("Existe Animal Parecido!!")
@@ -487,6 +473,8 @@ export class FoundRegisterPage {
               toast.present();
             }
             // this.navCtrl.push(FoundPage);
+            this.viewCtrl.dismiss(this.form.value);
+            this.navCtrl.push(FoundPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

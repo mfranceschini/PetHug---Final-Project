@@ -22,8 +22,10 @@ page-list-master {
     .imagediv{
         width: 150px;
         height: 150px;
+        max-width: 150px;
+        max-height: 150px;        
         position: relative;
         // margin-left: 10px;
-        z-index:0;
+        // z-index:0;
     }
 }

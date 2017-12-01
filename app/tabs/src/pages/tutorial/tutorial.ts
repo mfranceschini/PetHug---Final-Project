@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { MenuController, NavController, ToastController } from 'ionic-angular';
-
 import { TabsPage } from '../tabs/tabs';
 import { WelcomePage } from '../welcome/welcome';
-
+import { OneSignal } from '@ionic-native/onesignal'
 import { TranslateService } from '@ngx-translate/core';
 import { UserPage } from "../../providers/user";
 
@@ -24,7 +23,7 @@ export class TutorialPage {
   showSkip = true;
   toast: any;
 
-  constructor(public navCtrl: NavController, public toastCtrl: ToastController, public menu: MenuController, translate: TranslateService, public user: UserPage) {
+  constructor(private oneSignal: OneSignal, public navCtrl: NavController, public toastCtrl: ToastController, public menu: MenuController, translate: TranslateService, public user: UserPage) {
     
     translate.get(["TUTORIAL_SLIDE1_TITLE",
       "TUTORIAL_SLIDE1_DESCRIPTION",
@@ -73,10 +72,25 @@ export class TutorialPage {
     this.user.getUser().then((data) => {
       let usr = JSON.parse(data);
       if (usr != null){
-        this.navCtrl.setRoot(TabsPage, {}, {
-          animate: true,
-          direction: 'forward'
-        });
+        this.oneSignal.getIds().then((os)=>{
+          let json = {
+            "usuario_id": usr,
+            "dispositivo": os.userId
+          }
+          this.user.setDevice(json)
+          .map(res => res.json())
+          .subscribe((device) => {
+            if (device.success == "success") {
+              this.navCtrl.setRoot(TabsPage, {}, {
+                animate: true,
+                direction: 'forward'
+              });
+            }
+            else {
+              console.log("Erro ao adicionar dispositivo!")
+            }
+          })
+        })
       }
       else {
         this.navCtrl.setRoot(WelcomePage, {}, {

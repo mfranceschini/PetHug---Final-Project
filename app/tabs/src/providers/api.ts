@@ -11,11 +11,11 @@ export class Api {
   url: string;
 
   constructor(public http: Http, public storage: Storage) {
-    // this.url = "192.168.100.107" // EM CASA
+    this.url = "192.168.100.107" // EM CASA
     // this.url = "192.168.1.17" // NA CAMILA
     // this.url = "172.16.233.109" //NA PUC
     // this.url = "10.0.66.64" // NO STARBUCKS
-    this.url = "192.168.43.43" //NO CELULAR
+    // this.url = "192.168.43.43" //NO CELULAR
   }
 
   setIP(string){
@@ -28,6 +28,7 @@ export class Api {
     this.storage.set('ip', this.url);
     console.log('IP salvo!'+ this.url)
   }
+  
 
   getIP(){
     // return this.storage.get('ip');

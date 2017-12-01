@@ -9,6 +9,9 @@ import { ListMasterPage } from "../list-master/list-master";
 import { LostPage } from "../lost/lost";
 import { MainPage } from '../../pages/pages';
 import { Animals } from '../../providers/providers';
+import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
+
 
 @Component({
   selector: 'page-lost-register',
@@ -67,7 +70,7 @@ export class LostRegisterPage {
 
   listMaster: any;
 
-  constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
+  constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -113,6 +116,25 @@ export class LostRegisterPage {
 
   }
 
+  getLocation() {
+    this.geolocation.getCurrentPosition().then((position) => {
+      this.nativeGeocoder.reverseGeocode(position.coords.latitude, position.coords.longitude)
+      .then((result: NativeGeocoderReverseResult) => {
+        this.form.controls['city'].setValue(result.subAdministrativeArea)
+        this.form.controls['neighbor'].setValue(result.subLocality)
+        this.form.controls['address'].setValue(result.thoroughfare)        
+        
+      })
+    }).catch((err)=>{
+      let toast = this.toastCtrl.create({
+        message: "Não foi possível possível obter a localização. Por favor, preencha os campos abaixo",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+    })
+  }
+
   loadData(data) {
     console.log("Carregando listas dos animais...")
     this.speciesList = []
@@ -151,13 +173,13 @@ export class LostRegisterPage {
 
   getPicture() {
     const options: CameraOptions = {
-      quality : 75, 
+      quality : 100, 
       destinationType : this.camera.DestinationType.DATA_URL, 
       sourceType : this.camera.PictureSourceType.CAMERA, 
       allowEdit : false,
       encodingType: this.camera.EncodingType.JPEG,
-      targetWidth: 300,
-      targetHeight: 300,
+      targetWidth: 500,
+      targetHeight: 500,
       saveToPhotoAlbum: true,
       correctOrientation: true
     }
@@ -454,7 +476,6 @@ export class LostRegisterPage {
               position: 'top'
             });
             toast.present();
-            this.viewCtrl.dismiss(this.form.value);
             if (data.exist == true){
               // EXISTE ANIMAL PARECIDO!!!
               console.log("Existe Animal Parecido!!")
@@ -466,6 +487,8 @@ export class LostRegisterPage {
               toast.present();
             }
             // this.navCtrl.push(LostPage);
+            this.viewCtrl.dismiss(this.form.value);
+            this.navCtrl.push(LostPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

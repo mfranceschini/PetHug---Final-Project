@@ -18,7 +18,7 @@ export class LostPage {
   myInput: any;
 
   constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public lostAnimals: LostAnimals, public modalCtrl: ModalController, public http: Http) {
-    this.loadAnimals(false)
+    this.loadAnimals(false)    
   }
 
   /**
@@ -114,7 +114,8 @@ export class LostPage {
             "city":d.cidade.toString(),
             "neighbor":d.bairro.toString(),
             "address":d.endereco.toString(),
-            "id": d.id.toString()
+            "id": d.id.toString(),
+            "user": d.responsavel_id.toString()            
           })
           // this.loading.dismiss()
         });

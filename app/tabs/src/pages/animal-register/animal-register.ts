@@ -151,13 +151,13 @@ export class AnimalRegisterPage {
 
   getPicture() {
     const options: CameraOptions = {
-      quality : 75, 
+      quality : 100, 
       destinationType : this.camera.DestinationType.DATA_URL, 
       sourceType : this.camera.PictureSourceType.CAMERA, 
       allowEdit : false,
       encodingType: this.camera.EncodingType.JPEG,
-      targetWidth: 300,
-      targetHeight: 300,
+      targetWidth: 500,
+      targetHeight: 500,
       saveToPhotoAlbum: true,
       correctOrientation: true
     }
@@ -419,7 +419,7 @@ export class AnimalRegisterPage {
       }
       else {
         usuario = usr
-      }
+      }      
 
       this.animalForm = {
       'about': this.form.controls['about'].value,

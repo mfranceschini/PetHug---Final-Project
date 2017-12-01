@@ -10,6 +10,7 @@ import { ComplaintPage } from '../pages/complaint/complaint';
 import { SettingsPage } from '../pages/settings/settings';
 
 import { Settings } from '../providers/providers';
+import { OneSignal } from '@ionic-native/onesignal'
 
 import { TranslateService } from '@ngx-translate/core'
 
@@ -44,7 +45,7 @@ export class MyApp {
     { title: 'Configurações', component: SettingsPage }
   ]
 
-  constructor(private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {
+  constructor(private oneSignal: OneSignal, private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {
 
     this.initTranslate();
 
@@ -54,14 +55,14 @@ export class MyApp {
       statusBar.backgroundColorByHexString("#cc0000");
       splashScreen.hide();
 
-      // var notificationOpenedCallback = function(jsonData) {
-      //   console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-      // };
+      var notificationOpenedCallback = function(jsonData) {
+        console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+      };
   
-      // window["plugins"].OneSignal
-      //   .startInit("682f1efd-6ede-46bd-b6dc-102ecf7fac50", "463999146678")
-      //   .handleNotificationOpened(notificationOpenedCallback)
-      //   .endInit();
+      this.oneSignal
+        .startInit("682f1efd-6ede-46bd-b6dc-102ecf7fac50", "463999146678")
+        .handleNotificationOpened(notificationOpenedCallback)
+        .endInit();
     });
   }
 

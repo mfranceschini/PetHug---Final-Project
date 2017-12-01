@@ -2,11 +2,9 @@ import { Component } from '@angular/core';
 import { NavController, ToastController, LoadingController } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 import { MainPage } from '../../pages/pages';
-
 import { UserPage } from '../../providers/user';
-
 import { TranslateService } from '@ngx-translate/core';
-
+import { OneSignal } from '@ionic-native/onesignal'
 
 @Component({
   selector: 'page-login',
@@ -32,7 +30,7 @@ export class LoginPage {
 
   toast: any;
 
-  constructor(public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController,public userCtrl: UserPage,public toastCtrl: ToastController,public translateService: TranslateService) {
+  constructor(private oneSignal: OneSignal, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController,public userCtrl: UserPage,public toastCtrl: ToastController,public translateService: TranslateService) {
 
     this.translateService.get('LOGIN_ERROR').subscribe((value) => {
       this.loginErrorString = value;
@@ -67,16 +65,31 @@ export class LoginPage {
 
       login.map(res => res.json())
       .subscribe((data) => {
-        this.userCtrl._loggedIn(data);
-        this.loading.dismiss()
-        var nome = data.nome.split(" ",1)
-        this.toast = this.toastCtrl.create({
-          message: 'Bem-vindo, ' + nome,
-          duration: 3000,
-          position: 'top'
-        });
-        this.toast.present();
-        this.navCtrl.push(MainPage);
+        this.oneSignal.getIds().then((os)=>{
+          let json = {
+            "usuario_id": data.id,
+            "dispositivo": os.userId
+          }
+          this.userCtrl.setDevice(json)
+          .map(res => res.json())
+          .subscribe((device) => {
+            if (device.success == "success") {
+              this.userCtrl._loggedIn(data);
+              this.loading.dismiss()              
+              var nome = data.nome.split(" ",1)
+              this.toast = this.toastCtrl.create({
+                message: 'Bem-vindo, ' + nome,
+                duration: 3000,
+                position: 'top'
+              });
+              this.toast.present();
+              this.navCtrl.push(MainPage);
+            }
+            else {
+              console.log("Erro ao adicionar dispositivo!")
+            }
+          })
+        })
       }, (err) => {
         this.toast = this.toastCtrl.create({
           message: this.loginErrorString,

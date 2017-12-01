@@ -16,6 +16,7 @@
     "googleapis": "^19.0.0",
     "node-resemble-js": "^0.2.0",
     "onesignal": "^0.1.2",
+    "onesignal-node": "^1.0.2",
     "resemblejs": "^2.2.4"
   }
 }

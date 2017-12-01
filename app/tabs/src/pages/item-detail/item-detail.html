@@ -4,7 +4,16 @@
     <ion-title>{{ animal.name }}</ion-title>
 
     <ion-buttons end *ngIf="showDelete == true">
-      <button ion-button icon-only (click)="deleteAnimal(animal)">
+      <button *ngIf="normal == true" ion-button icon-only (click)="deleteAnimal(animal)">
+        <ion-icon name="md-trash"></ion-icon>
+      </button>
+      <button *ngIf="lost == true" ion-button icon-only (click)="deleteLostAnimal(animal)">
+        <ion-icon name="md-trash"></ion-icon>
+      </button>
+      <button *ngIf="found == true" ion-button icon-only (click)="deleteFoundAnimal(animal)">
+        <ion-icon name="md-trash"></ion-icon>
+      </button>
+      <button *ngIf="complaint == true" ion-button icon-only (click)="deleteComplaint(animal)">
         <ion-icon name="md-trash"></ion-icon>
       </button>
     </ion-buttons>

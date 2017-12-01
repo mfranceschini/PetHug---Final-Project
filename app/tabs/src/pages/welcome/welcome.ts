@@ -7,6 +7,7 @@ import { UserPage } from '../../providers/user';
 import { Facebook } from '@ionic-native/facebook';
 import { MainPage } from '../../pages/pages';
 import { Auth, User } from '@ionic/cloud-angular';
+import { OneSignal } from '@ionic-native/onesignal'
 
 /**
  * The Welcome Page is a splash page that quickly describes the app,
@@ -25,8 +26,9 @@ export class WelcomePage {
   toast: any;
   userId: any;
   params:any;
+  device_id:any;
 
-  constructor(public auth: Auth, public user: User, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public userCtrl: UserPage) {
+  constructor(private oneSignal: OneSignal, public auth: Auth, public user: User, public navCtrl: NavController, public toastCtrl: ToastController, public api: Api, public fb: Facebook, public userCtrl: UserPage) {
     // this.getIPAddr()
   }
 
@@ -69,15 +71,25 @@ export class WelcomePage {
           .map(res => res.json())
           .subscribe((data) => {
             if (data.success == 'existe'){
-              this.userCtrl._loggedIn(data.id);
-              var nome = data.nome.split(" ",1)
-              this.toast = this.toastCtrl.create({
-                message: 'Bem-vindo, ' + nome,
-                duration: 3000,
-                position: 'top'
-              });
-              this.toast.present();
-              this.navCtrl.push(MainPage);
+              this.oneSignal.getIds().then((os)=>{
+                let json = {
+                  "usuario_id": data.id,
+                  "dispositivo": os.userId
+                }
+                this.userCtrl.setDevice(json)
+                .map(res => res.json())
+                .subscribe((device) => {
+                  this.userCtrl._loggedIn(data.id);
+                  var nome = data.nome.split(" ",1)
+                  this.toast = this.toastCtrl.create({
+                    message: 'Bem-vindo, ' + nome,
+                    duration: 3000,
+                    position: 'top'
+                  });
+                  this.toast.present();
+                  this.navCtrl.push(MainPage);
+                })
+              })
             }
             else if (data.success == 'nao_existe'){
               console.log("Usuario FB nao tem cadastro!!")
@@ -115,15 +127,30 @@ export class WelcomePage {
       .map(res => res.json())
       .subscribe((data) => {
         if (data.success == 'existe'){
-          this.userCtrl._loggedIn(data.id);
-          var nome = data.nome.split(" ",1)
-          this.toast = this.toastCtrl.create({
-            message: 'Bem-vindo, ' + nome,
-            duration: 3000,
-            position: 'top'
-          });
-          this.toast.present();
-          this.navCtrl.push(MainPage);
+          this.oneSignal.getIds().then((os)=>{
+            let json = {
+              "usuario_id": data.id,
+              "dispositivo": os.userId
+            }
+            this.userCtrl.setDevice(json)
+            .map(res => res.json())
+            .subscribe((device) => {
+              if (device.success == "success") {
+                this.userCtrl._loggedIn(data.id);
+                var nome = data.nome.split(" ",1)
+                this.toast = this.toastCtrl.create({
+                  message: 'Bem-vindo, ' + nome,
+                  duration: 3000,
+                  position: 'top'
+                });
+                this.toast.present();
+                this.navCtrl.push(MainPage);
+              }
+              else {
+                console.log("Erro ao adicionar dispositivo!")
+              }
+            })
+          })
         }
         else if (data.success == 'nao_existe'){
           console.log("Usuario INSTA nao tem cadastro!!")

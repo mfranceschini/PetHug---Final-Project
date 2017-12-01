@@ -95,7 +95,8 @@ export class ComplaintPage {
             "address":d.endereco.toString(),
             "id": d.id.toString(),
             "about": d.descricao.toString(),
-            "specie": d.especie_id.toString()
+            "specie": d.especie_id.toString(),
+            "user": d.responsavel_id.toString()
           })
           // this.loading.dismiss()
         });

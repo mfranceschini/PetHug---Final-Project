@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, ToastController } from 'ionic-angular';
-import { Animals } from '../../providers/providers';
+import { Animals, Complaints, LostAnimals, FoundAnimals } from '../../providers/providers';
 import { EmailComposer } from '@ionic-native/email-composer';
 import { UserPage } from '../../providers/user'
 import { MainPage } from '../../pages/pages';
-import { FoundPage } from '../found/found'
+import { FoundPage } from '../found/found';
+import { LostPage } from '../lost/lost';
+import { ComplaintPage } from '../complaint/complaint';
+
 
 @Component({
   selector: 'page-item-detail', 
@@ -19,7 +22,7 @@ export class ItemDetailPage {
   normal: any;
   complaint: any;
 
-  constructor(public toastCtrl: ToastController, public user: UserPage, private emailComposer: EmailComposer, public navCtrl: NavController, navParams: NavParams, public animals: Animals) {
+  constructor(public toastCtrl: ToastController, public user: UserPage, private emailComposer: EmailComposer, public navCtrl: NavController, navParams: NavParams, public animals: Animals, public foundAnimals: FoundAnimals, public lostAnimals: LostAnimals, public complaints: Complaints) {
     this.animal = navParams.get('animal') || animals.defaultAnimal;
 
     this.emailComposer.addAlias('gmail', 'com.google.android.gm');
@@ -49,9 +52,9 @@ export class ItemDetailPage {
 
   ionViewDidLoad() {
     this.user.getUser().then((data) => {      
-      this.user_id = JSON.parse(data);      
-
-      if (this.animal.user == this.user_id.id) {
+      this.user_id = JSON.parse(data);
+      
+      if (this.animal.user == this.user_id) {
         this.showDelete = true      
       }
       else {
@@ -72,7 +75,7 @@ export class ItemDetailPage {
           position: 'top'
         });
         toast.present();
-        this.navCtrl.push(FoundPage);
+        this.navCtrl.setRoot(MainPage);
     }, (err) => {
       let toast = this.toastCtrl.create({
         message: "Erro ao Excluir Animal!",
@@ -84,20 +87,89 @@ export class ItemDetailPage {
     });
   }
 
+  deleteLostAnimal(animal) {
+    // this.loadingDel.present()
+    console.log("Apagando animal perdido")
+    let ret = this.lostAnimals.delete(animal);
+    ret.map(res => res.json())
+    .subscribe((data) => {
+      let toast = this.toastCtrl.create({
+          message: "Animal Perdido Excluído com Sucesso!",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        this.navCtrl.setRoot(LostPage);
+    }, (err) => {
+      let toast = this.toastCtrl.create({
+        message: "Erro ao Excluir Animal Perdido!",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+      // this.loadingDel.dismiss()
+    });
+  }
+
+  deleteFoundAnimal(animal) {
+    // this.loadingDel.present()
+    console.log("Apagando animal encontrado")
+    let ret = this.foundAnimals.delete(animal);
+    ret.map(res => res.json())
+    .subscribe((data) => {
+      let toast = this.toastCtrl.create({
+          message: "Animal Encontrado Excluído com Sucesso!",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        this.navCtrl.setRoot(FoundPage);
+    }, (err) => {
+      let toast = this.toastCtrl.create({
+        message: "Erro ao Excluir Animal Encontrado!",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+      // this.loadingDel.dismiss()
+    });
+  }
+
+  deleteComplaint(animal) {
+    // this.loadingDel.present()
+    console.log("Apagando denúncia")
+    let ret = this.complaints.delete(animal);
+    ret.map(res => res.json())
+    .subscribe((data) => {
+      let toast = this.toastCtrl.create({
+          message: "Denúncia Excluída com Sucesso!",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        this.navCtrl.setRoot(ComplaintPage);
+    }, (err) => {
+      let toast = this.toastCtrl.create({
+        message: "Erro ao Excluir Denúncia!",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+      // this.loadingDel.dismiss()
+    });
+  }
+
   sendEmail() {
     let email = {}
     this.emailComposer.isAvailable().then((available: boolean) =>{
-      console.log("Email disponivel");
       
       // if(available) {
-        this.user.getUserData(this.user_id.id)
+        this.user.getUserData(this.user_id)
         .map(res => res.json())
         .subscribe(usuario => {
           this.user.getUserData(this.animal.user)
           .map(res => res.json())
           .subscribe(responsavel => {
-            console.log("Responsavel pegado!!")
-            console.log(JSON.stringify(responsavel))
 
             if (this.normal == true) {
               console.log('Enviando email de disponíveis');

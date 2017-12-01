@@ -30,11 +30,11 @@
             <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
               <button ion-item>
                 <div class="imagediv">
-                    <img [src]="place.profilePic"/>
+                    <img width="300px" height="150px" [src]="place.profilePic"/>
                 </div>
                 <h2>{{place.name}}</h2>
                 <p>Tipo: {{place.type}}</p>
-                <p>Telefone: {{place.phone}}</p>
+                <p><a data-ng-href="+551932010483">Telefone: {{place.phone}}</a></p>
                 <p>Email: {{place.email}}</p>
                 <p>Cidade: {{place.city}}</p>
                 <p>Bairro: {{place.neighbor}}</p>

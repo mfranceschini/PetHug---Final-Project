@@ -23,7 +23,7 @@
   </ion-header>
   
   <ion-content>
-    <form *ngIf="form" [formGroup]="form" (ngSubmit)="createAnimal()">
+    <form *ngIf="form" [formGroup]="form">
       <input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
       <div class="profile-image-wrapper" (click)="getPicture()">
         <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">

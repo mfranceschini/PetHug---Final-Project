@@ -8,9 +8,11 @@ var pg = require('pg');
 var fs = require('fs');
 var cors = require('cors')
 var app = express();
+var OneSignal = require('onesignal-node');
+
+var serverClient;
 
 require('dotenv').config()
-
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false}));
@@ -21,6 +23,66 @@ app.use(cors());
 const projectId = 'pethug-168423';
 const GOOGLE_APPLICATION_CREDENTIALS = './PetHug-6c850c98ee05.json';
 const conString = process.env.DATABASE_URL || 'postgres://pethug:senha@localhost:5432/pethug';
+
+app.post('/set_device', function (req, res) {
+  console.log("Função Setar Dispositivo")
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  client.connect(function (err) {
+      if (err) throw err;
+      console.log ("Conexão Estabelecida!");
+    const query = client.query(
+    'INSERT INTO public."Usuario_dispositivo"(usuario_id, dispositivo) VALUES ($1, $2)',[userData.usuario_id, userData.dispositivo],
+      function(err, result) {
+        if (err) {
+          if (err.code == '23505') {
+            console.log("Já existe cadastrado!!!")
+            const query = client.query(
+              'UPDATE public."Usuario_dispositivo" SET dispositivo=($1) WHERE usuario_id=($2)',[userData.dispositivo, userData.usuario_id],
+                function(err, result) {
+                  if (err){
+                    console.log("Erro ao atualizar dispositivo!")
+                    console.log(Err)
+                  }
+                  else {
+                    console.log("\n\nDispositivo Atualizado!!\n\n")
+                    var myClient = new OneSignal.Client({
+                      userAuthKey: "'" + userData.usuario_id + "'",
+                      // note that "app" must have "appAuthKey" and "appId" keys
+                      app: { appAuthKey: 'YWJkMTZlMGItYzM1Ni00NjZiLWFiYmQtMmM0MmQ2MWI5ZDI2', appId: '682f1efd-6ede-46bd-b6dc-102ecf7fac50' }
+                    });
+                    var json = JSON.stringify({ 
+                      success: "success"
+                    });
+                    res.end(json)
+                  }
+                })
+          }
+          else {
+            console.log("Deu erro")
+            console.log(err);
+            var json = JSON.stringify({ 
+              success: "error"
+            });
+            res.end(json)
+          }
+        } else {
+          console.log("\n\nDispositivo adicionado!!\n\n")
+          var myClient = new OneSignal.Client({
+            userAuthKey: "'" + userData.usuario_id + "'",
+            // note that "app" must have "appAuthKey" and "appId" keys
+            app: { appAuthKey: 'YWJkMTZlMGItYzM1Ni00NjZiLWFiYmQtMmM0MmQ2MWI5ZDI2', appId: '682f1efd-6ede-46bd-b6dc-102ecf7fac50' }
+          });
+          var json = JSON.stringify({ 
+            success: "success"
+          });
+          res.end(json)
+        }
+        query.on('end', () => { client.end(); });                  
+      });
+  });  
+})
 
 app.post('/create_user', function (req, res) {
   var client = new pg.Client(conString);
@@ -53,7 +115,7 @@ app.post('/verify_facebook', function (req, res) {
   var result = []
   var result_id = []
   var userData = req.body
-  console.log(userData.facebook_id)
+  console.log(userData)
   client.connect(function (err) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
@@ -131,6 +193,7 @@ app.post('/create_facebook_user', function (req, res) {
                   });
                   res.end(json);
                   console.log("Facebook User Created!")
+                  
                 }
               })
           query2.on('end', () => { client.end(); });
@@ -584,12 +647,11 @@ app.post('/create_found_pet', function (req, res) {
                     if (result.rowCount > 0)
                     {
                       console.log("Existe animal perdido parecido!!!")
-                      console.log("Imagem cadastrada: " + path)
-                      console.log("Imagem retornada: " + result.rows[0].imagem)
                       // COMO EXISTE ANIMAL PARECIDO, VERIFICA SE AS IMAGENS SÃO PARECIDAS
                       var diff = resemble("./public/images/" + path).compareTo("./public/images/" + result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
                         if (data.misMatchPercentage < 40) {
                           console.log("As imagens são parecidas!!")
+                          var id_responsavel = result.rows[0].responsavel_id
                           const query3 = client.query(
                           'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
                             function(err, result) {
@@ -599,40 +661,70 @@ app.post('/create_found_pet', function (req, res) {
                               } else {
                                 if (result.rowCount > 0){
                                   console.log("User Exist!")
-                                  console.log("Enviando email para responsavel...")
-                                  const query4 = client.query(
-                                  'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                    function(err, user) {
-                                      if (err){
-                                        console.log("Erro ao pegar usuario logado")
-                                        console.log(JSON.stringify(err))
-                                      }
-                                      else {
-                                        const sgMail = require('@sendgrid/mail');
-                                        sgMail.setApiKey(process.SEND_GRID_KEY);
-                                        const msg = {
-                                          to: user.rows[0].email,
-                                          cc: 'm.franceschini17@gmail.com',
-                                          from: 'pethug@email.com',
-                                          subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                          text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
-                                          'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
-                                          'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                        };
-                                        sgMail.send(msg).then((data)=>{
-                                          console.log("Email enviado com sucesso")
-                                            var json = JSON.stringify({
-                                              success: 'sucesso',
-                                              exist: true
-                                            });
-                                            res.end(json)
-                                        }).catch((err)=>{
-                                          console.log("Erro ao enviar email")
+                                  console.log("Enviando notificação para responsavel...")
+                                  console.log("\n\nID: " + id_responsavel)
+                                  const query5 = client.query(
+                                    'SELECT * FROM public."Usuario_dispositivo" WHERE usuario_id=($1)',[id_responsavel],
+                                      function(err, device) {
+                                        if (err){
+                                          console.log("Erro ao pegar dispositivo")
                                           console.log(JSON.stringify(err))
-                                        })
-                                      }
-                                    })
-                                    query4.on('end', () => { client.end(); });
+                                        }
+                                        else {
+                                          if (device.rowCount > 0) {
+                                            console.log("\ncomeço da notificacao")
+                                            var firstNotification = new OneSignal.Notification({
+                                              template_id: "4c10b01e-8a8c-480d-b2c5-314c76f9925a"
+                                            });
+                                            // set target users 
+                                            firstNotification.setTargetDevices([device.rows[0].dispositivo])
+                                            
+                                            // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
+                                            serverClient.sendNotification(firstNotification)
+                                            .then(function (response) {
+                                              console.log("Notificação Enviada!!!!")
+                                                console.log(response.data);
+                                            })
+                                            .catch(function (err) {
+                                                console.log('Something went wrong...', err);
+                                            });
+                                          }
+                                          console.log("\nEnviando email para responsavel...")
+                                          const query4 = client.query(
+                                          'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                            function(err, user) {
+                                              if (err){
+                                                console.log("Erro ao pegar usuario logado")
+                                                console.log(JSON.stringify(err))
+                                              }
+                                              else {
+                                                //ENVIANDO EMAIL PARA O RESPONSAVEL
+                                                const sgMail = require('@sendgrid/mail');
+                                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                                const msg = {
+                                                  to: user.rows[0].email,
+                                                  cc: 'm.franceschini17@gmail.com',
+                                                  from: 'pethug@email.com',
+                                                  subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                                  text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
+                                                  'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                                };
+                                                sgMail.send(msg).then((data)=>{
+                                                  console.log("Email enviado com sucesso")
+                                                    var json = JSON.stringify({
+                                                      success: 'sucesso',
+                                                      exist: true
+                                                    });
+                                                    res.end(json)
+                                                }).catch((err)=>{
+                                                  console.log("Erro ao enviar email")
+                                                  console.log(JSON.stringify(err))
+                                                })
+                                              }
+                                            })
+                                            query4.on('end', () => { client.end(); });
+                                        }
+                                      })
                                 }
                               }
                             });
@@ -819,6 +911,7 @@ app.post('/create_lost_pet', function (req, res) {
                     var diff = resemble("./public/images/" + path).compareTo("./public/images/" + result.rows[0].imagem).ignoreAntialiasing().onComplete(function(data){
                       if (data.misMatchPercentage < 40) {
                         console.log("As imagens são parecidas!!")
+                        var id_responsavel = result.rows[0].responsavel_id
                         const query3 = client.query(
                         'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
                           function(err, result) {
@@ -828,40 +921,70 @@ app.post('/create_lost_pet', function (req, res) {
                             } else {
                               if (result.rowCount > 0){
                                 console.log("User Exist!")
-                                console.log("Enviando email para responsavel...")
-                                const query4 = client.query(
-                                'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                  function(err, user) {
-                                    if (err){
-                                      console.log("Erro ao pegar usuario logado")
-                                      console.log(JSON.stringify(err))
-                                    }
-                                    else {
-                                      const sgMail = require('@sendgrid/mail');
-                                      sgMail.setApiKey(process.env.SEND_GRID_KEY);
-                                      const msg = {
-                                        to: user.rows[0].email,
-                                        cc: 'm.franceschini17@gmail.com',
-                                        from: 'pethug@email.com',
-                                        subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                        text: 'Atenção!! Acabou de ser cadastrado em nosso sistema um animal semelhante ao seu!' + 
-                                        'O usuário ' + user.rows[0].nome + 'cadastrou um animal parecido com o seu!' + 
-                                        'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                      };
-                                      sgMail.send(msg).then((data)=>{
-                                        console.log("Email enviado com sucesso")
-                                          var json = JSON.stringify({
-                                            success: 'sucesso',
-                                            exist: true
-                                          });
-                                          res.end(json)
-                                      }).catch((err)=>{
-                                        console.log("Erro ao enviar email")
+                                console.log("Enviando notificação para responsavel...")
+                                console.log("\n\nID: " + id_responsavel)
+                                const query5 = client.query(
+                                  'SELECT * FROM public."Usuario_dispositivo" WHERE usuario_id=($1)',[id_responsavel],
+                                    function(err, device) {
+                                      if (err){
+                                        console.log("Erro ao pegar dispositivo")
                                         console.log(JSON.stringify(err))
-                                      })
-                                    }
-                                  })
-                                  query4.on('end', () => { client.end(); });
+                                      }
+                                      else {
+                                        if (device.rowCount > 0) {
+                                          console.log("\ncomeço da notificacao")
+                                          var firstNotification = new OneSignal.Notification({
+                                            template_id: "4c10b01e-8a8c-480d-b2c5-314c76f9925a"
+                                          });
+                                          // set target users 
+                                          firstNotification.setTargetDevices([device.rows[0].dispositivo])
+                                          
+                                          // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
+                                          serverClient.sendNotification(firstNotification)
+                                          .then(function (response) {
+                                            console.log("Notificação Enviada!!!!")
+                                              console.log(response.data);
+                                          })
+                                          .catch(function (err) {
+                                              console.log('Something went wrong...', err);
+                                          });
+                                        }
+                                        console.log("\nEnviando email para responsavel...")
+                                        const query4 = client.query(
+                                        'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                          function(err, user) {
+                                            if (err){
+                                              console.log("Erro ao pegar usuario logado")
+                                              console.log(JSON.stringify(err))
+                                            }
+                                            else {
+                                              //ENVIANDO EMAIL PARA O RESPONSAVEL
+                                              const sgMail = require('@sendgrid/mail');
+                                              sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                              const msg = {
+                                                to: user.rows[0].email,
+                                                cc: 'm.franceschini17@gmail.com',
+                                                from: 'pethug@email.com',
+                                                subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                                text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
+                                                'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                              };
+                                              sgMail.send(msg).then((data)=>{
+                                                console.log("Email enviado com sucesso")
+                                                  var json = JSON.stringify({
+                                                    success: 'sucesso',
+                                                    exist: true
+                                                  });
+                                                  res.end(json)
+                                              }).catch((err)=>{
+                                                console.log("Erro ao enviar email")
+                                                console.log(JSON.stringify(err))
+                                              })
+                                            }
+                                          })
+                                          query4.on('end', () => { client.end(); });
+                                      }
+                                    })
                                 }
                               }
                             });
@@ -943,7 +1066,6 @@ app.get('/found_pet_list', function (req, res) {
     const query = client.query(
     'SELECT * FROM public."Animal_Encontrado"');
     animalPromise = query.on('row', function(row) {
-        console.log("Recebeu os animais encontrados")
         result.push(row)
     })
     
@@ -1032,6 +1154,7 @@ app.get('/animal_data', function (req, res) {
     promiseStatus = query4.on('row', function(row) {
       resultStatus.push(row)
     });
+
     Promise.all([promiseSpecies, promiseBreeds, promiseSize, promiseStatus]).then(function(data) {
       console.log("Todas as consultas realizadas")
       var json = JSON.stringify({ 
@@ -1332,7 +1455,7 @@ app.post('/create_complaint', function (req, res) {
 
     Promise.all([promise]).then((data) => {
       const query = client.query(
-      'INSERT INTO public."Denuncia"(cidade, bairro, endereco, descricao, especie_id, imagem) VALUES ($1, $2, $3, $4, $5, $6)',[form.city, form.neighbor, form.address, form.about, form.species, path],
+      'INSERT INTO public."Denuncia"(cidade, bairro, endereco, descricao, especie_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',[form.city, form.neighbor, form.address, form.about, form.species, path, form.user],
         function(err, result) {
           if (err) {
             console.log("Deu erro")
@@ -1390,6 +1513,12 @@ app.post('/delete_complaint', function (req, res) {
 
 app.listen(3000, function (err) {
 
+  serverClient = new OneSignal.Client({
+    userAuthKey: "01",
+    // note that "app" must have "appAuthKey" and "appId" keys
+    app: { appAuthKey: 'YWJkMTZlMGItYzM1Ni00NjZiLWFiYmQtMmM0MmQ2MWI5ZDI2', appId: '682f1efd-6ede-46bd-b6dc-102ecf7fac50' }
+  });
+
   google.auth.getApplicationDefault(function(err, authClient) {
     if (err) {
       return cb(err);
@@ -1404,7 +1533,7 @@ app.listen(3000, function (err) {
     storage.buckets.list({
       auth: authClient,
       project: projectId,
-      languageHints: ['en', 'pt']
+      languageHints: ['en']
     });
   });
   

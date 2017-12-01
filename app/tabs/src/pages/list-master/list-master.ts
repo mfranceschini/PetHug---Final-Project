@@ -143,7 +143,7 @@ export class ListMasterPage {
             "status":d.status_id.toString(),
             "about": d.descricao.toString(),
             "id": d.id.toString(),
-            "user_id": d.responsavel_id.toString()
+            "user": d.responsavel_id.toString()
           })
           // this.loading.dismiss()
         });

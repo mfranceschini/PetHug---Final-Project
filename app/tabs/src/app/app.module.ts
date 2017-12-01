@@ -52,6 +52,8 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import { EmailComposer } from '@ionic-native/email-composer';
 import { Geolocation } from '@ionic-native/geolocation';
 import { NativeGeocoder } from '@ionic-native/native-geocoder';
+import { OneSignal } from '@ionic-native/onesignal'
+import { Device } from '@ionic-native/device';
 
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -143,6 +145,8 @@ export function providers() {
     StatusBar,
     Facebook,
     EmailComposer,
+    OneSignal,
+    Device,
 
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     // Keep this to enable Ionic's runtime error handling during development
