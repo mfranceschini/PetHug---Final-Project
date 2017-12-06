@@ -28,18 +28,18 @@
         <ion-label text-center style="font-size:1.3em;color:gray" *ngIf="currentPlaces.length == 0">Não existem estabelecimentos cadastrados!</ion-label>          
         <ion-col text-center col-12 *ngFor="let place of currentPlaces">
             <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
-              <button ion-item>
+              <div ion-item>
                 <div class="imagediv">
                     <img width="300px" height="150px" [src]="place.profilePic"/>
                 </div>
                 <h2>{{place.name}}</h2>
                 <p>Tipo: {{place.type}}</p>
-                <p><a data-ng-href="+551932010483">Telefone: {{place.phone}}</a></p>
+                <p><a (click)="openPlace(place)">Telefone: {{place.phone}}</a></p>
                 <p>Email: {{place.email}}</p>
                 <p>Cidade: {{place.city}}</p>
                 <p>Bairro: {{place.neighbor}}</p>
                 <p>Endereço: {{place.address}}</p>
-              </button>
+              </div>
         
               <ion-item-options>
                 <button ion-button color="danger" (click)="deletePlace(place)">

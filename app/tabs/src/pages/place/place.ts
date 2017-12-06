@@ -6,6 +6,7 @@ import { Place } from '../../models/place';
 import { PlaceRegisterPage } from '../place-register/place-register';
 import { Http, Headers } from '@angular/http';
 import { Api } from '../../providers/api'
+import { CallNumber } from '@ionic-native/call-number';
 
 
 @Component({
@@ -17,7 +18,7 @@ export class PlacePage {
   ipAddress: any;
   myInput: any;
 
-  constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public places: Places, public modalCtrl: ModalController, public http: Http) {
+  constructor(private dialer: CallNumber, public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public places: Places, public modalCtrl: ModalController, public http: Http) {
     this.loadPlaces(false)
   }
 
@@ -136,5 +137,17 @@ export class PlacePage {
       });
       toast.present();
     });
+  }
+
+  openPlace(place) {
+    let toast = this.toastCtrl.create({
+      message: "Abrindo Discador...",
+      duration: 1500,
+      position: 'top'
+    });
+    toast.present().then((data) => {
+      this.dialer.callNumber(place.phone, true)
+    });
+    
   }
 }
