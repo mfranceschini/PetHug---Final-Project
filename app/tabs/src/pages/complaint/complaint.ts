@@ -5,7 +5,7 @@ import { Complaints } from '../../providers/providers';
 import { ComplaintRegisterPage } from '../complaint-register/complaint-register';
 import { Http, Headers } from '@angular/http';
 import { Api } from '../../providers/api'
-
+import { UserPage } from '../../providers/user'
 
 @Component({
   selector: 'page-complaint',
@@ -16,7 +16,7 @@ export class ComplaintPage {
   ipAddress: any;
   myInput: any;
 
-  constructor(public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public complaints: Complaints, public modalCtrl: ModalController, public http: Http) {
+  constructor(private user: UserPage, public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public complaints: Complaints, public modalCtrl: ModalController, public http: Http) {
     this.loadComplaint(false)
   }
 
@@ -156,9 +156,18 @@ export class ComplaintPage {
   }
 
   openComplaint(complaint) {
-    this.navCtrl.push(ItemDetailPage, {
-      animal: complaint,
-      "complaint": true
-    });
+    this.user.getUserData(complaint.user)
+    .map(res => res.json())
+    .subscribe((user) => {
+      let email = user.email
+      var json = {
+        "complaint": complaint,
+        "email": email
+      }
+      this.navCtrl.push(ItemDetailPage, {
+        animal: json,
+        "complaint": true
+      });
+    })
   }
 }

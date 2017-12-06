@@ -23,8 +23,10 @@
 
 
 <ion-content>
-  <div class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.profilePic + ')'">
+  <div *ngIf="complaint != true" class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.profilePic + ')'">
   </div>
+  <div *ngIf="complaint == true" class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.complaint.profilePic + ')'">
+    </div>
 
   <button ion-button block *ngIf="complaint != true" (click)="sendEmail()" class="email">Entrar em Contato</button>
   
@@ -58,11 +60,12 @@
   </div>
 
   <div *ngIf="complaint == true" class="item-detail" padding>
-    <h2>Sou um <b>{{animal.specie}}</b>,</h2>
-    <p>Estou em <b>{{animal.city}}</b>,</p>
-    <p>No Bairro <b>{{animal.neighbor}}</b>,</p>
-    <p>No Endereço <b>{{animal.address}}</b>,</p>
-    <p>Sobre mim: <b>{{animal.about}}</b></p>
+    <h2>Sou um <b>{{animal.complaint.specie}}</b>,</h2>
+    <p>Estou em <b>{{animal.complaint.city}}</b>,</p>
+    <p>No Bairro <b>{{animal.complaint.neighbor}}</b>,</p>
+    <p>No Endereço <b>{{animal.complaint.address}}</b>,</p>
+    <p>Sobre mim: <b>{{animal.complaint.about}}</b></p>
+    <p>Denúncia registrada por: <b>{{animal.email}}</b></p>   
   </div>
 
 </ion-content>
