@@ -29,6 +29,7 @@ app.post('/set_device', function (req, res) {
   var client = new pg.Client(conString);
   var result = []
   var userData = req.body
+  console.log(userData)
   client.connect(function (err) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
@@ -405,41 +406,32 @@ app.post('/create_pet', function (req, res) {
       random = random.toPrecision(4)
       const imagePath = "./public/images/animal" + random + ".jpeg"
   
-      createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+      fs.writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, 
+        function(err) {
             if(err){
-              throw(err);
+              return(err);
             }
-            else{
-              console.log("\nAnalysed Image: " + imagePath)
-              Promise.resolve()
-            }
-        }))
-  
-      Promise.all([createFile]).then(function(data) {
-        // all loaded
-        visionClient.detectLabels(imagePath)
-        .then((results) => {
-          const labels = results[0];
-          console.log('Analysing Image...!\n');
-          labels.forEach((label) =>
-            console.log(label));
-          console.log("Image Analysed!\n");
-          var json = JSON.stringify({ 
-          image1: labels
-          });
-          res.end(json);
-          console.log("Response Sent!\n")
-          require('fs').unlinkSync(imagePath)
-          console.log("Image Deleted: " + imagePath)
-        })
-        .catch((err) => {
-          console.error('ERROR:', err);
-          res.end('erro')
-        });
-      }, function(err) {
-        console.error('ERROR:', err);
-        // one or more failed
-      });
+            visionClient.detectLabels(imagePath)
+            .then((results) => {
+              const labels = results[0];    
+              console.log('Analysing Image...!\n');
+              labels.forEach((label) =>
+                console.log(label));
+              console.log("Image Analysed!\n");
+              var json = JSON.stringify({ 
+              image1: labels
+              });
+              res.end(json);
+              console.log("Response Sent!\n")
+              require('fs').unlinkSync(imagePath)
+              console.log("Image Deleted: " + imagePath)
+            })
+            .catch((err) => {              
+              console.error('ERROR1:', err);
+              console.log(err.errors[0].errors)
+              res.end('erro')
+            });
+      })
     }
     else if (req.body.form){
       var form = req.body.form
@@ -537,44 +529,33 @@ app.post('/create_found_pet', function (req, res) {
       var random = Math.random() * (9999 - 1000) + 1000
       random = random.toPrecision(4)
       const imagePath = "./public/images/animal" + random + ".jpeg"
-  
-      createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+
+      fs.writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, 
+        function(err) {
             if(err){
-              throw(err);
+              return(err);
             }
-            else{
-              console.log("\nAnalysed Image: " + imagePath)
-              Promise.resolve()
-            }
-        }))
-  
-      Promise.all([createFile]).then(function(data) {
-        // all loaded
-        visionClient.detectLabels(imagePath)
-        .then((results) => {
-          const labels = results[0];
-          console.log('Analysing Image...!\n');
-          labels.forEach((label) =>
-            console.log(label));
-          console.log("Image Analysed!\n");
-          var json = JSON.stringify({ 
-          image1: labels
-          });
-          res.end(json);
-          console.log("Response Sent!\n")
-          require('fs').unlinkSync(imagePath)
-          console.log("Image Deleted: " + imagePath)
-        })
-        .catch((err) => {
-          console.error('ERROR1:', err);
-          console.log(err.errors[0].errors)
-          
-          res.end('erro')
-        });
-      }, function(err) {
-        console.error('ERROR:', err);
-        // one or more failed
-      });
+            visionClient.detectLabels(imagePath)
+            .then((results) => {
+              const labels = results[0];    
+              console.log('Analysing Image...!\n');
+              labels.forEach((label) =>
+                console.log(label));
+              console.log("Image Analysed!\n");
+              var json = JSON.stringify({ 
+              image1: labels
+              });
+              res.end(json);
+              console.log("Response Sent!\n")
+              require('fs').unlinkSync(imagePath)
+              console.log("Image Deleted: " + imagePath)
+            })
+            .catch((err) => {              
+              console.error('ERROR1:', err);
+              console.log(err.errors[0].errors)
+              res.end('erro')
+            });
+      })
     }
     else if (req.body.form){
       var form = req.body.form
@@ -796,42 +777,32 @@ app.post('/create_lost_pet', function (req, res) {
     random = random.toPrecision(4)
     const imagePath = "./public/images/animal" + random + ".jpeg"
 
-    createFile = (require("fs").writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, function(err) {
+    fs.writeFile(imagePath, imageBuffer.data, {encoding: 'base64'}, 
+      function(err) {
           if(err){
-            Promise.reject()
-            throw(err);
+            return(err);
           }
-          else{
-            console.log("\nAnalysed Image: " + imagePath)
-            Promise.resolve()
-          }
-      }))
-
-    Promise.all([createFile]).then(function(data) {
-      // all loaded
-      visionClient.detectLabels(imagePath)
-      .then((results) => {
-        const labels = results[0];
-        console.log('Analysing Image...!\n');
-        labels.forEach((label) =>
-          console.log(label));
-        console.log("Image Analysed!\n");
-        var json = JSON.stringify({ 
-        image1: labels
-        });
-        res.end(json);
-        console.log("Response Sent!\n")
-        require('fs').unlinkSync(imagePath)
-        console.log("Image Deleted: " + imagePath)
-      })
-      .catch((err) => {
-        console.error('ERROR:', err);
-        res.end('erro')
-      });
-    }, function(err) {
-      console.error('ERROR:', err);
-      // one or more failed
-    });
+          visionClient.detectLabels(imagePath)
+          .then((results) => {
+            const labels = results[0];    
+            console.log('Analysing Image...!\n');
+            labels.forEach((label) =>
+              console.log(label));
+            console.log("Image Analysed!\n");
+            var json = JSON.stringify({ 
+            image1: labels
+            });
+            res.end(json);
+            console.log("Response Sent!\n")
+            require('fs').unlinkSync(imagePath)
+            console.log("Image Deleted: " + imagePath)
+          })
+          .catch((err) => {              
+            console.error('ERROR1:', err);
+            console.log(err.errors[0].errors)
+            res.end('erro')
+          });
+    })
   }
   else if (req.body.form){
     var form = req.body.form

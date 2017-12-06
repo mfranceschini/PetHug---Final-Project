@@ -1,35 +1,8 @@
 page-lost {
-    .mask_dog{
-        max-height: 140px;
-        max-width: 140px;
-        height: 140px;
-        width: 140px;
-        background-image:url('../../assets/img/paw_frame.png');
-        z-index:1;
-        background-size: cover;
-        position: absolute;
-        margin-left: 10px;
-    }
-
-    .mask_cat{
-        max-height: 140px;
-        max-width: 140px;
-        width: 140px;
-        height: 140px;
-        background-image:url('../../assets/img/cat_frame.png');
-        z-index:1;
-        background-size: cover;
-        position: absolute;
-        margin-left: 10px;
-    }
-
     .imagediv{
-        max-height: 140px;
-        max-width: 140px;
-        width: 140px;
-        height: 140px;
+        width: 150px;
+        height: 150px;
         position: relative;
-        margin-left: 10px;
-        z-index:0;
+        margin-bottom: 15px;
     }
 }

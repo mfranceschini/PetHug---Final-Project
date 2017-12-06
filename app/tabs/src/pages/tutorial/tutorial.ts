@@ -74,7 +74,7 @@ export class TutorialPage {
       if (usr != null){
         this.oneSignal.getIds().then((os)=>{
           let json = {
-            "usuario_id": usr,
+            "usuario_id": usr.id,
             "dispositivo": os.userId
           }
           this.user.setDevice(json)
