@@ -21,16 +21,15 @@
 
 </ion-header>
 
-
 <ion-content>
   <div *ngIf="complaint != true" class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.profilePic + ')'">
   </div>
   <div *ngIf="complaint == true" class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.complaint.profilePic + ')'">
-    </div>
+  </div>
 
-  <button ion-button block *ngIf="complaint != true" (click)="sendEmail()" class="email">Entrar em Contato</button>
+  <button ion-button block *ngIf="normal == true" (click)="sendNotification()" class="notification">Tenho Interesse</button>  
+  <button ion-button block *ngIf="complaint != true && showEmail == true" (click)="sendEmail()" class="email">Entrar em Contato</button>
   
-
   <div *ngIf="normal == true" class="item-detail" padding>
     <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
     <p>Sou um <b>{{animal.species}}</b>,</p>
@@ -65,7 +64,7 @@
     <p>No Bairro <b>{{animal.complaint.neighbor}}</b>,</p>
     <p>No Endereço <b>{{animal.complaint.address}}</b>,</p>
     <p>Sobre mim: <b>{{animal.complaint.about}}</b></p>
-    <p>Denúncia registrada por: <b>{{animal.email}}</b></p>   
+    <p *ngIf="animal.complaint.share_email == 1">Denúncia registrada por: <b>{{animal.email}}</b></p>   
   </div>
 
 </ion-content>

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav, Config } from 'ionic-angular';
+import { Platform, Nav, Config, ToastController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -9,7 +9,7 @@ import { PlacePage } from '../pages/place/place';
 import { ComplaintPage } from '../pages/complaint/complaint';
 import { SettingsPage } from '../pages/settings/settings';
 
-import { Settings } from '../providers/providers';
+import { Settings, UserPage } from '../providers/providers';
 import { OneSignal } from '@ionic-native/onesignal'
 
 import { TranslateService } from '@ngx-translate/core'
@@ -45,7 +45,7 @@ export class MyApp {
     { title: 'Configurações', component: SettingsPage }
   ]
 
-  constructor(private oneSignal: OneSignal, private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {
+  constructor(public toastCtrl: ToastController,private user: UserPage, private oneSignal: OneSignal, private translate: TranslateService, platform: Platform, settings: Settings, private config: Config, statusBar: StatusBar, splashScreen: SplashScreen) {
 
     this.initTranslate();
 
@@ -81,9 +81,23 @@ export class MyApp {
     // });
   }
 
-  openPage(page) {
+  openPage(page) {    
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
-    this.nav.push(page.component);
+    this.user.getUser().then((data) =>{
+      var usuario = JSON.parse(data)
+      
+      if (page.title == "Denúncias" && usuario.tipo == 2) {
+        let toast = this.toastCtrl.create({
+          message: "Apenas Instituições têm acesso às Denúncias!",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+      }
+      else {
+        this.nav.push(page.component);
+      }
+    })
   }
 }

@@ -66,6 +66,8 @@ export class AnimalRegisterPage {
 
   listMaster: any;
 
+  share_email: any; 
+
   constructor(public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public animals: Animals, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
@@ -78,6 +80,7 @@ export class AnimalRegisterPage {
       age: [''],
       weight: [''],
       status: [''],
+      share_email: ['']
     });
 
     this.imageLoaded = false;
@@ -147,6 +150,7 @@ export class AnimalRegisterPage {
   }
 
   ionViewDidLoad() {
+    this.share_email = 1
   }
 
   getPicture() {
@@ -167,8 +171,6 @@ export class AnimalRegisterPage {
         this.form.patchValue({ 'profilePic': 'data:image/jpg;base64,' + data });
         this.processCameraImage('data:image/jpg;base64,' + data)
       }, (err) => {
-        alert('Unable to take photo');
-        alert(err)
         this.fileInput.nativeElement.click();
       })
     } else {
@@ -241,6 +243,19 @@ export class AnimalRegisterPage {
             }
           }
         }
+        if (this.specieModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
+          if (this.loading){
+            this.loading.dismiss()
+          }
+          let toast = this.toastCtrl.create({
+            message: "Não foi possível analisar a imagem. Por favor, preencha os campos abaixo",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
         //Sugere Raça
         for (j=0;j<this.breedsList.length;j++){
           for(i=0;i<data.image1.length;i++){
@@ -251,6 +266,10 @@ export class AnimalRegisterPage {
               break
             }
           }
+        }
+        if (this.breedModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
         }
       },
       (err) => {
@@ -432,8 +451,9 @@ export class AnimalRegisterPage {
       'status': 1,
       'weight': this.form.controls['weight'].value,
       'image': this.form.controls['profilePic'].value,
-      'user': usuario
-      }
+      'user': usuario,
+      'share_email': this.share_email
+      }      
 
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');

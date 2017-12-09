@@ -68,6 +68,20 @@
       <ion-item>
         <ion-input type="text"  placeholder="{{ 'ANIMAL_ABOUT_PLACEHOLDER' | translate }}" formControlName="about"></ion-input>
       </ion-item>
+
+      <ion-list radio-group formControlName="share_email" [(ngModel)]="share_email">
+        <ion-item>
+          <ion-label style="color:gray">Aceito disponibilizar meu e-mail para contato:</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label style="color:gray">Sim</ion-label>
+          <ion-radio value="1" checked></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label style="color:gray">Não</ion-label>
+          <ion-radio value="2"></ion-radio>
+        </ion-item>
+      </ion-list>
     </ion-list>
   </form>
 </ion-content>

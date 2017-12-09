@@ -93,7 +93,7 @@ app.post('/create_user', function (req, res) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
     const query = client.query(
-    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3)',[userData.nome, userData.email, userData.senha],
+    'INSERT INTO public."Usuario"(nome, email, senha, tipo) VALUES ($1, $2, $3, $4)',[userData.nome, userData.email, userData.senha, userData.tipo],
       function(err, result) {
         if (err) {
           console.log("Deu erro")
@@ -143,7 +143,9 @@ app.post('/verify_facebook', function (req, res) {
                   var json = JSON.stringify({ 
                     success: "existe",
                     id: result_id,
-                    nome: resp.rows[0].nome
+                    nome: resp.rows[0].nome,
+                    email: resp.rows[0].email,
+                    tipo: resp.rows[0].tipo
                   });
                   res.end(json)
                 }
@@ -173,7 +175,7 @@ app.post('/create_facebook_user', function (req, res) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
     const query = client.query(
-    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3) RETURNING id',[userData.nome, userData.email, userData.senha],
+    'INSERT INTO public."Usuario"(nome, email, senha, tipo) VALUES ($1, $2, $3, $4) RETURNING id',[userData.nome, userData.email, userData.senha, userData.tipo],
       function(err, result) {
         if (err) {
           console.log("Deu erro")
@@ -236,7 +238,9 @@ app.post('/verify_instagram', function (req, res) {
                   var json = JSON.stringify({ 
                     success: "existe",
                     id: result_id,
-                    nome: resp.rows[0].nome
+                    nome: resp.rows[0].nome,
+                    email: resp.rows[0].email,
+                    tipo: resp.rows[0].tipo
                   });
                   res.end(json)
                 }
@@ -266,7 +270,7 @@ app.post('/create_instagram_user', function (req, res) {
       if (err) throw err;
       console.log ("Conexão Estabelecida!");
     const query = client.query(
-    'INSERT INTO public."Usuario"(nome, email, senha) VALUES ($1, $2, $3) RETURNING id',[userData.nome, userData.email, userData.senha],
+    'INSERT INTO public."Usuario"(nome, email, senha, tipo) VALUES ($1, $2, $3, $4) RETURNING id',[userData.nome, userData.email, userData.senha, userData.tipo],
       function(err, result) {
         if (err) {
           console.log("Deu erro")
@@ -320,7 +324,8 @@ app.post('/get_user', function (req, res) {
               status: 'sucesso',
               email: result[i].email,
               nome: result[i].nome,
-              id: result[i].id
+              id: result[i].id,
+              tipo: result[i].tipo
             });
             res.end(json);
             console.log("Response Sent!\n")
@@ -363,6 +368,72 @@ app.post('/get_user_data', function (req, res) {
             nome: result.rows[0].nome
           });
           res.end(json)
+        }
+      }
+      query.on('end', () => { client.end(); });
+    });      
+  });
+})
+
+app.post('/notify_interrest', function (req, res) {
+  console.log("\nNotificando Interesse...")
+  var client = new pg.Client(conString);
+  var result = []
+  var userData = req.body
+  var promise;
+  console.log(JSON.stringify(userData))
+  client.connect(function (err) {
+    if (err) throw err;
+    console.log ("Conexão Estabelecida!");
+  const query = client.query(
+  'SELECT * FROM public."Usuario_dispositivo" WHERE usuario_id=($1)',[userData.user],
+    function(err, result) {
+      if (err) {
+        console.log("Erro Get User Device")
+        console.log(err);
+      } else {
+        if (result.rowCount == 1){
+          console.log("Got Device!")
+          console.log("Resultado! " + result.rows[0])
+          console.log("\ncomeço da notificacao")
+          if (userData.species == "Cachorro") {
+            var firstNotification = new OneSignal.Notification({
+              contents: {
+                en: "Atenção, um usuário tem interesse em adotar o cachorro " + userData.animal
+              }
+            });
+            // set target users 
+            firstNotification.setTargetDevices([result.rows[0].dispositivo])
+            
+            // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
+            serverClient.sendNotification(firstNotification)
+            .then(function (response) {
+              console.log("Notificação Enviada!!!!")
+              console.log(response.data);
+            })
+            .catch(function (err) {
+                console.log('Something went wrong...', err);
+            });
+          }
+          else if (userData.species == "Gato") {
+            var firstNotification = new OneSignal.Notification({
+              contents: {
+                en: "Atenção, um usuário tem interesse em adotar o gato " + userData.animal
+              }
+            });
+            // set target users 
+            firstNotification.setTargetDevices([result.rows[0].dispositivo])
+            
+            // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
+            serverClient.sendNotification(firstNotification)
+            .then(function (response) {
+              console.log("Notificação Enviada!!!!")
+              console.log(response.data);
+            })
+            .catch(function (err) {
+                console.log('Something went wrong...', err);
+            });
+          }          
         }
       }
       query.on('end', () => { client.end(); });
@@ -476,7 +547,7 @@ app.post('/create_pet', function (req, res) {
   
         Promise.all([promise]).then((data) => {
           const query = client.query(
-          'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user],
+          'INSERT INTO public."Animal"(nome, sexo, idade, descricao, peso, status_id, especie_id, raca_id, porte_id, imagem, responsavel_id, contato_email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',[form.name, form.gender, form.age, form.about, form.weight, form.status, form.species, form.breed, form.size, path, form.user, form.share_email],
             function(err, result) {
               if (err) {
                 console.log("Deu erro")
@@ -600,8 +671,8 @@ app.post('/create_found_pet', function (req, res) {
   
         Promise.all([promise]).then((data) => {
           const query = client.query(
-          'INSERT INTO public."Animal_Encontrado"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
-            function(err, result) {
+          'INSERT INTO public."Animal_Encontrado"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco, contato_email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address, form.share_email],
+            function(err, suc) {
               if (err) {
                 console.log("Deu erro")
                 console.log(err);
@@ -635,12 +706,12 @@ app.post('/create_found_pet', function (req, res) {
                           var id_responsavel = result.rows[0].responsavel_id
                           const query3 = client.query(
                           'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
-                            function(err, result) {
+                            function(err, resultado) {
                               if (err) {
                                 console.log("Erro Get User Data")
                                 console.log(err);
                               } else {
-                                if (result.rowCount > 0){
+                                if (resultado.rowCount > 0){
                                   console.log("User Exist!")
                                   console.log("Enviando notificação para responsavel...")
                                   console.log("\n\nID: " + id_responsavel)
@@ -660,7 +731,6 @@ app.post('/create_found_pet', function (req, res) {
                                             // set target users 
                                             firstNotification.setTargetDevices([device.rows[0].dispositivo])
                                             
-                                            // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
                                             serverClient.sendNotification(firstNotification)
                                             .then(function (response) {
                                               console.log("Notificação Enviada!!!!")
@@ -670,40 +740,52 @@ app.post('/create_found_pet', function (req, res) {
                                                 console.log('Something went wrong...', err);
                                             });
                                           }
-                                          console.log("\nEnviando email para responsavel...")
-                                          const query4 = client.query(
-                                          'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                            function(err, user) {
-                                              if (err){
-                                                console.log("Erro ao pegar usuario logado")
-                                                console.log(JSON.stringify(err))
-                                              }
-                                              else {
-                                                //ENVIANDO EMAIL PARA O RESPONSAVEL
-                                                const sgMail = require('@sendgrid/mail');
-                                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                                                const msg = {
-                                                  to: user.rows[0].email,
-                                                  cc: 'm.franceschini17@gmail.com',
-                                                  from: 'pethug@email.com',
-                                                  subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                                  text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
-                                                  'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                                };
-                                                sgMail.send(msg).then((data)=>{
-                                                  console.log("Email enviado com sucesso")
-                                                    var json = JSON.stringify({
-                                                      success: 'sucesso',
-                                                      exist: true
-                                                    });
-                                                    res.end(json)
-                                                }).catch((err)=>{
-                                                  console.log("Erro ao enviar email")
+                                          console.log("\nEmail= " + result.rows[0].contato_email)
+                                          if (result.rows[0].contato_email == 1) {
+                                            console.log("\nEnviando email para responsavel...")
+                                            const query4 = client.query(
+                                            'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                              function(err, user) {
+                                                if (err){
+                                                  console.log("Erro ao pegar usuario logado")
                                                   console.log(JSON.stringify(err))
-                                                })
-                                              }
-                                            })
-                                            query4.on('end', () => { client.end(); });
+                                                }
+                                                else {
+                                                  //ENVIANDO EMAIL PARA O RESPONSAVEL
+                                                  const sgMail = require('@sendgrid/mail');
+                                                  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                                  const msg = {
+                                                    to: resultado.rows[0].email,
+                                                    cc: 'm.franceschini17@gmail.com',
+                                                    from: 'pethug@email.com',
+                                                    subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                                    text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
+                                                    'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                                  };
+                                                  sgMail.send(msg).then((data)=>{
+                                                    console.log("\n\nEmail enviado com sucesso para: " + resultado.rows[0].email + "!!\n\n")
+                                                      var json = JSON.stringify({
+                                                        success: 'sucesso',
+                                                        exist: true
+                                                      });
+                                                      res.end(json)
+                                                  }).catch((err)=>{
+                                                    console.log("Erro ao enviar email encontrado")
+                                                    console.log(JSON.stringify(err))
+                                                  })
+                                                }
+                                              })
+                                              query4.on('end', () => { client.end(); });
+                                          }
+                                          else {
+                                            console.log("Email não liberado para contato")
+                                            var json = JSON.stringify({
+                                              success: 'sucesso',
+                                              exist: true
+                                            });
+                                            res.end(json)
+                                            query5.on('end', () => { client.end(); });
+                                          }
                                         }
                                       })
                                 }
@@ -848,8 +930,8 @@ app.post('/create_lost_pet', function (req, res) {
       Promise.all([promise]).then((data) => {
         
         const query = client.query(
-        'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address],
-          function(err, result) {
+        'INSERT INTO public."Animal_Perdido"(nome, sexo, especie_id, raca_id, porte_id, imagem, responsavel_id, cidade, bairro, endereco, contato_email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',[form.name, form.gender, form.species, form.breed, form.size, path, form.user, form.city, form.neighbor, form.address, form.share_email],
+          function(err, suc) {
             if (err) {
               console.log("Deu erro")
               console.log(err);
@@ -885,12 +967,12 @@ app.post('/create_lost_pet', function (req, res) {
                         var id_responsavel = result.rows[0].responsavel_id
                         const query3 = client.query(
                         'SELECT * FROM public."Usuario" WHERE id=($1)',[result.rows[0].responsavel_id],
-                          function(err, result) {
+                          function(err, resultado) {
                             if (err) {
                               console.log("Erro Get User Data")
                               console.log(err);
                             } else {
-                              if (result.rowCount > 0){
+                              if (resultado.rowCount > 0){
                                 console.log("User Exist!")
                                 console.log("Enviando notificação para responsavel...")
                                 console.log("\n\nID: " + id_responsavel)
@@ -910,7 +992,6 @@ app.post('/create_lost_pet', function (req, res) {
                                           // set target users 
                                           firstNotification.setTargetDevices([device.rows[0].dispositivo])
                                           
-                                          // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
                                           serverClient.sendNotification(firstNotification)
                                           .then(function (response) {
                                             console.log("Notificação Enviada!!!!")
@@ -920,40 +1001,52 @@ app.post('/create_lost_pet', function (req, res) {
                                               console.log('Something went wrong...', err);
                                           });
                                         }
-                                        console.log("\nEnviando email para responsavel...")
-                                        const query4 = client.query(
-                                        'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
-                                          function(err, user) {
-                                            if (err){
-                                              console.log("Erro ao pegar usuario logado")
-                                              console.log(JSON.stringify(err))
-                                            }
-                                            else {
-                                              //ENVIANDO EMAIL PARA O RESPONSAVEL
-                                              const sgMail = require('@sendgrid/mail');
-                                              sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                                              const msg = {
-                                                to: user.rows[0].email,
-                                                cc: 'm.franceschini17@gmail.com',
-                                                from: 'pethug@email.com',
-                                                subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
-                                                text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
-                                                'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
-                                              };
-                                              sgMail.send(msg).then((data)=>{
-                                                console.log("Email enviado com sucesso")
-                                                  var json = JSON.stringify({
-                                                    success: 'sucesso',
-                                                    exist: true
-                                                  });
-                                                  res.end(json)
-                                              }).catch((err)=>{
-                                                console.log("Erro ao enviar email")
+                                        console.log("Email= " + result.rows[0].contato_email)
+                                        if (result.rows[0].contato_email == 1) {
+                                          console.log("\nEnviando email para responsavel...")
+                                          const query4 = client.query(
+                                          'SELECT * FROM public."Usuario" WHERE id=($1)',[form.user],
+                                            function(err, user) {
+                                              if (err){
+                                                console.log("Erro ao pegar usuario logado")
                                                 console.log(JSON.stringify(err))
-                                              })
-                                            }
-                                          })
-                                          query4.on('end', () => { client.end(); });
+                                              }
+                                              else {
+                                                //ENVIANDO EMAIL PARA O RESPONSAVEL
+                                                const sgMail = require('@sendgrid/mail');
+                                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                                const msg = {
+                                                  to: resultado.rows[0].email,
+                                                  cc: 'm.franceschini17@gmail.com',
+                                                  from: 'pethug@email.com',
+                                                  subject: '[URGENTE] PetHug - Seu animal pode ter sido encontrado!!',
+                                                  text: 'Atenção!!' + ' O usuário ' + user.rows[0].nome + ' cadastrou um animal parecido com o seu! ' + 
+                                                  'Por favor, entre em contato pelo e-mail: ' + user.rows[0].email
+                                                };
+                                                sgMail.send(msg).then((data)=>{
+                                                  console.log("\n\nEmail enviado com sucesso para: " + resultado.rows[0].email + "!!\n\n")
+                                                  var json = JSON.stringify({
+                                                      success: 'sucesso',
+                                                      exist: true
+                                                    });
+                                                    res.end(json)
+                                                }).catch((err)=>{
+                                                  console.log("Erro ao enviar email")
+                                                  console.log(JSON.stringify(err))
+                                                })
+                                              }
+                                            })
+                                            query4.on('end', () => { client.end(); });
+                                        }
+                                        else {
+                                          console.log("Email nao liberado para contato")
+                                          var json = JSON.stringify({
+                                            success: 'sucesso',
+                                            exist: true
+                                          });
+                                          res.end(json)
+                                          query5.on('end', () => { client.end(); });
+                                        }
                                       }
                                     })
                                 }
@@ -1426,7 +1519,7 @@ app.post('/create_complaint', function (req, res) {
 
     Promise.all([promise]).then((data) => {
       const query = client.query(
-      'INSERT INTO public."Denuncia"(cidade, bairro, endereco, descricao, especie_id, imagem, responsavel_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',[form.city, form.neighbor, form.address, form.about, form.species, path, form.user],
+      'INSERT INTO public."Denuncia"(cidade, bairro, endereco, descricao, especie_id, imagem, responsavel_id, contato_email) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',[form.city, form.neighbor, form.address, form.about, form.species, path, form.user, form.share_email],
         function(err, result) {
           if (err) {
             console.log("Deu erro")

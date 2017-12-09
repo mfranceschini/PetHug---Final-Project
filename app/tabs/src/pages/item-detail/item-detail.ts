@@ -7,6 +7,8 @@ import { MainPage } from '../../pages/pages';
 import { FoundPage } from '../found/found';
 import { LostPage } from '../lost/lost';
 import { ComplaintPage } from '../complaint/complaint';
+import { Http, Headers } from '@angular/http';
+import { Api } from '../../providers/api'
 
 
 @Component({
@@ -17,12 +19,14 @@ export class ItemDetailPage {
   animal: any;
   user_id: any;
   showDelete: boolean;
+  showEmail: boolean;  
   found: any;
   lost: any;
   normal: any;
   complaint: any;
+  ipAddress: any;
 
-  constructor(public toastCtrl: ToastController, public user: UserPage, private emailComposer: EmailComposer, public navCtrl: NavController, navParams: NavParams, public animals: Animals, public foundAnimals: FoundAnimals, public lostAnimals: LostAnimals, public complaints: Complaints) {
+  constructor(public api: Api, public http: Http, public toastCtrl: ToastController, public user: UserPage, private emailComposer: EmailComposer, public navCtrl: NavController, navParams: NavParams, public animals: Animals, public foundAnimals: FoundAnimals, public lostAnimals: LostAnimals, public complaints: Complaints) {
     this.animal = navParams.get('animal') || animals.defaultAnimal;
 
     this.emailComposer.addAlias('gmail', 'com.google.android.gm');
@@ -45,7 +49,7 @@ export class ItemDetailPage {
       this.normal = true
     }
     else if (navParams.get('complaint') == true) {
-      console.log('veio de denuncias');
+      console.log('veio de denuncias');      
       this.complaint = true
     }
   }
@@ -54,13 +58,30 @@ export class ItemDetailPage {
     this.user.getUser().then((data) => {      
       this.user_id = JSON.parse(data);
       
-      if (this.animal.user == this.user_id) {
-        this.showDelete = true      
+      if (this.animal.complaint) {
+        if (this.animal.complaint.user == this.user_id.id) {
+          this.showDelete = true      
+        }
+        else {
+          this.showDelete = false
+        }
       }
       else {
-        this.showDelete = false
+        if (this.animal.user == this.user_id.id) {
+          this.showDelete = true      
+        }
+        else {
+          this.showDelete = false
+        }
       }
     })
+
+    if (this.animal.share_email == 1) {
+      this.showEmail = true
+    }
+    else {
+      this.showEmail = false
+    }    
   }
 
   deleteAnimal(animal) {
@@ -159,12 +180,12 @@ export class ItemDetailPage {
     });
   }
 
-  sendEmail() {
+  sendEmail() {    
     let email = {}
     this.emailComposer.isAvailable().then((available: boolean) =>{
       
       // if(available) {
-        this.user.getUserData(this.user_id)
+        this.user.getUserData(this.user_id.id)
         .map(res => res.json())
         .subscribe(usuario => {
           this.user.getUserData(this.animal.user)
@@ -183,67 +204,48 @@ export class ItemDetailPage {
                   // 'base64:icon.png//iVBORw0KGgoAAAANSUhEUg...',
                   // 'file://README.pdf'
                 ],
-                subject: 'PetHug - ' + usuario.nome.split(" ",1) + ' quer adotar a/o ' + this.animal.name,
-                body: 'Olá ' + responsavel.nome.split(" ",1) + ', a/o ' + usuario.nome.split(" ",1) + 
-                ', através do PetHug encontrou a/o ' + this.animal.name + 
-                " e quer adotá-la/o! Para isso, por favor entre em contato com a futura família através dos dados abaixo." 
+                subject: 'PetHug - ' + usuario.nome.split(" ",1) + ' quer adotar ' + this.animal.name,
+                body: 'Olá ' + responsavel.nome.split(" ",1) + ', o usuário ' + usuario.nome.split(" ",1) + 
+                ', através do PetHug encontrou ' + this.animal.name + 
+                " e quer adotá-la/o! Para isso, por favor entre em contato com a futura família através dos dados abaixo. \n\n\n" 
                 + "Nome Completo: " + usuario.nome
-                + ",Email: " + usuario.email
-                + ". Mais uma vez, obrigado por utilizar o PetHug, Atenciosamente Equipe PetHug",
+                + ", Email: " + usuario.email
+                + ". Mais uma vez, obrigado por utilizar o PetHug. Atenciosamente, Equipe PetHug",
                 isHtml: true
               };
-            }
-            else if (this.found == true) {
-              console.log('Enviando email de encontrados');
-              
-              email = {
-                to: responsavel.email,
-                cc: 'm.franceschini17@gmail.com',
-                attachments: [
-                  // 'file://img/logo.png',
-                  // 'res://icon.png',
-                  // 'base64:icon.png//iVBORw0KGgoAAAANSUhEUg...',
-                  // 'file://README.pdf'
-                ],
-                subject: 'PetHug - ' + usuario.nome.split(" ",1) + ' tem informações sobre ' + this.animal.name,
-                body: 'Olá ' + responsavel.nome.split(" ",1) + ', a/o ' + usuario.nome.split(" ",1) + 
-                ', através do PetHug, pode ter novas informações sobre ' + this.animal.name + "!" +
-                " Para isso, por favor entre em contato através dos dados abaixo." 
-                + "Nome Completo: " + usuario.nome
-                + ",Email: " + usuario.email
-                + ". Mais uma vez, obrigado por utilizar o PetHug, Atenciosamente Equipe PetHug",
-                isHtml: true
-              };
-            }
-            else if (this.lost == true) {
-              console.log("Enviando email de perdidos");
-              
-              email = {
-                to: responsavel.email,
-                cc: 'm.franceschini17@gmail.com',
-                attachments: [
-                  // 'file://img/logo.png',
-                  // 'res://icon.png',
-                  // 'base64:icon.png//iVBORw0KGgoAAAANSUhEUg...',
-                  // 'file://README.pdf'
-                ],
-                subject: 'PetHug - ' + usuario.nome.split(" ",1) + ' tem informações sobre ' + this.animal.name,
-                body: 'Olá ' + responsavel.nome.split(" ",1) + ', a/o ' + usuario.nome.split(" ",1) + 
-                ', através do PetHug, pode ter novas informações sobre ' + this.animal.name + "!" +
-                " Para isso, por favor entre em contato através dos dados abaixo." 
-                + "Nome Completo: " + usuario.nome
-                + ",Email: " + usuario.email
-                + ". Mais uma vez, obrigado por utilizar o PetHug, Atenciosamente Equipe PetHug",
-                isHtml: true
-              };
-            }
-    
+            }    
             this.emailComposer.open(email);
           });
 
         });
       // }
      });
+  }
+
+  sendNotification() {
+    console.log("Usuário tem interesse!");
+    this.ipAddress = 'http://' + this.api.url
+    if (this.ipAddress == 'http://undefined'){
+      this.ipAddress = 'http://localhost'
+    }
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    let body = {
+      'user': this.animal.user,
+      'animal': this.animal.name,
+      'species': this.animal.species
+    };
+    this.http.post(this.ipAddress + ':3000/notify_interrest', body, {headers: headers})
+      .map(res => res.json())
+      .subscribe((data) => {
+        console.log("Notificação enviada!");
+        let toast = this.toastCtrl.create({
+          message: "Usuário notificado!",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+      })
   }
 
 }

@@ -157,13 +157,7 @@ export class FoundPage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addFoundAnimal() {
-    let addModal = this.modalCtrl.create(FoundRegisterPage);
-    addModal.onDidDismiss(animal => {
-      if (animal) {
-        this.foundAnimals.add(animal);
-      }
-    })
-    addModal.present();
+    this.navCtrl.push(FoundRegisterPage);
   }
 
   /**

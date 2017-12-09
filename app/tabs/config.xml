@@ -3,7 +3,7 @@
     <name>PetHug</name>
     <description>Adote um amigo.</description>
     <author email="m.franceschini17@gmail.com">Matheus Franceschini</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://192.168.100.107:8101" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-intent href="http://*/*" />
@@ -93,7 +93,10 @@
     <allow-navigation href="http://172.16.245.139:4000" />
     <allow-navigation href="http://192.168.43.43:8100" />
     <allow-navigation href="http://172.16.233.109:8100" />
+    <allow-navigation href="http://192.168.100.107:8101" />
     <engine name="android" spec="^6.3.0" />
+    <plugin name="com-badrit-base64" spec="^0.2.0" />
+    <plugin name="com.synconset.imagepicker" spec="~2.1.8" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1" />
     <plugin name="cordova-plugin-console" spec="1.0.5" />
     <plugin name="cordova-plugin-device" spec="1.1.4" />

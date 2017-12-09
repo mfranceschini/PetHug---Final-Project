@@ -26,6 +26,20 @@
         <ion-input type="password" [(ngModel)]="account.password" name="password" required ></ion-input>
       </ion-item>
 
+      <ion-list radio-group [(ngModel)]="account.type" [ngModelOptions]="{standalone: true}">
+        <ion-item>
+          <ion-label style="color:gray">Tipo de Usuário:</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label style="color:gray">Instituição</ion-label>
+          <ion-radio value="1"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label style="color:gray">Pessoa Física</ion-label>
+          <ion-radio value="2"></ion-radio>
+        </ion-item>
+      </ion-list>
+
       <div padding>
         <button *ngIf="showPassword == 0" (click)="doSignup()" ion-button color="primary" block>{{ 'SIGNUP_BUTTON' | translate }}</button>
         <button *ngIf="showPassword == 1" (click)="doSignupInstagram()" ion-button class="signupIN" block>{{ 'SIGNUP_BUTTON' | translate }}</button>        

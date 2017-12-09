@@ -5,7 +5,8 @@ import { MainPage } from '../../pages/pages';
 import { Api } from '../../providers/api';
 import { WelcomePage } from '../welcome/welcome';
 import { PlacePage } from '../place/place';
-
+import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
 import { TranslateService } from '@ngx-translate/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -24,8 +25,8 @@ export class PlaceRegisterPage {
     ipAddress: any;
     v_obj;
     v_fun;
-
-  constructor(public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
+ 
+  constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -40,15 +41,32 @@ export class PlaceRegisterPage {
     this.form.valueChanges.subscribe((v) => {
       this.isReadyToSave = this.form.valid;
     });
-  
+  }
+
+  getLocation() {
+    this.geolocation.getCurrentPosition().then((position) => {      
+      this.nativeGeocoder.reverseGeocode(position.coords.latitude, position.coords.longitude)
+      .then((result: NativeGeocoderReverseResult) => {
+        this.form.controls['city'].setValue(result.subAdministrativeArea)
+        this.form.controls['neighbor'].setValue(result.subLocality)
+        this.form.controls['address'].setValue(result.thoroughfare)        
+        
+      })
+    }).catch((err)=>{
+      let toast = this.toastCtrl.create({
+        message: "Não foi possível possível obter a localização. Por favor, preencha os campos abaixo",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
+    })
   }
 
   /* Máscaras ER */
   mascara(o,f){
     this.v_obj=o
     this.v_fun=f
-    
-    setTimeout(this.execmascara(),1)
+    setTimeout(this.execmascara(), 1)
   }
   execmascara(){
     this.v_obj.phoneNumber=this.mtel(this.v_obj.form.controls.phone.value)   
@@ -125,7 +143,7 @@ export class PlaceRegisterPage {
           });
           toast.present();
           this.viewCtrl.dismiss(this.form.value);
-          this.navCtrl.setRoot(PlacePage);
+          //this.navCtrl.push(PlacePage);
         }
         else if (data.success == 'erro'){
           let toast = this.toastCtrl.create({

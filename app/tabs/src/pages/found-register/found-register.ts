@@ -69,6 +69,8 @@ export class FoundRegisterPage {
 
   listMaster: any;
 
+  share_email: any;
+
   constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
@@ -79,7 +81,8 @@ export class FoundRegisterPage {
       gender: [''],
       size: [''],
       neighbor: [''],
-      city: ['']
+      city: [''],
+      share_email: ['']
     });
 
     this.imageLoaded = false;
@@ -100,9 +103,7 @@ export class FoundRegisterPage {
       spinner: 'dots',
       content: 'Analisando imagem...'
     });
-
   }
-  
 
   getLocation() {
     this.geolocation.getCurrentPosition().then((position) => {
@@ -114,6 +115,8 @@ export class FoundRegisterPage {
         
       })
     }).catch((err)=>{
+      console.log("Erro Localização: " + JSON.stringify(err));
+      
       let toast = this.toastCtrl.create({
         message: "Não foi possível possível obter a localização. Por favor, preencha os campos abaixo",
         duration: 3000,
@@ -157,6 +160,8 @@ export class FoundRegisterPage {
   }
 
   ionViewDidLoad() {
+    this.share_email = 1
+    
     this.ipAddress = 'http://' + this.api.url
     if (this.ipAddress == 'http://undefined'){
       this.ipAddress = 'http://localhost'
@@ -262,6 +267,19 @@ export class FoundRegisterPage {
             }
           }
         }
+        if (this.specieModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
+          if (this.loading){
+            this.loading.dismiss()
+          }
+          let toast = this.toastCtrl.create({
+            message: "Não foi possível analisar a imagem. Por favor, preencha os campos abaixo",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
         //Sugere Raça
         for (j=0;j<this.breedsList.length;j++){
           for(i=0;i<data.image1.length;i++){
@@ -272,6 +290,10 @@ export class FoundRegisterPage {
               break
             }
           }
+        }
+        if (this.breedModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
         }
       },
       (err) => {
@@ -425,8 +447,8 @@ export class FoundRegisterPage {
       else {
         usuario = usr
       }
-
-      console.log(this.form.controls)
+      console.log("Pode email? " + this.share_email);
+      
 
       this.animalForm = {
       'city': this.form.controls['city'].value,
@@ -438,7 +460,8 @@ export class FoundRegisterPage {
       'size': this.selectedSize,
       'species': this.selectedSpecie,
       'image': this.form.controls['profilePic'].value,
-      'user': usuario
+      'user': usuario,
+      'share_email': this.share_email
       }
 
       let headers = new Headers();
@@ -474,7 +497,7 @@ export class FoundRegisterPage {
             }
             // this.navCtrl.push(FoundPage);
             this.viewCtrl.dismiss(this.form.value);
-            this.navCtrl.push(FoundPage);
+            this.navCtrl.setRoot(FoundPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

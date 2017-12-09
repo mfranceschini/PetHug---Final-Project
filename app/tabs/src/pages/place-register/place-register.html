@@ -23,7 +23,7 @@
     </ion-header>
     
     <ion-content>
-      <form *ngIf="form" [formGroup]="form" (ngSubmit)="createPlace()">
+      <form *ngIf="form" [formGroup]="form">
         <input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
         <div class="profile-image-wrapper" (click)="getPicture()">
           <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">
@@ -39,10 +39,10 @@
             <ion-input type="text" placeholder="Nome" formControlName="name"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-input type="text" placeholder="Telefone" formControlName="phone" maxlength="14" [(ngModel)]="phoneNumber" (keyup)="mascara(this, phoneNumber)"></ion-input>
+            <ion-input type="tel" placeholder="Telefone: (DD) DDDD-DDDD" formControlName="phone" maxlength="144" [(ngModel)]="phoneNumber" (keyup)="mascara(this, phoneNumber)"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-input type="text" placeholder="Email" formControlName="email"></ion-input>
+            <ion-input type="email" placeholder="Email" formControlName="email"></ion-input>
           </ion-item>
           <ion-item>
             <ion-select [(ngModel)]="typeModel"  placeholder="Tipo" formControlName="type">
@@ -53,6 +53,9 @@
               <ion-option value= "Sorveteria">Sorveteria</ion-option>
               <ion-option value= "Pet Shop">Pet Shop</ion-option>
             </ion-select>
+          </ion-item>
+          <ion-item>
+            <button ion-button block (click)="getLocation()" class="location">Obter Localização</button>
           </ion-item>
           <ion-item>
             <ion-input type="text" placeholder="Cidade" formControlName="city"></ion-input>

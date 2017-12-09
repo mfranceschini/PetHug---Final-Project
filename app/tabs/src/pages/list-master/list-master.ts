@@ -143,7 +143,8 @@ export class ListMasterPage {
             "status":d.status_id.toString(),
             "about": d.descricao.toString(),
             "id": d.id.toString(),
-            "user": d.responsavel_id.toString()
+            "user": d.responsavel_id.toString(),
+            "share_email": d.contato_email.toString()
           })
           // this.loading.dismiss()
         });
@@ -171,13 +172,7 @@ export class ListMasterPage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addAnimal() {
-    let addModal = this.modalCtrl.create(AnimalRegisterPage);
-    addModal.onDidDismiss(animal => {
-      if (animal) {
-        this.animals.add(animal);
-      }
-    })
-    addModal.present();
+    this.navCtrl.push(AnimalRegisterPage);
   }
 
   /**

@@ -78,8 +78,8 @@ export class WelcomePage {
                 }
                 this.userCtrl.setDevice(json)
                 .map(res => res.json())
-                .subscribe((device) => {
-                  this.userCtrl._loggedIn(data.id);
+                .subscribe((device) => {                  
+                  this.userCtrl._loggedIn(data);
                   var nome = data.nome.split(" ",1)
                   this.toast = this.toastCtrl.create({
                     message: 'Bem-vindo, ' + nome,
@@ -94,7 +94,11 @@ export class WelcomePage {
             else if (data.success == 'nao_existe'){
               console.log("Usuario FB nao tem cadastro!!")
               user_id = {'id':authId, 'facebook':true}
-              this.navCtrl.push(SignupPage,result, user_id)
+              var json = {
+                "result": result,
+                "data": user_id
+              }              
+              this.navCtrl.push(SignupPage,json)
               this.toast = this.toastCtrl.create({
                 message: 'Por Favor, preencha os campos abaixo',
                 duration: 5000,

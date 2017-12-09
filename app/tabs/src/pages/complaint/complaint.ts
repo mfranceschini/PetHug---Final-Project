@@ -96,7 +96,8 @@ export class ComplaintPage {
             "id": d.id.toString(),
             "about": d.descricao.toString(),
             "specie": d.especie_id.toString(),
-            "user": d.responsavel_id.toString()
+            "user": d.responsavel_id.toString(),
+            "share_email": d.contato_email.toString()
           })
           // this.loading.dismiss()
         });
@@ -121,13 +122,7 @@ export class ComplaintPage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addComplaint() {
-    let addModal = this.modalCtrl.create(ComplaintRegisterPage);
-    addModal.onDidDismiss(complaint => {
-      if (complaint) {
-        this.complaints.add(complaint);
-      }
-    })
-    addModal.present();
+    this.navCtrl.push(ComplaintRegisterPage);
   }
 
   /**

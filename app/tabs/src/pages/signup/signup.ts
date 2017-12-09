@@ -17,10 +17,11 @@ export class SignupPage {
   // The account fields for the login form.
   // If you're using the username field with or without email, make
   // sure to add it to the type
-  account: { name: string, email: string, password: string } = {
+  account: { name: string, email: string, password: string, type: string } = {
     name: '',
     email: '',
-    password: ''
+    password: '',
+    type: ''
   };
 
   // Our translated text strings
@@ -46,7 +47,6 @@ export class SignupPage {
   }
 
   ionViewDidLoad(){
-
     if (this.navParams.get('instagram') == true){
       this.showPassword = 1
       console.log("Login pelo Insta")
@@ -57,35 +57,34 @@ export class SignupPage {
         this.account.email = this.navParams.get('email')
       }
       if (this.navParams.get('id')){
-        console.log('dentro get id')
-        console.log(this.navParams.get('id'))
         this.instagram_user_id = this.navParams.get('id')
       }
     }
-    else if (this.navParams.get('facebook') == true){
-      this.showPassword = 2
-      console.log("Login pelo Face")
-      if (this.navParams.get('first_name') && this.navParams.get('last_name')){
-        this.account.name = this.navParams.get('first_name') + ' ' + this.navParams.get('last_name')
-      }
-      if (this.navParams.get('email')){
-        this.account.email = this.navParams.get('email')
-      }
-      if (this.navParams.get('id')){
-        this.facebook_user_id = this.navParams.get('id')
+    else if (this.navParams.get('data')) {
+      if (this.navParams.get('data').facebook == true){
+        this.showPassword = 2
+        console.log("Login pelo Face")
+        if (this.navParams.get('result').first_name && this.navParams.get('result').last_name){
+          this.account.name = this.navParams.get('result').first_name + ' ' + this.navParams.get('result').last_name
+        }
+        if (this.navParams.get('result').email){
+          this.account.email = this.navParams.get('result').email
+        }
+        if (this.navParams.get('result').id){
+          this.facebook_user_id = this.navParams.get('result').id
+        }
       }
     }
     else {
       console.log("Login normal")
       this.showPassword = 0;
     }
-    
   }
 
-  doSignup() {
+  doSignup() {    
     this.resp = 0
     this.loading.present()
-    if (this.account.name == null || this.account.email == null || this.account.password == null) {
+    if (this.account.name == null || this.account.email == null || this.account.password == null || this.account.type == null) {
       let toast = this.toastCtrl.create({
             message: this.signupErrorString,
             duration: 3000,
@@ -98,7 +97,8 @@ export class SignupPage {
       let body = {
         nome: this.account.name,
         email: this.account.email,
-        senha: this.account.password
+        senha: this.account.password,
+        tipo: this.account.type
       }
 
       var create = this.userCtrl.signup(body)
@@ -141,7 +141,8 @@ export class SignupPage {
         nome: this.account.name,
         email: this.account.email,
         senha: null,
-        facebook_id: this.facebook_user_id
+        facebook_id: this.facebook_user_id,
+        tipo: this.account.type
       }
 
       var create = this.userCtrl.signupFacebook(body)
@@ -184,7 +185,8 @@ export class SignupPage {
         nome: this.account.name,
         email: this.account.email,
         senha: null,
-        instagram_id: this.instagram_user_id
+        instagram_id: this.instagram_user_id,
+        tipo: this.account.type
       }
 
       var create = this.userCtrl.signupInstagram(body)

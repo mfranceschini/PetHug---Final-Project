@@ -70,6 +70,8 @@ export class LostRegisterPage {
 
   listMaster: any;
 
+  share_email: any;
+
   constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public api: Api, public loadingCtrl: LoadingController, public toastCtrl: ToastController, public navCtrl: NavController, public viewCtrl: ViewController, formBuilder: FormBuilder, private camera: Camera, public http: Http, public user: UserPage, public modalCtrl: ModalController) {
     this.form = formBuilder.group({
       profilePic: [''],
@@ -80,7 +82,8 @@ export class LostRegisterPage {
       gender: [''],
       size: [''],
       neighbor: [''],
-      city: ['']
+      city: [''],
+      share_email: ['']
     });
 
     this.imageLoaded = false;
@@ -169,6 +172,7 @@ export class LostRegisterPage {
   }
 
   ionViewDidLoad() {
+    this.share_email = 1
   }
 
   getPicture() {
@@ -226,6 +230,8 @@ export class LostRegisterPage {
       .map(res => res.json())
       .subscribe((data) => {
         console.log("Resultado de Análise Recebida!")
+        console.log("tamanho vetor analise: " + data.image1.length);
+        
         let i = 0;
         for (i=0;i<data.image1.length;i++){
           if (data.image1[i] == 'whiskers' || data.image1[i] == 'cat like mammal' || data.image1[i] == 'dog breed' || data.image1[i] == 'mammal' || data.image1[i] == 'vertebrate' || data.image1[i] == 'dog like mammal'){
@@ -246,7 +252,11 @@ export class LostRegisterPage {
           else if (data.image1[i] == 'english cocker spaniel'){
             data.image1[i] = 'Cocker Spaniel'
           }
+          console.log("dentro for perdido");
         }
+        console.log("fora for");
+        console.log(this.specieModel);
+        
         var j;
         for (j=0;j<this.speciesList.length;j++){
           for(i=0;i<data.image1.length;i++){
@@ -262,6 +272,19 @@ export class LostRegisterPage {
             }
           }
         }
+        if (this.specieModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
+          if (this.loading){
+            this.loading.dismiss()
+          }
+          let toast = this.toastCtrl.create({
+            message: "Não foi possível analisar a imagem. Por favor, preencha os campos abaixo",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
         //Sugere Raça
         for (j=0;j<this.breedsList.length;j++){
           for(i=0;i<data.image1.length;i++){
@@ -272,6 +295,10 @@ export class LostRegisterPage {
               break
             }
           }
+        }
+        if (this.breedModel == null) {
+          Promise.resolve()
+          this.imageLoaded = true
         }
       },
       (err) => {
@@ -452,7 +479,8 @@ export class LostRegisterPage {
         'size': this.selectedSize,
         'species': this.selectedSpecie,
         'image': this.form.controls['profilePic'].value,
-        'user': usuario
+        'user': usuario,
+        'share_email': this.share_email
         }
 
       let headers = new Headers();
@@ -486,9 +514,8 @@ export class LostRegisterPage {
               });
               toast.present();
             }
-            // this.navCtrl.push(LostPage);
             this.viewCtrl.dismiss(this.form.value);
-            this.navCtrl.push(LostPage);
+            this.navCtrl.setRoot(LostPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

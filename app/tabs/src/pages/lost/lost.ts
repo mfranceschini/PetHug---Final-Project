@@ -143,13 +143,14 @@ export class LostPage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addLostAnimal() {
-    let addModal = this.modalCtrl.create(LostRegisterPage);
-    addModal.onDidDismiss(animal => {
-      if (animal) {
-        this.lostAnimals.add(animal);
-      }
-    })
-    addModal.present();
+    // let addModal = this.modalCtrl.create(LostRegisterPage);
+    // addModal.onDidDismiss(animal => {
+    //   if (animal) {
+    //     this.lostAnimals.add(animal);
+    //   }
+    // })
+    // addModal.present();
+    this.navCtrl.push(LostRegisterPage);
   }
 
   /**

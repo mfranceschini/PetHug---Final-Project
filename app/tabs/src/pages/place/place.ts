@@ -105,13 +105,7 @@ export class PlacePage {
    * modal and then adds the new item to our data source if the user created one.
    */
   addPlace() {
-    let addModal = this.modalCtrl.create(PlaceRegisterPage);
-    addModal.onDidDismiss(place => {
-      if (place) {
-        this.places.add(place);
-      }
-    })
-    addModal.present();
+    this.navCtrl.push(PlaceRegisterPage);
   }
 
   /**

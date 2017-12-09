@@ -28,6 +28,7 @@ export class ComplaintRegisterPage {
     animalsData: any;
     selectedSpecie: any;
     specieModel: any;
+    share_email: any;
 
   constructor(private nativeGeocoder: NativeGeocoder, public user: UserPage, private geolocation: Geolocation, public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
     this.form = formBuilder.group({
@@ -36,7 +37,8 @@ export class ComplaintRegisterPage {
       about: [''],
       species: [''],
       neighbor: [''],
-      city: ['']
+      city: [''],
+      share_email: ['']
     });
 
     this.form.valueChanges.subscribe((v) => {
@@ -86,7 +88,9 @@ export class ComplaintRegisterPage {
     }
   }
 
-  ionViewDidLoad(){}
+  ionViewDidLoad(){
+    this.share_email = 1
+  }
 
   getPicture() {
     this.fileInput.nativeElement.click();
@@ -141,8 +145,9 @@ export class ComplaintRegisterPage {
         'about': this.form.controls['about'].value,
         'image': this.form.controls['profilePic'].value,
         'species': this.selectedSpecie,
-        'user': usuario      
-        }
+        'user': usuario,
+        'share_email': this.share_email
+      }
 
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
@@ -166,7 +171,7 @@ export class ComplaintRegisterPage {
             });
             toast.present();
             this.viewCtrl.dismiss(this.form.value);
-            this.navCtrl.setRoot(ComplaintPage);
+            this.navCtrl.push(ComplaintPage);
           }
           else if (data.success == 'erro'){
             let toast = this.toastCtrl.create({

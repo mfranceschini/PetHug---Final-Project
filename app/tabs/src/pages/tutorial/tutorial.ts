@@ -68,36 +68,33 @@ export class TutorialPage {
       });
   }
 
-  startApp() {
-    this.user.getUser().then((data) => {
-      let usr = JSON.parse(data);
-      if (usr != null){
-        this.oneSignal.getIds().then((os)=>{
-          let json = {
-            "usuario_id": usr.id,
-            "dispositivo": os.userId
-          }
-          this.user.setDevice(json)
-          .map(res => res.json())
-          .subscribe((device) => {
-            if (device.success == "success") {
-              this.navCtrl.setRoot(TabsPage, {}, {
-                animate: true,
-                direction: 'forward'
-              });
-            }
-            else {
-              console.log("Erro ao adicionar dispositivo!")
-            }
-          })
-        })
+  startApp(user) {
+    let usuario
+    if (user.id) {
+      usuario = user.id
+    }
+    else {
+      usuario = user
+    }
+    
+    this.oneSignal.getIds().then((os)=>{
+      let json = {
+        "usuario_id": usuario,
+        "dispositivo": os.userId
       }
-      else {
-        this.navCtrl.setRoot(WelcomePage, {}, {
-          animate: true,
-          direction: 'forward'
-        });
-      }
+      this.user.setDevice(json)
+      .map(res => res.json())
+      .subscribe((device) => {
+        if (device.success == "success") {
+          this.navCtrl.setRoot(TabsPage, {}, {
+            animate: true,
+            direction: 'forward'
+          });
+        }
+        else {
+          console.log("Erro ao adicionar dispositivo!")
+        }
+      })
     })
     
   }
@@ -121,7 +118,13 @@ export class TutorialPage {
           });
           this.toast.present();
         }
-        this.startApp()
+        this.startApp(usr)
+      }
+      else {
+        this.navCtrl.setRoot(WelcomePage, {}, {
+          animate: true,
+          direction: 'forward'
+        });
       }
       this.menu.enable(false);
     })
