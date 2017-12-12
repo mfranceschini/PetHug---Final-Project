@@ -27,8 +27,8 @@
   <div *ngIf="complaint == true" class="item-profile" text-center #profilePic [style.background-image]="'url(' + animal.complaint.profilePic + ')'">
   </div>
 
-  <button ion-button block *ngIf="normal == true" (click)="sendNotification()" class="notification">Tenho Interesse</button>  
-  <button ion-button block *ngIf="complaint != true && showEmail == true" (click)="sendEmail()" class="email">Entrar em Contato</button>
+  <button ion-button block *ngIf="normal == true && showDelete == false" (click)="sendNotification()" class="notification">Tenho Interesse</button>  
+  <button ion-button block *ngIf="complaint != true && showEmail == true && showDelete == false" (click)="sendEmail()" class="email">Entrar em Contato</button>
   
   <div *ngIf="normal == true" class="item-detail" padding>
     <h2>Meu nome é <b>{{animal.name}}</b>,</h2>
@@ -46,7 +46,7 @@
     <p>Sou <b>{{animal.gender}}</b>,</p>      
     <p>Fui encontrado em <b>{{animal.city}}</b>,</p>
     <p>No bairro <b>{{animal.neighbor}}</b>,</p>
-    <p>Sou de porte <b>{{animal.size}}</b>,</p>
+    <p>Sou de porte <b>{{animal.size}}</b></p>
   </div>
 
   <div *ngIf="lost == true" class="item-detail" padding>
@@ -55,7 +55,7 @@
     <p>Sou <b>{{animal.gender}}</b>,</p>      
     <p>Fui encontrado em <b>{{animal.city}}</b>,</p>
     <p>No bairro <b>{{animal.neighbor}}</b>,</p>
-    <p>Sou de porte <b>{{animal.size}}</b>,</p>
+    <p>Sou de porte <b>{{animal.size}}</b></p>
   </div>
 
   <div *ngIf="complaint == true" class="item-detail" padding>

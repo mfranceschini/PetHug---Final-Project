@@ -9,10 +9,16 @@
 <ion-content>
 
   <form [formGroup]="form" *ngIf="settingsReady">
+
+    <div padding>
+      <h2>Usuário Conectado:</h2>
+      <h6>Nome: {{usuario.nome}}</h6>
+      <h6>E-mail: {{usuario.email}}</h6>
+    </div>
+
     <div padding>
       <button ion-button block (click)="doLogout()">Sair</button>
     </div>
-
 
     <!-- <ion-list *ngIf="page == 'profile'">
       <ion-item>

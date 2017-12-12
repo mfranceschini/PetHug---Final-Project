@@ -3,7 +3,7 @@
     <name>PetHug</name>
     <description>Adote um amigo.</description>
     <author email="m.franceschini17@gmail.com">Matheus Franceschini</author>
-    <content original-src="index.html" src="http://192.168.100.107:8101" />
+    <content original-src="index.html" src="http://192.168.100.107:8100" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-intent href="http://*/*" />
@@ -94,6 +94,7 @@
     <allow-navigation href="http://192.168.43.43:8100" />
     <allow-navigation href="http://172.16.233.109:8100" />
     <allow-navigation href="http://192.168.100.107:8101" />
+    <allow-navigation href="http://172.16.232.169:8100" />
     <engine name="android" spec="^6.3.0" />
     <plugin name="com-badrit-base64" spec="^0.2.0" />
     <plugin name="com.synconset.imagepicker" spec="~2.1.8" />

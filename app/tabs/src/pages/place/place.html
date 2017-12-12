@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="danger">
-    <ion-title>Estabelecimentos PetFriendly</ion-title>
+    <ion-title>Estabelecimentos Pet Friendly</ion-title>
 
     <ion-buttons end>
       <button ion-button icon-only (click)="addPlace()">
@@ -39,13 +39,10 @@
                 <p>Cidade: {{place.city}}</p>
                 <p>Bairro: {{place.neighbor}}</p>
                 <p>Endereço: {{place.address}}</p>
-              </div>
-        
-              <ion-item-options>
-                <button ion-button color="danger" (click)="deletePlace(place)">
-                  {{ 'DELETE_BUTTON' | translate }}
+                <button *ngIf="usuario.id == place.user" ion-button icon-only style="float:right" (click)="deletePlace(place)">
+                  <ion-icon name="md-trash"></ion-icon>
                 </button>
-              </ion-item-options>
+              </div>
           </ion-item-sliding>
         </ion-col>
       </ion-row>

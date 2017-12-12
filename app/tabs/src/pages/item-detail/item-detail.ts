@@ -223,7 +223,6 @@ export class ItemDetailPage {
   }
 
   sendNotification() {
-    console.log("Usuário tem interesse!");
     this.ipAddress = 'http://' + this.api.url
     if (this.ipAddress == 'http://undefined'){
       this.ipAddress = 'http://localhost'
@@ -238,7 +237,7 @@ export class ItemDetailPage {
     this.http.post(this.ipAddress + ':3000/notify_interrest', body, {headers: headers})
       .map(res => res.json())
       .subscribe((data) => {
-        console.log("Notificação enviada!");
+        alert("Notificação enviada!");
         let toast = this.toastCtrl.create({
           message: "Usuário notificado!",
           duration: 3000,

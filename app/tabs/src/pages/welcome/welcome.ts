@@ -140,7 +140,7 @@ export class WelcomePage {
             .map(res => res.json())
             .subscribe((device) => {
               if (device.success == "success") {
-                this.userCtrl._loggedIn(data.id);
+                this.userCtrl._loggedIn(data);
                 var nome = data.nome.split(" ",1)
                 this.toast = this.toastCtrl.create({
                   message: 'Bem-vindo, ' + nome,

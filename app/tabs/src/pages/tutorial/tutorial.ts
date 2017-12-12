@@ -69,8 +69,17 @@ export class TutorialPage {
   }
 
   startApp(user) {
+    console.log(user);
+    
     let usuario
-    if (user.id) {
+    if (user == null) {
+      this.navCtrl.setRoot(WelcomePage, {}, {
+        animate: true,
+        direction: 'forward'
+      });
+      return;
+    }
+    else if (user.id) {
       usuario = user.id
     }
     else {
@@ -121,10 +130,10 @@ export class TutorialPage {
         this.startApp(usr)
       }
       else {
-        this.navCtrl.setRoot(WelcomePage, {}, {
-          animate: true,
-          direction: 'forward'
-        });
+        // this.navCtrl.setRoot(WelcomePage, {}, {
+        //   animate: true,
+        //   direction: 'forward'
+        // });
       }
       this.menu.enable(false);
     })

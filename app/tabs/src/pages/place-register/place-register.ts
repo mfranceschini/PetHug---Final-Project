@@ -9,6 +9,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
 import { TranslateService } from '@ngx-translate/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UserPage } from '../../providers/user'
 
 
 @Component({
@@ -26,7 +27,7 @@ export class PlaceRegisterPage {
     v_obj;
     v_fun;
  
-  constructor(private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
+  constructor(private user: UserPage, private nativeGeocoder: NativeGeocoder, private geolocation: Geolocation, public viewCtrl: ViewController, formBuilder: FormBuilder, public navParams: NavParams, public api: Api, public loadingCtrl: LoadingController, public http: Http, public navCtrl: NavController, public toastCtrl: ToastController, public translateService: TranslateService,private events: Events) {
     this.form = formBuilder.group({
       profilePic: [''],
       name: ['', Validators.required],
@@ -110,50 +111,63 @@ export class PlaceRegisterPage {
     this.placeForm = new Object()
     console.log("Salvando formulário")
 
-    this.placeForm = {
-      'city': this.form.controls['city'].value,
-      'neighbor': this.form.controls['neighbor'].value,
-      'address': this.form.controls['address'].value,
-      'name': this.form.controls['name'].value,
-      'image': this.form.controls['profilePic'].value,
-      'phone': this.form.controls['phone'].value,
-      'email': this.form.controls['email'].value,
-      'type': this.form.controls['type'].value
+    this.user.getUser().then((data) => {
+      var usuario;
+      var usr = JSON.parse(data);
+      if (usr.id){
+        usuario = usr.id
+      }
+      else {
+        usuario = usr
       }
 
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    let body = {
-      'form': this.placeForm
-    };
-    this.ipAddress = 'http://' + this.api.url
-    if (this.ipAddress == 'http://undefined'){
-      this.ipAddress = 'http://localhost'
-    }
+      this.placeForm = {
+        'city': this.form.controls['city'].value,
+        'neighbor': this.form.controls['neighbor'].value,
+        'address': this.form.controls['address'].value,
+        'name': this.form.controls['name'].value,
+        'image': this.form.controls['profilePic'].value,
+        'phone': this.form.controls['phone'].value,
+        'email': this.form.controls['email'].value,
+        'type': this.form.controls['type'].value,
+        'user': usuario
+        }
 
-    this.http.post(this.ipAddress + ':3000/create_place', body, {headers: headers})
-      .map(res => res.json())
-      .subscribe(data => {
-        console.log("Retorno depois de criar estabelecimento")
-        if (data.success == 'sucesso'){
-          let toast = this.toastCtrl.create({
-            message: "Estabelecimento cadastrado com sucesso!",
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();
-          this.viewCtrl.dismiss(this.form.value);
-          //this.navCtrl.push(PlacePage);
-        }
-        else if (data.success == 'erro'){
-          let toast = this.toastCtrl.create({
-            message: "Erro ao cadastrar estabelecimento!",
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();
-        }
-      });
-    if (!this.form.valid) { return; }
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      let body = {
+        'form': this.placeForm
+      };
+      this.ipAddress = 'http://' + this.api.url
+      if (this.ipAddress == 'http://undefined'){
+        this.ipAddress = 'http://localhost'
+      }
+
+      this.http.post(this.ipAddress + ':3000/create_place', body, {headers: headers})
+        .map(res => res.json())
+        .subscribe(data => {
+          console.log("Retorno depois de criar estabelecimento")
+          if (data.success == 'sucesso'){
+            let toast = this.toastCtrl.create({
+              message: "Estabelecimento cadastrado com sucesso!",
+              duration: 3000,
+              position: 'top'
+            });
+            toast.present();
+            this.viewCtrl.dismiss(this.form.value);
+            this.navCtrl.setRoot(MainPage);
+            this.navCtrl.push(PlacePage);
+          }
+          else if (data.success == 'erro'){
+            let toast = this.toastCtrl.create({
+              message: "Erro ao cadastrar estabelecimento!",
+              duration: 3000,
+              position: 'top'
+            });
+            toast.present();
+          }
+        });
+      if (!this.form.valid) { return; }
+    })
   }
 }

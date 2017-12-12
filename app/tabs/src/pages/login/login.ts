@@ -91,6 +91,7 @@ export class LoginPage {
           })
         })
       }, (err) => {
+        alert(JSON.stringify(err))
         this.toast = this.toastCtrl.create({
           message: this.loginErrorString,
           duration: 3000,

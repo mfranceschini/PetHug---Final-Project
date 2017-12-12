@@ -300,6 +300,7 @@ app.post('/create_instagram_user', function (req, res) {
 })
 
 app.post('/get_user', function (req, res) {
+  console.log("Dentro get_user")
   var client = new pg.Client(conString);
   var result = []
   var userData = req.body
@@ -310,10 +311,10 @@ app.post('/get_user', function (req, res) {
     const query = client.query(
       'SELECT * FROM public."Usuario"')// WHERE email=$1', userData.email);
     promise = query.on('row', function(row) {
-        console.log("Recebeu usuários")
         result.push(row)
       });
     Promise.all([promise]).then(function(data) {
+      console.log("Recebeu usuários")
       var i, json;
       var found = false;
       for (i=0;i<result.length;i++){
@@ -725,13 +726,13 @@ app.post('/create_found_pet', function (req, res) {
                                         else {
                                           if (device.rowCount > 0) {
                                             console.log("\ncomeço da notificacao")
-                                            var firstNotification = new OneSignal.Notification({
+                                            var foundNotification = new OneSignal.Notification({
                                               template_id: "4c10b01e-8a8c-480d-b2c5-314c76f9925a"
                                             });
                                             // set target users 
-                                            firstNotification.setTargetDevices([device.rows[0].dispositivo])
+                                            foundNotification.setTargetDevices([device.rows[0].dispositivo])
                                             
-                                            serverClient.sendNotification(firstNotification)
+                                            serverClient.sendNotification(foundNotification)
                                             .then(function (response) {
                                               console.log("Notificação Enviada!!!!")
                                                 console.log(response.data);
@@ -986,13 +987,13 @@ app.post('/create_lost_pet', function (req, res) {
                                       else {
                                         if (device.rowCount > 0) {
                                           console.log("\ncomeço da notificacao")
-                                          var firstNotification = new OneSignal.Notification({
+                                          var lostNotification = new OneSignal.Notification({
                                             template_id: "4c10b01e-8a8c-480d-b2c5-314c76f9925a"
                                           });
                                           // set target users 
-                                          firstNotification.setTargetDevices([device.rows[0].dispositivo])
+                                          lostNotification.setTargetDevices([device.rows[0].dispositivo])
                                           
-                                          serverClient.sendNotification(firstNotification)
+                                          serverClient.sendNotification(lostNotification)
                                           .then(function (response) {
                                             console.log("Notificação Enviada!!!!")
                                               console.log(response.data);
@@ -1424,7 +1425,7 @@ app.post('/create_place', function (req, res) {
 
     Promise.all([promise]).then((data) => {
       const query = client.query(
-      'INSERT INTO public."Estabelecimento"(nome, cidade, bairro, endereco, telefone, email, imagem, tipo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',[form.name, form.city, form.neighbor, form.address, form.phone, form.email, path, form.type],
+      'INSERT INTO public."Estabelecimento"(nome, cidade, bairro, endereco, telefone, email, imagem, tipo, usuario_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',[form.name, form.city, form.neighbor, form.address, form.phone, form.email, path, form.type, form.user],
         function(err, result) {
           if (err) {
             console.log("Deu erro")
@@ -1442,6 +1443,43 @@ app.post('/create_place', function (req, res) {
   }
   })
 });
+
+app.post('/delete_place', function (req, res) {
+  var result = []
+  var client = new pg.Client(conString);
+  console.log("Exclusao de Estabelecimentos")
+  console.log(req.body.id)
+
+  client.connect(function (err) {
+  	if (err) throw err;
+  	console.log ("Conexão Estabelecida!");
+
+    const query = client.query(
+    'DELETE FROM public."Estabelecimento" WHERE id=($1)',[req.body.id]);
+    placePromise = query.on('row', function(row) {
+      result.push(row)
+    });
+
+    Promise.all([placePromise]).then(function(data) {
+      console.log("Estabelecimento deletado com sucesso")
+      var json = JSON.stringify({ 
+        status: 'success'
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+    }, function(err) {
+      console.error('ERROR:', err);
+      var json = JSON.stringify({ 
+        status: 'error'
+      });
+      res.end(json);
+      console.log("Response Sent!\n")
+      query.on('end', () => { client.end(); });
+      // one or more failed
+    })
+  })
+})
 
 app.get('/complaint_list', function (req, res) {
   var result = []

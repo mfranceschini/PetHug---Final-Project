@@ -5,7 +5,6 @@ import { NavController, NavParams, App } from 'ionic-angular';
 import { Settings } from '../../providers/settings';
 import { UserPage } from '../../providers/user'
 import { WelcomePage } from '../welcome/welcome';
-
 import { TranslateService } from '@ngx-translate/core';
 
 /**
@@ -35,6 +34,7 @@ export class SettingsPage {
   pageTitle: string;
 
   subSettings: any = SettingsPage;
+  usuario: any;
 
   constructor(public navCtrl: NavController,
     public settings: Settings,
@@ -72,6 +72,9 @@ export class SettingsPage {
   ionViewDidLoad() {
     // Build an empty form for the template to render
     this.form = this.formBuilder.group({});
+    this.user.getUser().then((usu) => {
+      this.usuario = JSON.parse(usu)
+    })
   }
 
   ionViewWillEnter() {

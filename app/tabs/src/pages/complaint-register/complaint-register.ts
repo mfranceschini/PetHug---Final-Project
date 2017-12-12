@@ -171,6 +171,7 @@ export class ComplaintRegisterPage {
             });
             toast.present();
             this.viewCtrl.dismiss(this.form.value);
+            this.navCtrl.setRoot(MainPage);
             this.navCtrl.push(ComplaintPage);
           }
           else if (data.success == 'erro'){

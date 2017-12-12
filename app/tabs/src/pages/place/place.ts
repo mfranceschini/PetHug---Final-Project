@@ -7,6 +7,7 @@ import { PlaceRegisterPage } from '../place-register/place-register';
 import { Http, Headers } from '@angular/http';
 import { Api } from '../../providers/api'
 import { CallNumber } from '@ionic-native/call-number';
+import { UserPage } from '../../providers/user'
 
 
 @Component({
@@ -17,15 +18,17 @@ export class PlacePage {
   currentPlaces: any[];
   ipAddress: any;
   myInput: any;
+  showDelete: boolean[];
+  usuario: any;
 
-  constructor(private dialer: CallNumber, public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public places: Places, public modalCtrl: ModalController, public http: Http) {
-    this.loadPlaces(false)
+  constructor(private user: UserPage, private dialer: CallNumber, public api: Api, public toastCtrl: ToastController, public navCtrl: NavController, public places: Places, public modalCtrl: ModalController, public http: Http) {
+    this.loadPlaces(false)    
   }
 
   /**
    * The view loaded, let's query our items for the list
    */
-  ionViewDidLoad() {
+  ionViewDidEnter() {
   }
 
   onInput(ev: any) {
@@ -70,6 +73,9 @@ export class PlacePage {
   }
 
   loadPlaces(loading){
+    this.user.getUser().then((result) => {
+      this.usuario = JSON.parse(result)          
+    })
     console.log("Carregando Estabelecimentos")
     this.currentPlaces = []
     this.currentPlaces.splice(0,this.currentPlaces.length)
@@ -79,7 +85,7 @@ export class PlacePage {
       if (this.ipAddress == 'http://undefined'){
         this.ipAddress = 'http://localhost'
       }
-      console.log(JSON.stringify(data));
+      
       data.places.forEach(d => {
         this.currentPlaces.push({
           "name": d.nome.toString(),
@@ -90,12 +96,14 @@ export class PlacePage {
           "id": d.id.toString(),
           "email": d.email.toString(),
           "phone": d.telefone.toString(),
-          "type": d.tipo.toString()
-        })
+          "type": d.tipo.toString(),
+          "user": d.usuario_id.toString()
+        })        
       });
+      
     }, (err) => {
       console.log('deu erro')
-      console.log(err)
+      console.log(JSON.stringify(err))
     });
   }
 
@@ -113,6 +121,7 @@ export class PlacePage {
    */
   deletePlace(place) {
     console.log("Apagando estabelecimento")
+    
     let ret = this.places.delete(place);
     ret.map(res => res.json())
     .subscribe((data) => {
@@ -124,6 +133,8 @@ export class PlacePage {
         toast.present();
       this.loadPlaces(true)
     }, (err) => {
+      console.log(JSON.stringify(err));
+      
       let toast = this.toastCtrl.create({
         message: "Erro ao Excluir Estabelecimento!",
         duration: 3000,
