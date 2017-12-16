@@ -237,13 +237,15 @@ export class ItemDetailPage {
     this.http.post(this.ipAddress + ':3000/notify_interrest', body, {headers: headers})
       .map(res => res.json())
       .subscribe((data) => {
-        alert("Notificação enviada!");
-        let toast = this.toastCtrl.create({
-          message: "Usuário notificado!",
-          duration: 3000,
-          position: 'top'
-        });
-        toast.present();
+        console.log("Notificação enviada com sucesso!");
+        if (data.success == "sucesso") {
+          let toast = this.toastCtrl.create({
+            message: "Usuário notificado!",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
       })
   }
 

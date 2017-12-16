@@ -73,9 +73,6 @@ export class PlacePage {
   }
 
   loadPlaces(loading){
-    this.user.getUser().then((result) => {
-      this.usuario = JSON.parse(result)          
-    })
     console.log("Carregando Estabelecimentos")
     this.currentPlaces = []
     this.currentPlaces.splice(0,this.currentPlaces.length)
@@ -105,6 +102,7 @@ export class PlacePage {
       console.log('deu erro')
       console.log(JSON.stringify(err))
     });
+  
   }
 
 

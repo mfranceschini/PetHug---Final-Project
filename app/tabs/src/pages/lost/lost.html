@@ -30,7 +30,7 @@
       <ion-col text-center col-6 *ngFor="let animal of currentLostAnimals">
           <ion-item-sliding style="box-shadow: 2px 2px 10px #bfbfbf;">
             <button ion-item (click)="openLostAnimal(animal)">
-              <div class="imagediv">
+              <div style="width:150px;height:150px;position:relative">
                 <img width="150px" height="150px" [src]="animal.profilePic"/>
               </div>
               <h2>{{animal.name}}</h2>

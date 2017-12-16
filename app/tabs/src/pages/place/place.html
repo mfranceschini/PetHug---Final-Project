@@ -39,9 +39,6 @@
                 <p>Cidade: {{place.city}}</p>
                 <p>Bairro: {{place.neighbor}}</p>
                 <p>Endereço: {{place.address}}</p>
-                <button *ngIf="usuario.id == place.user" ion-button icon-only style="float:right" (click)="deletePlace(place)">
-                  <ion-icon name="md-trash"></ion-icon>
-                </button>
               </div>
           </ion-item-sliding>
         </ion-col>

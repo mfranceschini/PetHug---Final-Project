@@ -11,12 +11,13 @@ export class Api {
   url: string;
 
   constructor(public http: Http, public storage: Storage) {
-    this.url = "192.168.100.107" // EM CASA
+    // this.url = "192.168.100.107" // EM CASA
     // this.url = "192.168.1.17" // NA CAMILA
     // this.url = "172.16.232.169" //NA PUC
     // this.url = "10.0.66.64" // NO STARBUCKS
     // this.url = "192.168.43.43" //NO CELULAR
     // this.url = "192.168.21.110" //NA SAVEWAY
+    this.url = "192.168.1.24" //NO MODEM
   }
 
   setIP(string){

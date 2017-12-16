@@ -411,25 +411,33 @@ app.post('/notify_interrest', function (req, res) {
             .then(function (response) {
               console.log("Notificação Enviada!!!!")
               console.log(response.data);
+              var json = JSON.stringify({ 
+                success: "sucesso"
+              });
+              res.end(json)
             })
             .catch(function (err) {
                 console.log('Something went wrong...', err);
             });
           }
           else if (userData.species == "Gato") {
-            var firstNotification = new OneSignal.Notification({
+            var secondNotification = new OneSignal.Notification({
               contents: {
                 en: "Atenção, um usuário tem interesse em adotar o gato " + userData.animal
               }
             });
             // set target users 
-            firstNotification.setTargetDevices([result.rows[0].dispositivo])
+            secondNotification.setTargetDevices([result.rows[0].dispositivo])
             
             // firstNotification.setTargetDevices(result.rows[0].responsavel_id)
-            serverClient.sendNotification(firstNotification)
+            serverClient.sendNotification(secondNotification)
             .then(function (response) {
               console.log("Notificação Enviada!!!!")
               console.log(response.data);
+              var json = JSON.stringify({ 
+                success: "sucesso"
+              });
+              res.end(json)
             })
             .catch(function (err) {
                 console.log('Something went wrong...', err);
