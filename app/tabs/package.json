@@ -54,7 +54,7 @@
         "cordova-plugin-facebook4": "^1.9.1",
         "cordova-plugin-file": "^4.3.3",
         "cordova-plugin-geolocation": "^2.4.3",
-        "cordova-plugin-inappbrowser": "^1.7.1",
+        "cordova-plugin-inappbrowser": "^4.0.0",
         "cordova-plugin-media-capture": "^1.4.3",
         "cordova-plugin-nativegeocoder": "^2.0.4",
         "cordova-plugin-splashscreen": "~4.0.1",
